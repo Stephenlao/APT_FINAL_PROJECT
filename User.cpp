@@ -146,11 +146,44 @@ class Member : public User {
 
         }
 
-       
+        // function to check username is unique or not
+        bool isUsernameUnique(const string& userName) {
+            fstream myFile("members.dat", std::ios::in);
+            if (!myFile.is_open()) {
+                std::cerr << "Cannot open file!\n";
+                return false;
+            }
+
+            string line, fileUserId, filePassword, fileUsername;
+            while (getline(myFile, line)) {
+                stringstream ss(line);
+                getline(ss, fileUserId, ',');
+                getline(ss, filePassword, ',');
+                getline(ss, fileUsername, ',');
+                if (fileUsername == userName) {
+                    myFile.close();
+                    return false; // Username is not unique
+                }
+            }
+            myFile.close();
+            return true; // Username is unique
+        }
+
 
         void registerMember() {
-            cout << "Enter username: ";
-            std::getline(cin >> std::ws, userName);
+            bool uniqueUsername;
+            do
+            {
+                cout << "Enter username: ";
+                std::getline(cin >> std::ws, userName);
+                uniqueUsername = isUsernameUnique(userName);
+                if (!uniqueUsername) {
+                    cout << "This username is already exist. Please enter a different username\n ";
+                }            
+            } 
+            while (!uniqueUsername);
+            
+         
             cout << "Enter your full name: ";
             std::getline(cin >> std::ws, fullName);
             cout << "Enter your email: ";
@@ -253,7 +286,7 @@ class Member : public User {
                 if (usernameInput == userName) {
                     if (filePassword == "") {
                         return 0;
-                }
+                    }
                 }
                 
                 // Compare the username and hashed password
