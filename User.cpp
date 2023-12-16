@@ -618,18 +618,3 @@ class Guest {
             }
         };
 };
-
-
-// things to do:
-// 1. add title in members.dat: FINISH
-// 2. validate password (password should have min 8 digits to max 20 digits, contains special characters, digits, num,
-// upper, lowercase,etc...: FINISH
-// 3. login() method: FINISH
-// 4. Member view all his/her information: FINISH
-// 5. A non member can register to become a member (info recorded in file): ALMOST FINISH (GUEST CAN REGISTER TO BECOME MEMBER)
-// 6. A non-member view all supporters detail: FINISH
-// 7. An admin can login with predefined username and password,
-// and can reset password for any member: PENDING
-// 8. Fix while loop main menu: Finish
-// 9. Add city attributes for member: Finish
-// 10. Add resetPassword for admin:
