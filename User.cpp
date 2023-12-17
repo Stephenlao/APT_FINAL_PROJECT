@@ -647,7 +647,9 @@ class Guest {
                 // only print these information only for guest
                 cout << "Full name: " << fullName_val << " ,email: " << email_val << ",phone number: "
                 << phoneNumber_val <<", Home address: " << homeAddress_val << ", City: " << city_val 
-                << ", Credit point: " << creditPoint_val << "\n\n";   
+                << ", Credit point: " << creditPoint_val << "\n\n";
+
+                cout << "Hello world" << "\n";  
             }
         };
 };
