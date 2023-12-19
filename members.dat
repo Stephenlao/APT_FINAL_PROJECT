@@ -1,3 +1,5 @@
 userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint
-M7499,3474847797,usera,User a,usera@gmail.com,1,truong son,sai gon,20
-M7616,471348470,userb,User b,userb@gmail.com,2,cmt8,sai gon,20
+M7499,1146502610,usera,User a,usera@gmail.com,1,truong son,sai gon,20
+M7616,1185638003,userb,User b,userb@gmail.com,2,cmt8,sai gon,20
+M6884,1224773396,userc,User c,userc@gmail.com,3,dien bien phu,ha noi,20
+M7083,1263908789,userd,Userd,userd@gmail.com,4,hoa binh,ha noi,20

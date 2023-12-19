@@ -143,8 +143,8 @@ class Member : public User {
         void registerMember();
         void showInfo();
         void saveDataToFile(const Member& member);
-        void readDataInFileToCheckLogin(string userNameIn, string passwordIn);
-        void loginMember();
+        int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
+        int loginMember();
         void updatePasswordInFile();
 };
 
@@ -207,6 +207,7 @@ void Member::registerMember() {
             cout << "Enter username: ";
             std::getline(cin >> std::ws, userName);
         } else {
+            // ask user to re-enter if username is duplicated
                bool uniqueUsername;
             do
             {
@@ -278,19 +279,19 @@ void Member::showInfo() {
 }
 
 
-
-void Member::readDataInFileToCheckLogin(const string userNameIn, const string passwordIn) {
+// This function is to read mem in file and save in each attrs
+int Member::readDataInFileToCheckLogin(const string userNameIn, const string passwordIn) {
     fstream myFile;
-    bool check;
+    // bool check;
 
     myFile.open("members.dat", std::ios::in);
     if (!myFile.is_open()) {
         std::cerr << "Unable to open file!" << "\n";
-        return;
+        return 2;
     } else {
         string line;
         while(std::getline(myFile, line)) {
-            // string userId_val, password_val;
+            // read each data to attrs
             stringstream ss(line);
             std::getline(ss, userId, ',');
             std::getline(ss, password, ',');
@@ -307,33 +308,40 @@ void Member::readDataInFileToCheckLogin(const string userNameIn, const string pa
             if (userNameIn == userName) {
                 if (password == "") {
                     cout << "Your password is reset by admin. Please create new password!" << "\n";
-                    return;
+                    return 0;
                 }
             }
             
             // check if username and password is correct 
             if (userNameIn == userName && std::to_string(hashPassword(passwordIn)) == password) {
-                showInfo();
-                check = true;
-                break;
+                // showInfo();
+                return 1;
+                // break;
             }
         }
 
-        // password is incorrect
-        if (!check) {
-            cout << "Incorrect username or password!" << "\n";
-        }
-        myFile.close();
+        cout << "Incorrect username or password!" << "\n";
+        myFile.close();  
     }
+    return 2; // no matching username or password
 }
 
-void Member::loginMember() {
+int Member::loginMember() {
     string usernameInput, passwordInput;
     cout << "Enter username: ";
     cin >> usernameInput;
     cout << "Enter password: ";
     cin >> passwordInput;
-    readDataInFileToCheckLogin(usernameInput,passwordInput);
+    int loginResult = readDataInFileToCheckLogin(usernameInput,passwordInput);
+    // first check if username is empty or not return 0
+    if (loginResult == 0) {
+        return 0;
+    // check username and password is equal or not
+    } else if (loginResult == 1) {
+        return 1;
+    }
+    // both password and username is not match
+    return 2;
 }
 
 

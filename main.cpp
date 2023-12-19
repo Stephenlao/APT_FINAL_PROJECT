@@ -3,12 +3,16 @@
 using std::cout;
 using std::cin;
 void mainMenu();
+void LogInadminMenu();
+void adminMenu(Admin& admin);
+void LogInRegMemberMenu();
+void memberMenu(Member& member);
 
-void adminMenu() {
+
+void LogInadminMenu() {
     int choice;
     cout << "1.Login\n";
-    cout << "2.Reset member password\n";
-    cout << "3.Back to main menu\n";
+    cout << "2.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     Admin admin;
@@ -16,10 +20,35 @@ void adminMenu() {
     {
     case 1:
         if (admin.loginAdmin()) {
-            admin.showInfo();
+            adminMenu(admin);
         } else {
             cout << "Invalid adminName or password!" << "\n"; 
         }
+        mainMenu();
+        break;
+    case 2:
+        mainMenu();
+        break;
+    default:
+        cout << "Invalid choice!" << "\n";
+        break;
+    }
+
+}
+
+
+void adminMenu(Admin& admin) {
+    int choice;
+    cout << "\nAdmin menu\n";
+    cout << "1. View admin information\n";
+    cout << "2.Reset member password\n";
+    cout << "3.Back to main menu\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    switch (choice)
+    {
+    case 1:
+        admin.showInfo();
         mainMenu();
         break;
     case 2:
@@ -36,29 +65,63 @@ void adminMenu() {
 
 }
 
-void memberMenu() {
+
+
+
+void LogInRegMemberMenu() {
     int choice;
     cout << "1.Register\n";
     cout << "2.Login\n";
     cout << "3.Create new password\n";
-    cout << "4.Back to main menu\n";
+    cout << "3. Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     Member member;
+    
+    // Store the result of loginMember in a variable
+    int loginResult;
+
+    switch (choice) {
+        case 1:
+            member.registerMember();
+            mainMenu();
+            break;
+        case 2:
+            loginResult = member.loginMember();
+            if (loginResult == 0) {
+                mainMenu();
+            } else if (loginResult == 1) {
+                memberMenu(member);
+            } else {
+                mainMenu();
+            }
+            break;
+        case 3:
+            member.updatePasswordInFile();
+            mainMenu();
+            break;
+        default:
+            cout << "Invalid choice!" << "\n";
+            break;
+    }
+  
+}
+
+
+void memberMenu(Member& member) {
+    int choice;
+    cout << "\nMember menu:\n";
+    cout << "1.View information\n";
+    cout << "2.Back to main menu\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
     switch (choice)
     {
     case 1:
-        member.registerMember();
+        member.showInfo();
         mainMenu();
         break;
     case 2:
-        member.loginMember();
-        mainMenu();
-    case 3:
-        member.updatePasswordInFile();
-        mainMenu();
-        break;
-    case 4:
         mainMenu();
         break;
     default:
@@ -109,11 +172,11 @@ void mainMenu() {
             break;
 
         case 2:
-            memberMenu();
+            LogInRegMemberMenu();
             break;
         
         case 3:
-            adminMenu();
+            LogInadminMenu();
             break;
         case 4:
             cout << "Exiting the application.\n";
