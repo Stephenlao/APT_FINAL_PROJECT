@@ -11,14 +11,19 @@ void memberMenu(Member& member);
 
 void LogInadminMenu() {
     int choice;
-    cout << "1.Login\n";
-    cout << "2.Back to main menu\n";
+    cout << "1.Register\n";
+    cout << "2.Login\n";
+    cout << "3.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     Admin admin;
     switch (choice)
     {
     case 1:
+        admin.registerAdmin();
+        mainMenu();
+        break;
+    case 2:
         if (admin.loginAdmin()) {
             adminMenu(admin);
         } else {
@@ -26,7 +31,7 @@ void LogInadminMenu() {
         }
         mainMenu();
         break;
-    case 2:
+    case 3:
         mainMenu();
         break;
     default:
@@ -73,7 +78,7 @@ void LogInRegMemberMenu() {
     cout << "1.Register\n";
     cout << "2.Login\n";
     cout << "3.Create new password\n";
-    cout << "3. Back to main menu\n";
+    cout << "4. Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     Member member;
@@ -100,6 +105,9 @@ void LogInRegMemberMenu() {
             member.updatePasswordInFile();
             mainMenu();
             break;
+        case 4:
+            mainMenu();
+            break;
         default:
             cout << "Invalid choice!" << "\n";
             break;
@@ -120,8 +128,6 @@ void memberMenu(Member& member) {
     case 1:
         member.showInfo();
         mainMenu();
-        // memberMenu(member);
-        // LogInRegMemberMenu();
         break;
     case 2:
         mainMenu();

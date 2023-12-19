@@ -414,6 +414,110 @@ class Admin : public User {
         Admin(string adminId_val = "", string password_val = "", string adminName_val = "", string email_val = "")
         : User(adminId_val,password_val), adminName(adminName_val), email(email_val) {};
 
+
+        // function to check username is unique or not
+    bool isAdminUserNameUnique() {
+        fstream myFile("admin.dat", std::ios::in);
+        if (myFile.is_open()) {
+
+        string line, fileUserId, filePassword, fileAdminname;
+        while (getline(myFile, line)) {
+            stringstream ss(line);
+            getline(ss, fileUserId, ',');
+            getline(ss, filePassword, ',');
+            getline(ss, fileAdminname, ',');
+            // check there is admin user name exist in file
+            if (fileAdminname != "") {
+                myFile.close();
+                return false; // admin username exists
+            }
+        }
+        myFile.close();
+        return true; // Username is unique
+        } else {
+            cout << "Unable to open file" << "\n";
+            return false;
+        }
+}
+
+        void registerAdmin() {
+            fstream myFile; 
+            myFile.open("admin.dat", std::ios::in);
+            if (!myFile.is_open()) {
+                cout << "Enter admin name: ";
+                std::getline(cin >> std::ws, adminName);
+            } else {
+                 // check admin username if it is duplicated
+                 // quit system
+                cout << "Enter admin name: ";
+                std::getline(cin >> std::ws, adminName);
+                if (!isAdminUserNameUnique()) {
+                    cout << "There is only one admin in system!" << "\n";
+                    return;
+                }
+            }
+       
+            cout << "Enter your email: ";
+            cin >> email;
+
+
+            // Generating random admin ID
+            srand(time(NULL)); // Seed for random number generation
+            int randomID = rand() % 10000; // Generate a random number
+            string adminId = User::getUserId();
+            adminId = "A" + std::to_string(randomID);
+            User::setUserId(adminId);
+            cin.ignore();
+
+
+            cout << "Password should have at least minimum 8 digits and maximum 20 digits\n "
+                <<  "Have at least 1 upper character and lower character\n"
+                <<  "Have at least 1 digit and contains special character:\n";
+
+            string passwordInput;
+            bool isValidPassword = false;
+
+            while(!isValidPassword) {
+                cout << "Enter your password: ";
+                std::getline(cin, passwordInput);
+
+            if (checkValidatePassword(passwordInput)) {
+                cout << "Create password successful!" << "\n";
+                isValidPassword = true;
+            } else {
+                cout << "Please follow the rule to create strong password!";
+            }
+        }
+
+            // save password to password attrs in User because password is in User class
+            string password = User::getPassword();
+            password = std::to_string(hashPassword(passwordInput)); // Hashing the password
+
+            // set password to attrs password to save in User class
+            User::setPassword (password);
+
+
+            // Save to file
+            fstream outFile("admin.dat", std::ios::app | std::ios::out); // Append mode
+            if (outFile.is_open()) {
+
+                std::ifstream inFile("admin.dat");
+                if (isFileEmpty(inFile)) {
+                    outFile << "userID,Password,adminName,Email\n";
+                }
+                inFile.close();
+
+                // save all attributes of admin in file
+                outFile << adminId << "," << password<< "," << adminName << "," 
+                << email << "\n";
+
+                outFile.close();
+            } else {
+                cout << "Unable to open file.\n";
+            }
+            cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
+        }   
+
     bool loginAdmin() {
         string adminnameInput, passwordInput;
         cout << "Enter username: ";
