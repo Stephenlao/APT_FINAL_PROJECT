@@ -1,6 +1,5 @@
-userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,CreditPoint
-M7356,8245057927675798715,khanglao,Lao Vinh Khang,laostephen24@gmail.com,0913501135,truong son,20
-M8969,249865033934182163,uyendoan,Doan Phuong Uyen,pud0112@gmail.com,099999,ni su huynh line,20
-M8713,249846591497637092,hunghoang,Hung Manh Hanh,hunghoang1234@gmail.com,09090,tan binh,20
-M1201,7570937864997806,Duc,Nguyen Phu Duc,ducoccho12@gmail.com,0909,long thanh,20
-M1310,249846069001005149,hieu,hieu nguyen,hieu@gmail.co,0999,14 truong son,20
+userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint
+M457,1146502610,usera,User a,usera@gmail.com,1,truong son,sai gon,20
+M933,1185638003,userb,User b,userb@gmail.com,2,hoa binh,ha noi,20
+M1067,1762816439,userc,User c,userc@gmail.com,3,dien bien phu,sai gon,20
+M7099,1263908789,userd,User d,userd,4,dis 1,sai gon,20
