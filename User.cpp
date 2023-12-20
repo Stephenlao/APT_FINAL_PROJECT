@@ -694,7 +694,7 @@ class Guest {
 
             while(getline(myFile, line)) {
                 stringstream ss(line);
-                string fullName_val, email_val, phoneNumber_val, homeAddress_val,city_val,creditPoint_val, temp1,temp2,temp3;
+                string fullName_val, email_val, phoneNumber_val, homeAddress_val,city_val, temp1,temp2,temp3;
                 getline(ss, temp1, ',');
                 getline(ss, temp2, ',');
                 getline(ss, temp3, ',');
@@ -706,11 +706,10 @@ class Guest {
                 std::getline(ss, phoneNumber_val, ',');
                 std::getline(ss, homeAddress_val, ',');
                 std::getline(ss, city_val, ',');
-                std::getline(ss, creditPoint_val, ',');
                 // only print these information only for guest
                 cout << "Full name: " << fullName_val << " ,email: " << email_val << ",phone number: "
                 << phoneNumber_val <<", Home address: " << homeAddress_val << ", City: " << city_val 
-                << ", Credit point: " << creditPoint_val << "\n\n";   
+                << "\n\n";   
             }
             myFile.close();
         };
