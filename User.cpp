@@ -128,7 +128,7 @@ class Member : public User {
         string phoneNumber;
         string homeAddress;
         string city;
-        int creditPoint;
+        int* creditPoint;
     
     public:
         Member(string userId_val = "", string password_val = "",
@@ -137,7 +137,16 @@ class Member : public User {
 
         : User(userId_val,password_val), userName(userName_val),
         fullName(fullName_val), email(email_val), phoneNumber(phoneNumber_val),
-        homeAddress(homeAddress_val), city(city_val), creditPoint(creditPoint_val) {};
+        homeAddress(homeAddress_val), city(city_val) {
+
+            //Allocate memory for creditPoint and assign the value
+        creditPoint = new int(creditPoint_val);
+        }
+
+        // Destructor to release memory allocated for creditPoint
+        ~Member() {
+            delete creditPoint;
+        }
 
         bool isUsernameUnique(const string& userName);
         void registerMember();
@@ -146,6 +155,16 @@ class Member : public User {
         int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
         int loginMember();
         void updatePasswordInFile();
+
+         // Getter function for creditPoint
+        int getCreditPoint() const {
+            return *creditPoint;
+        }
+
+        // Setter function for creditPoint
+        void setCreditPoint(int newCreditPoint) {
+            *creditPoint = newCreditPoint;
+        }
 };
 
 
@@ -191,7 +210,7 @@ void Member::saveDataToFile(const Member& member) {
 
             myFile << member.userId << "," << member.password << "," << member.userName
             << "," << member.fullName << "," << member.email << "," << member.phoneNumber << ","
-            << member.homeAddress << "," << member.city << "," << member.creditPoint << "\n"; 
+            << member.homeAddress << "," << member.city << "," << *(member.creditPoint) << "\n"; 
     } else {
         std::cerr << "Unable to open file!"<< "\n";
         return;
@@ -265,17 +284,24 @@ void Member::registerMember() {
         // called method createpassword
         string password = User::createPassword();
 
-        creditPoint = 20; // Setting initial credit points
+        int initialPoint = 20;
+
+        // allocated memory for credit point
+        creditPoint = new int(initialPoint);
 
         cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
         saveDataToFile(*this);
+
+        // delete creditPoint to free up memory
+        delete creditPoint;
+
 }
 
 
 void Member::showInfo() {
     cout << "Member user name: " << userName << ", fullName: " << fullName
     << ", email: " << email << ", phoneNumber: " << phoneNumber << 
-    ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << creditPoint << "\n";
+    ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << *creditPoint << "\n";
 }
 
 
@@ -301,7 +327,7 @@ int Member::readDataInFileToCheckLogin(const string userNameIn, const string pas
             std::getline(ss, phoneNumber, ',');
             std::getline(ss, homeAddress, ',');
             std::getline(ss, city, ',');
-            ss >> creditPoint;
+            ss >> *creditPoint;
 
 
             // check whether password is reset by admin

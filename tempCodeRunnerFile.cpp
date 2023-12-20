@@ -45,7 +45,7 @@ void LogInadminMenu() {
 void adminMenu(Admin& admin) {
     int choice;
     cout << "\nAdmin menu\n";
-    cout << "1. View admin information\n";
+    cout << "1.View admin information\n";
     cout << "2.Reset member password\n";
     cout << "3.Back to main menu\n";
     cout << "Enter your choice: ";
