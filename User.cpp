@@ -1,3 +1,4 @@
+#include "User.h"
 #include <iostream>
 #include <string>
 #include <cstdlib>
@@ -13,161 +14,122 @@ using std::fstream;
 using std::stringstream;
 using std::vector;
 
+User::User(string userId_val, string password_val)
+    : userId(userId_val), password(password_val) {};
 
-class User {
-    protected:
-        string userId;
-        string password;
-    public:
-        User(string userId_val = "", string password_val = "")
-        : userId(userId_val), password(password_val) {};
-
-        void showInfo() {
+void User::showInfo() {
             cout << "UserID: " << userId <<  ", password: " << password << "\n"; 
-        }
+}
+
+ // hash password function
+unsigned long User::hashPassword(const std::string& password) {
+    unsigned long hash = 5381; // A prime number as initial hash value
+    int c;
+
+    for (auto str_iter = password.begin(); str_iter != password.end(); ++str_iter) {
+        c = *str_iter;
+        hash = ((hash << 5) + hash) + c; // hash * 33 + c
+    }
+    return hash;
+}
 
 
-        // hash password function
+bool User::checkValidatePassword(string pwd) {
+    if (pwd.length() < 8 || pwd.length() > 20) {
+        return false; // Check length
+    }
 
-        unsigned long hashPassword(const std::string& password) {
-            unsigned long hash = 5381; // A prime number as initial hash value
-            int c;
+    bool hasLower = false, hasUpper = false, hasDigit = false, hasSpecial = false;
 
-            for (auto str_iter = password.begin(); str_iter != password.end(); ++str_iter) {
-                c = *str_iter;
-                hash = ((hash << 5) + hash) + c; // hash * 33 + c
-            }
-            return hash;
-        }
+    // Check for lower case, upper case, and digit
+    for (int i = 0; i < pwd.length(); i++) {
+        if (islower(pwd[i])) hasLower = true;
+        if (isupper(pwd[i])) hasUpper = true;
+        if (isdigit(pwd[i])) hasDigit = true;
+    }
 
-
-        bool checkValidatePassword(string pwd) {
-            if (pwd.length() < 8 || pwd.length() > 20) {
-                return false; // Check length
-            }
-
-            bool hasLower = false, hasUpper = false, hasDigit = false, hasSpecial = false;
-
-            // Check for lower case, upper case, and digit
-            for (int i = 0; i < pwd.length(); i++) {
-                if (islower(pwd[i])) hasLower = true;
-                if (isupper(pwd[i])) hasUpper = true;
-                if (isdigit(pwd[i])) hasDigit = true;
-            }
-
-            // Special characters
-            char specialChar[] = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '<', '>', '?'};
-            for (size_t i = 0; i < pwd.length(); i++) {
-                for (size_t j = 0; j < sizeof(specialChar)/sizeof(char); j++) {
-                    if (pwd[i] == specialChar[j]) {
-                        hasSpecial = true;
-                        break; // Break inner loop
-                    }
-                }
-            }
-            // Check if all conditions are met
-            return hasLower && hasUpper && hasDigit && hasSpecial;
-        }
-
-        bool isFileEmpty(std::ifstream& pfile) {
-            return pfile.peek() == std::fstream::traits_type::eof();
-        }
-
-        string createPassword() {
-            cout << "Password should have at least minimum 8 digits and maximum 20 digits\n "
-                <<  "Have at least 1 upper character and lower character\n"
-                <<  "Have at least 1 digit and contains special character:\n";
-
-            string passwordInput;
-            bool isValidPassword = false;
-
-            while(!isValidPassword) {
-                cout << "Enter your password: ";
-                std::getline(cin, passwordInput);
-
-            if (checkValidatePassword(passwordInput)) {
-                cout << "Create password successful!" << "\n";
-                isValidPassword = true;
-            } else {
-                cout << "Please follow the rule to create strong password!";
+    // Special characters
+    char specialChar[] = {'!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '+', '=', '<', '>', '?'};
+    for (size_t i = 0; i < pwd.length(); i++) {
+        for (size_t j = 0; j < sizeof(specialChar)/sizeof(char); j++) {
+            if (pwd[i] == specialChar[j]) {
+                hasSpecial = true;
+                break; // Break inner loop
             }
         }
-            string password = User::getPassword();
-            password = std::to_string(hashPassword(passwordInput)); // Hashing the password
+    }
+    // Check if all conditions are met
+    return hasLower && hasUpper && hasDigit && hasSpecial;
+}
 
-            // set password to attrs password to save in User class
-            User::setPassword(password);
-            return password;
+bool User::isFileEmpty(std::ifstream& pfile) {
+    return pfile.peek() == std::fstream::traits_type::eof();
+}
 
-        }
+string User::createPassword() {
+    cout << "Password should have at least minimum 8 digits and maximum 20 digits\n "
+        <<  "Have at least 1 upper character and lower character\n"
+        <<  "Have at least 1 digit and contains special character:\n";
+
+    string passwordInput;
+    bool isValidPassword = false;
+
+    while(!isValidPassword) {
+        cout << "Enter your password: ";
+        std::getline(cin, passwordInput);
+
+    if (checkValidatePassword(passwordInput)) {
+        cout << "Create password successful!" << "\n";
+        isValidPassword = true;
+    } else {
+        cout << "Please follow the rule to create strong password!";
+    }
+}
+    string password = User::getPassword();
+    password = std::to_string(hashPassword(passwordInput)); // Hashing the password
+
+    // set password to attrs password to save in User class
+    User::setPassword(password);
+    return password;
+
+}
 
 
-        string getUserId() {
-            return userId;
-        }
+string User::getUserId() {
+    return userId;
+}
 
-        void setUserId(string userId_val) {
-            this->userId = userId_val;
-        }
+void User::setUserId(string userId_val) {
+    this->userId = userId_val;
+}
 
-        string getPassword() {
-            return password;
-        }
+string User::getPassword() {
+    return password;
+}
 
-        void setPassword(string password_val) {
-            this->password = password_val;
-        }
-
-};
-
-class Member : public User {
-    private:
-        string userName;
-        string fullName;
-        string email;
-        string phoneNumber;
-        string homeAddress;
-        string city;
-        int* creditPoint;
-    
-    public:
-        Member(string userId_val = "", string password_val = "",
-        string userName_val = "", string fullName_val = "", string email_val = "",
-        string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0)
-
-        : User(userId_val,password_val), userName(userName_val),
-        fullName(fullName_val), email(email_val), phoneNumber(phoneNumber_val),
-        homeAddress(homeAddress_val), city(city_val) {
-
-            //Allocate memory for creditPoint and assign the value
-        creditPoint = new int(creditPoint_val);
-        }
-
-        // Destructor to release memory allocated for creditPoint
-        ~Member() {
-            delete creditPoint;
-        }
-
-        bool isUsernameUnique(const string& userName);
-        void registerMember();
-        void showInfo();
-        void saveDataToFile(const Member& member);
-        int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
-        int loginMember();
-        void updatePasswordInFile();
-
-         // Getter function for creditPoint
-        int getCreditPoint() const {
-            return *creditPoint;
-        }
-
-        // Setter function for creditPoint
-        void setCreditPoint(int newCreditPoint) {
-            *creditPoint = newCreditPoint;
-        }
+void User::setPassword(string password_val) {
+    this->password = password_val;
 };
 
 
+
+Member::Member(string userId_val , string password_val,
+string userName_val, string fullName_val, string email_val,
+string phoneNumber_val, string homeAddress_val, string city_val, int creditPoint_val)
+
+: User(userId_val,password_val), userName(userName_val),
+fullName(fullName_val), email(email_val), phoneNumber(phoneNumber_val),
+homeAddress(homeAddress_val), city(city_val) {
+
+    //Allocate memory for creditPoint and assign the value
+creditPoint = new int(creditPoint_val);
+};
+
+
+// Destructor to release memory allocated for creditPoint
+Member::~Member() {
+    delete creditPoint;
+};
 
 
 // Define Member's function outside class
@@ -432,17 +394,12 @@ void Member::updatePasswordInFile() {
 
 }
 
-class Admin : public User {
-    private:
-        string adminName;
-        string email;
-    public:
-        Admin(string adminId_val = "", string password_val = "", string adminName_val = "", string email_val = "")
-        : User(adminId_val,password_val), adminName(adminName_val), email(email_val) {};
+Admin::Admin(string adminId_val, string password_val, string adminName_val, string email_val)
+: User(adminId_val,password_val), adminName(adminName_val), email(email_val) {};
 
 
         // function to check username is unique or not
-    bool isAdminUserNameUnique() {
+bool Admin::isAdminUserNameUnique() {
         fstream myFile("admin.dat", std::ios::in);
         if (myFile.is_open()) {
 
@@ -466,252 +423,250 @@ class Admin : public User {
         }
 }
 
-        void registerAdmin() {
-            fstream myFile; 
-            myFile.open("admin.dat", std::ios::in);
-            if (!myFile.is_open()) {
-                cout << "Enter admin name: ";
-                std::getline(cin >> std::ws, adminName);
-            } else {
-                 // check admin username if it is duplicated
-                 // quit system
-                cout << "Enter admin name: ";
-                std::getline(cin >> std::ws, adminName);
-                if (!isAdminUserNameUnique()) {
-                    cout << "There is only one admin in system!" << "\n";
-                    return;
-                }
-            }
-       
-            cout << "Enter your email: ";
-            cin >> email;
-
-
-            // Generating random admin ID
-            srand(time(NULL)); // Seed for random number generation
-            int randomID = rand() % 10000; // Generate a random number
-            string adminId = User::getUserId();
-            adminId = "A" + std::to_string(randomID);
-            User::setUserId(adminId);
-            cin.ignore();
-
-
-            cout << "Password should have at least minimum 8 digits and maximum 20 digits\n "
-                <<  "Have at least 1 upper character and lower character\n"
-                <<  "Have at least 1 digit and contains special character:\n";
-
-            string passwordInput;
-            bool isValidPassword = false;
-
-            while(!isValidPassword) {
-                cout << "Enter your password: ";
-                std::getline(cin, passwordInput);
-
-            if (checkValidatePassword(passwordInput)) {
-                cout << "Create password successful!" << "\n";
-                isValidPassword = true;
-            } else {
-                cout << "Please follow the rule to create strong password!";
-            }
+void Admin::registerAdmin() {
+    fstream myFile; 
+    myFile.open("admin.dat", std::ios::in);
+    if (!myFile.is_open()) {
+        cout << "Enter admin name: ";
+        std::getline(cin >> std::ws, adminName);
+    } else {
+            // check admin username if it is duplicated
+            // quit system
+        cout << "Enter admin name: ";
+        std::getline(cin >> std::ws, adminName);
+        if (!isAdminUserNameUnique()) {
+            cout << "There is only one admin in system!" << "\n";
+            return;
         }
+    }
 
-            // save password to password attrs in User because password is in User class
-            string password = User::getPassword();
-            password = std::to_string(hashPassword(passwordInput)); // Hashing the password
-
-            // set password to attrs password to save in User class
-            User::setPassword (password);
+    cout << "Enter your email: ";
+    cin >> email;
 
 
-            // Save to file
-            fstream outFile("admin.dat", std::ios::app | std::ios::out); // Append mode
-            if (outFile.is_open()) {
-
-                std::ifstream inFile("admin.dat");
-                if (isFileEmpty(inFile)) {
-                    outFile << "userID,Password,adminName,Email\n";
-                }
-                inFile.close();
-
-                // save all attributes of admin in file
-                outFile << adminId << "," << password<< "," << adminName << "," 
-                << email << "\n";
-
-                outFile.close();
-            } else {
-                cout << "Unable to open file.\n";
-            }
-            cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
-        }   
-
-    bool loginAdmin() {
-        string adminnameInput, passwordInput;
-        cout << "Enter username: ";
-        std::getline(cin >> std::ws, adminnameInput);
-        cout << "Enter password: ";
-        std::getline(cin >> std::ws, passwordInput);
-
-        // Convert the password to a hash
-
-        unsigned long hashedPassword = hashPassword(passwordInput);
-
-        fstream inFile("admin.dat", std::ios::in);
-        if (!inFile.is_open()) {
-            std::cerr << "Unable to open file.\n";
-            return false;
-        }
-
-        string line;
-        while (getline(inFile, line)) {
-            stringstream ss(line);
-            // ignore the AdminID start with password, store in file
-            getline(ss, userId , ',');
-            getline(ss, password, ','); // save password to filePassword
-            getline(ss, adminName, ','); // save username to userName
+    // Generating random admin ID
+    srand(time(NULL)); // Seed for random number generation
+    int randomID = rand() % 10000; // Generate a random number
+    string adminId = User::getUserId();
+    adminId = "A" + std::to_string(randomID);
+    User::setUserId(adminId);
+    cin.ignore();
 
 
-            // Compare the username and hashed password
-            if (adminnameInput == adminName && std::to_string(hashedPassword) == password) {
-                // extract each information in admin.dat and save it in each attributes
-                ss >> email;
-                return true;
-            }
+    cout << "Password should have at least minimum 8 digits and maximum 20 digits\n "
+        <<  "Have at least 1 upper character and lower character\n"
+        <<  "Have at least 1 digit and contains special character:\n";
+
+    string passwordInput;
+    bool isValidPassword = false;
+
+    while(!isValidPassword) {
+        cout << "Enter your password: ";
+        std::getline(cin, passwordInput);
+
+    if (checkValidatePassword(passwordInput)) {
+        cout << "Create password successful!" << "\n";
+        isValidPassword = true;
+    } else {
+        cout << "Please follow the rule to create strong password!";
+    }
+}
+
+    // save password to password attrs in User because password is in User class
+    string password = User::getPassword();
+    password = std::to_string(hashPassword(passwordInput)); // Hashing the password
+
+    // set password to attrs password to save in User class
+    User::setPassword (password);
+
+
+    // Save to file
+    fstream outFile("admin.dat", std::ios::app | std::ios::out); // Append mode
+    if (outFile.is_open()) {
+
+        std::ifstream inFile("admin.dat");
+        if (isFileEmpty(inFile)) {
+            outFile << "userID,Password,adminName,Email\n";
         }
         inFile.close();
+
+        // save all attributes of admin in file
+        outFile << adminId << "," << password<< "," << adminName << "," 
+        << email << "\n";
+
+        outFile.close();
+    } else {
+        cout << "Unable to open file.\n";
+    }
+    cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
+}   
+
+
+bool Admin::loginAdmin() {
+    string adminnameInput, passwordInput;
+    cout << "Enter username: ";
+    std::getline(cin >> std::ws, adminnameInput);
+    cout << "Enter password: ";
+    std::getline(cin >> std::ws, passwordInput);
+
+    // Convert the password to a hash
+
+    unsigned long hashedPassword = hashPassword(passwordInput);
+
+    fstream inFile("admin.dat", std::ios::in);
+    if (!inFile.is_open()) {
+        std::cerr << "Unable to open file.\n";
         return false;
     }
 
-    void resetMemberPassword() {
-        fstream myFile;
-        myFile.open("members.dat", std::ios::in);
-        if (!myFile.is_open()) {
-            std::cerr << "Cannot open file path!" << "\n";
-            return;
-        }
+    string line;
+    while (getline(inFile, line)) {
+        stringstream ss(line);
+        // ignore the AdminID start with password, store in file
+        getline(ss, userId , ',');
+        getline(ss, password, ','); // save password to filePassword
+        getline(ss, adminName, ','); // save username to userName
 
-        // Skip the first line in file
-        string line;
-        if (!getline(myFile, line)) {
-            std::cerr << "Error or empty file.\n";
-            return;
-        }
 
-        string temp1, temp2, username_val;
-        vector<string> members;
-        int order_num = 1;
-        cout << "List of members:\n";
-        while (getline(myFile, line)) {
-            stringstream ss(line);
-            getline(ss, temp1, ',');
-            getline(ss, temp2, ',');
-            getline(ss, username_val, ',');
-            members.push_back(line); // Store the whole line
-            cout << "\t" << order_num++ << ". " << username_val << "\n";
+        // Compare the username and hashed password
+        if (adminnameInput == adminName && std::to_string(hashedPassword) == password) {
+            // extract each information in admin.dat and save it in each attributes
+            ss >> email;
+            return true;
         }
-        myFile.close();
-
-        // Ask admin to choose a user that admin want to reset password
-        cout << "Enter the number of the user to reset password: ";
-        int choice;
-        cin >> choice;
-        if (choice < 1 || choice > members.size()) {
-            std::cerr << "Invalid choice!\n";
-            return;
-        }
-
-        // Reset password
-        stringstream newMemberData;
-        for (int i = 0; i < members.size(); i++) {
-            if (i == choice - 1) { // User selected
-                stringstream ss(members[i]);
-                string temp, newPassword = "";
-                getline(ss, temp, ','); // M8289 get id of member
-                newMemberData << temp << ","; // write to newMemberData
-                getline(ss, temp, ','); // Old password
-                newMemberData << newPassword << ","; // Reset password
-                while (getline(ss, temp, ',')) { // Rest of data
-                    newMemberData << temp << ",";
-                }
-                newMemberData.seekp(-1, newMemberData.cur); // Remove last comma
-                newMemberData << "\n";
-            } else {
-                newMemberData << members[i] << "\n";
-            }
-        }
-
-        // Write updated data back to file
-        myFile.open("members.dat", std::ios::out | std::ios::trunc);
-        if (!myFile.is_open()) {
-            std::cerr << "Cannot open file path!" << "\n";
-            return;
-        }
-        myFile <<"userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint\n";
-        myFile << newMemberData.str();
-        myFile.close();
-
-        cout << "Password reset successfully for user " << choice << ".\n";
+    }
+    inFile.close();
+    return false;
 }
 
-    string getAdminName() {
-        return adminName;
+void Admin::resetMemberPassword() {
+    fstream myFile;
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile.is_open()) {
+        std::cerr << "Cannot open file path!" << "\n";
+        return;
     }
 
-    void setAdminName(string adminName_val) {
-        adminName = adminName_val;
+    // Skip the first line in file
+    string line;
+    if (!getline(myFile, line)) {
+        std::cerr << "Error or empty file.\n";
+        return;
     }
 
-    string getEmail() {
-        return email;
-    } 
+    string temp1, temp2, username_val;
+    vector<string> members;
+    int order_num = 1;
+    cout << "List of members:\n";
+    while (getline(myFile, line)) {
+        stringstream ss(line);
+        getline(ss, temp1, ',');
+        getline(ss, temp2, ',');
+        getline(ss, username_val, ',');
+        members.push_back(line); // Store the whole line
+        cout << "\t" << order_num++ << ". " << username_val << "\n";
+    }
+    myFile.close();
 
-    void setEmail(string email_val) {
-        email = email_val;
+    // Ask admin to choose a user that admin want to reset password
+    cout << "Enter the number of the user to reset password: ";
+    int choice;
+    cin >> choice;
+    if (choice < 1 || choice > members.size()) {
+        std::cerr << "Invalid choice!\n";
+        return;
     }
 
-    void showInfo() {
-        cout << "Admin name: " << adminName << ", Email: " << email << "\n";
-    }
-};
-
-
-class Guest {
-    public:
-        void viewSupporters() {
-            fstream myFile;
-            myFile.open("members.dat", std::ios::in);
-            if (!myFile.is_open()) {
-                std::cerr << "Unable to open file!" << "\n";
-                return;
+    // Reset password
+    stringstream newMemberData;
+    for (int i = 0; i < members.size(); i++) {
+        if (i == choice - 1) { // User selected
+            stringstream ss(members[i]);
+            string temp, newPassword = "";
+            getline(ss, temp, ','); // M8289 get id of member
+            newMemberData << temp << ","; // write to newMemberData
+            getline(ss, temp, ','); // Old password
+            newMemberData << newPassword << ","; // Reset password
+            while (getline(ss, temp, ',')) { // Rest of data
+                newMemberData << temp << ",";
             }
-            cout << "All supporters: " << "\n\n";
-            string line;
+            newMemberData.seekp(-1, newMemberData.cur); // Remove last comma
+            newMemberData << "\n";
+        } else {
+            newMemberData << members[i] << "\n";
+        }
+    }
 
-            // Skip the first line
-            if (!std::getline(myFile, line)) {
-                std::cerr << "Error or empty file.\n";
-                return;
-            }
+    // Write updated data back to file
+    myFile.open("members.dat", std::ios::out | std::ios::trunc);
+    if (!myFile.is_open()) {
+        std::cerr << "Cannot open file path!" << "\n";
+        return;
+    }
+    myFile <<"userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint\n";
+    myFile << newMemberData.str();
+    myFile.close();
 
-            while(getline(myFile, line)) {
-                stringstream ss(line);
-                string fullName_val, email_val, phoneNumber_val, homeAddress_val,city_val, temp1,temp2,temp3;
-                getline(ss, temp1, ',');
-                getline(ss, temp2, ',');
-                getline(ss, temp3, ',');
-                // ignore first three information in file which is 
-                // ID, password and username
+    cout << "Password reset successfully for user " << choice << ".\n";
+}
 
-                std::getline(ss, fullName_val, ',');
-                std::getline(ss, email_val, ',');
-                std::getline(ss, phoneNumber_val, ',');
-                std::getline(ss, homeAddress_val, ',');
-                std::getline(ss, city_val, ',');
-                // only print these information only for guest
-                cout << "Full name: " << fullName_val << " ,email: " << email_val << ",phone number: "
-                << phoneNumber_val <<", Home address: " << homeAddress_val << ", City: " << city_val 
-                << "\n\n";   
-            }
-            myFile.close();
-        };
+string Admin::getAdminName() {
+    return adminName;
+}
+
+void Admin::setAdminName(string adminName_val) {
+    adminName = adminName_val;
+}
+
+string Admin::getEmail() {
+    return email;
+} 
+
+void Admin::setEmail(string email_val) {
+    email = email_val;
+}
+
+void Admin::showInfo() {
+    cout << "Admin name: " << adminName << ", Email: " << email << "\n";
+}
+
+
+
+void Guest::viewSupporters() {
+    fstream myFile;
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile.is_open()) {
+        std::cerr << "Unable to open file!" << "\n";
+        return;
+    }
+    cout << "All supporters: " << "\n\n";
+    string line;
+
+    // Skip the first line
+    if (!std::getline(myFile, line)) {
+        std::cerr << "Error or empty file.\n";
+        return;
+    }
+
+    while(getline(myFile, line)) {
+        stringstream ss(line);
+        string fullName_val, email_val, phoneNumber_val, homeAddress_val,city_val, temp1,temp2,temp3;
+        getline(ss, temp1, ',');
+        getline(ss, temp2, ',');
+        getline(ss, temp3, ',');
+        // ignore first three information in file which is 
+        // ID, password and username
+
+        std::getline(ss, fullName_val, ',');
+        std::getline(ss, email_val, ',');
+        std::getline(ss, phoneNumber_val, ',');
+        std::getline(ss, homeAddress_val, ',');
+        std::getline(ss, city_val, ',');
+        // only print these information only for guest
+        cout << "Full name: " << fullName_val << " ,email: " << email_val << ",phone number: "
+        << phoneNumber_val <<", Home address: " << homeAddress_val << ", City: " << city_val 
+        << "\n\n";   
+    }
+    myFile.close();
 };
 

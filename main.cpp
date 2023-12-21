@@ -1,7 +1,9 @@
 #include <iostream>
-#include "User.cpp"
+#include "User.h"
+// #include "User.cpp"
 using std::cout;
 using std::cin;
+
 void mainMenu();
 void LogInadminMenu();
 void adminMenu(Admin& admin);
