@@ -1,17 +1,17 @@
 #include <iostream>
 #include "User.h"
 // #include "User.cpp"
-using std::cout;
 using std::cin;
+using std::cout;
 
 void mainMenu();
 void LogInadminMenu();
-void adminMenu(Admin& admin);
+void adminMenu(Admin &admin);
 void LogInRegMemberMenu();
-void memberMenu(Member& member);
+void memberMenu(Member &member);
 
-
-void LogInadminMenu() {
+void LogInadminMenu()
+{
     int choice;
     cout << "1.Register\n";
     cout << "2.Login\n";
@@ -26,10 +26,14 @@ void LogInadminMenu() {
         mainMenu();
         break;
     case 2:
-        if (admin.loginAdmin()) {
+        if (admin.loginAdmin())
+        {
             adminMenu(admin);
-        } else {
-            cout << "Invalid adminName or password!" << "\n"; 
+        }
+        else
+        {
+            cout << "Invalid adminName or password!"
+                 << "\n";
         }
         mainMenu();
         break;
@@ -37,14 +41,14 @@ void LogInadminMenu() {
         mainMenu();
         break;
     default:
-        cout << "Invalid choice!" << "\n";
+        cout << "Invalid choice!"
+             << "\n";
         break;
     }
-
 }
 
-
-void adminMenu(Admin& admin) {
+void adminMenu(Admin &admin)
+{
     int choice;
     cout << "\nAdmin menu\n";
     cout << "1.View admin information\n";
@@ -66,16 +70,16 @@ void adminMenu(Admin& admin) {
         mainMenu();
         break;
     default:
-        cout << "Invalid choice!" << "\n";
+        cout << "Invalid choice!"
+             << "\n";
         break;
     }
-
 }
 
+// ex for pull
 
-//ex for pull
-
-void LogInRegMemberMenu() {
+void LogInRegMemberMenu()
+{
     int choice;
     cout << "1.Register\n";
     cout << "2.Login\n";
@@ -84,41 +88,47 @@ void LogInRegMemberMenu() {
     cout << "Enter your choice: ";
     cin >> choice;
     Member member;
-    
+
     // Store the result of loginMember in a variable
     int loginResult;
 
-    switch (choice) {
-        case 1:
-            member.registerMember();
+    switch (choice)
+    {
+    case 1:
+        member.registerMember();
+        mainMenu();
+        break;
+    case 2:
+        loginResult = member.loginMember();
+        if (loginResult == 0)
+        {
             mainMenu();
-            break;
-        case 2:
-            loginResult = member.loginMember();
-            if (loginResult == 0) {
-                mainMenu();
-            } else if (loginResult == 1) {
-                memberMenu(member);
-            } else {
-                mainMenu();
-            }
-            break;
-        case 3:
-            member.updatePasswordInFile();
+        }
+        else if (loginResult == 1)
+        {
+            memberMenu(member);
+        }
+        else
+        {
             mainMenu();
-            break;
-        case 4:
-            mainMenu();
-            break;
-        default:
-            cout << "Invalid choice!" << "\n";
-            break;
+        }
+        break;
+    case 3:
+        member.updatePasswordInFile();
+        mainMenu();
+        break;
+    case 4:
+        mainMenu();
+        break;
+    default:
+        cout << "Invalid choice!"
+             << "\n";
+        break;
     }
-  
 }
 
-
-void memberMenu(Member& member) {
+void memberMenu(Member &member)
+{
     int choice;
     cout << "\nMember menu:\n";
     cout << "1.View information\n";
@@ -135,13 +145,14 @@ void memberMenu(Member& member) {
         mainMenu();
         break;
     default:
-        cout << "Invalid choice!" << "\n";
+        cout << "Invalid choice!"
+             << "\n";
         break;
     }
 }
 
-
-void guestMenu() {
+void guestMenu()
+{
     int choice;
     cout << "1. View supporters\n";
     cout << "2. Register member\n";
@@ -164,39 +175,76 @@ void guestMenu() {
         mainMenu();
         break;
     default:
-        cout << "Invalid choice!" << "\n";
+        cout << "Invalid choice!"
+             << "\n";
         break;
     }
 }
-void mainMenu() {
+void mainMenu()
+{
     int choice;
-        cout << "Use the app as 1. Guest      2. Member       3. Admin        4. Exit\n";
-        cout <<  "Enter choice: ";
-        cin >> choice;
-        Member member;
+    cout << "Use the app as 1. Guest      2. Member       3. Admin        4. Exit\n";
+    cout << "Enter choice: ";
+    cin >> choice;
+    Member member;
 
-        switch (choice)
-        {
-        case 1:
-            guestMenu();
-            break;
+    switch (choice)
+    {
+    case 1:
+        guestMenu();
+        break;
 
-        case 2:
-            LogInRegMemberMenu();
-            break;
-        
-        case 3:
-            LogInadminMenu();
-            break;
-        case 4:
-            cout << "Exiting the application.\n";
-            exit(0);
-        default:
-            cout << "Invalid choice!" << "\n";
-            break;
-        }
+    case 2:
+        LogInRegMemberMenu();
+        break;
 
+    case 3:
+        LogInadminMenu();
+        break;
+    case 4:
+        cout << "Exiting the application.\n";
+        exit(0);
+    default:
+        cout << "Invalid choice!"
+             << "\n";
+        break;
+    }
 }
-int main() {
-    mainMenu();
+
+int main()
+{
+    // mainMenu();
+    Member mem1("tuananh", "tuananh", "tuananh", "tuananh", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
+    Member mem2("tom", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
+    Member mem3("tit", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
+
+    mem1.showInfo();
+    // mem1.createAndAddSkill("C++", 200);
+    // mem1.createAndAddSkill("Java", 200);
+    // mem1.createAndAddSkill("ReactJS", 200);
+
+    // mem1.showInfo();
+    // mem1.addHostRating(5, "Verygood");
+    // mem1.addHostRating(3, "Normal");
+    // mem1.addHostRating(1, "Bad");
+    // mem1.addSupportRating(4, "Good");
+    // mem1.addSupportRating(1, "OK");
+    // cout << "Host Rating: "
+    //      << "\n";
+    // mem1.getHostRating();
+    // cout << "Support Rating: "
+    //      << "\n";
+
+    // mem1.getSupportRating();
+
+    // cout << "Support avg rating: " << mem1.getSpAvgRating() << "\n";
+    mem1.setListedStatus(true);
+    mem2.setListedStatus(true);
+    mem3.setListedStatus(true);
+    AvailableList list1;
+    list1.addUser(mem1);
+    list1.addUser(mem2);
+    // list1.addUser(mem3);
+
+    list1.displayListedMembers();
 }

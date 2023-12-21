@@ -1,6 +1,6 @@
 
-#ifndef _USER_H_     
-#define _USER_H_ 
+#ifndef _USER_H_
+#define _USER_H_
 
 #include <iostream>
 #include <string>
@@ -9,95 +9,128 @@
 #include <fstream>
 #include <sstream>
 #include <vector>
+#include "Skill.h"
+#include "Rating.h"
 using std::cin;
 using std::cout;
-using std::string;
 using std::ctime;
 using std::fstream;
+using std::string;
 using std::stringstream;
 using std::vector;
 
+class User
+{
+protected:
+    string userId;
+    string password;
 
-
-
-class User {
-    protected:
-        string userId;
-        string password;
-    public:
-        User(string userId_val = "", string password_val = "");
-        void showInfo();
-        // hash password function
-        unsigned long hashPassword(const std::string& password);
-        bool checkValidatePassword(string pwd);
-        bool isFileEmpty(std::ifstream& pfile);
-        string createPassword();
-        string getUserId();
-        void setUserId(string userId_val);
-        string getPassword();
-        void setPassword(string password_val);
-
+public:
+    User(string userId_val = "", string password_val = "");
+    void showInfo();
+    // hash password function
+    unsigned long hashPassword(const std::string &password);
+    bool checkValidatePassword(string pwd);
+    bool isFileEmpty(std::ifstream &pfile);
+    string createPassword();
+    string getUserId();
+    void setUserId(string userId_val);
+    string getPassword();
+    void setPassword(string password_val);
 };
 
-class Member : public User {
-    private:
-        string userName;
-        string fullName;
-        string email;
-        string phoneNumber;
-        string homeAddress;
-        string city;
-        int* creditPoint;
-    
-    public:
-        Member(string userId_val = "", string password_val = "",
-        string userName_val = "", string fullName_val = "", string email_val = "",
-        string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0);
-
-        //Allocate memory for creditPoint and assign the value
-
-        // Destructor to release memory allocated for creditPoint
-        ~Member();
-
-        bool isUsernameUnique(const string& userName);
-        void registerMember();
-        void showInfo();
-        void saveDataToFile(const Member& member);
-        int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
-        int loginMember();
-        void updatePasswordInFile();
-         // Getter function for creditPoint
-        int getCreditPoint() const;
-        // Setter function for creditPoint
-        void setCreditPoint(int newCreditPoint);
-};
+class Member : public User
+{
+private:
+    string userName;
+    string fullName;
+    string email;
+    string phoneNumber;
+    string homeAddress;
+    string city;
+    int *creditPoint;
+    vector<Skill> skillsList;
+    Rating hostRating;
+    Rating supportRating;
+    bool isListed;
 
 
+public:
+    Member(string userId_val = "", string password_val = "",
+           string userName_val = "", string fullName_val = "", string email_val = "",
+           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0, bool isListed = false);
+
+    // Allocate memory for creditPoint and assign the value
+
+    // Destructor to release memory allocated for creditPoint
+    ~Member();
+
+    bool isUsernameUnique(const string &userName);
+    void registerMember();
+    void showInfo();
+    void saveDataToFile(const Member &member);
+    int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
+    int loginMember();
+    void updatePasswordInFile();
+    // Getter function for creditPoint
+    int getCreditPoint() const;
+    // Setter function for creditPoint
+    void setCreditPoint(int newCreditPoint);
 
 
-class Admin : public User {
+    // SKILL
+    void createAndAddSkill(const std::string &skillName, float creditPerHour);
+    // Rating
+    void addHostRating(int score, const std::string &comment);
+    void addSupportRating(int score, const std::string &comment);
+    void getHostRating();
+    void getSupportRating();
+    float getHostAvgRating();
+    float getSpAvgRating();
+    void setListedStatus(bool status);
+    // Method to check if the member is listed
+    bool isMemberListed() const ;    
+
+        void showSupportInfo();
+
+        friend class AvailableList;
+    };
+
+    class Admin : public User
+    {
     private:
         string adminName;
         string email;
+
     public:
         Admin(string adminId_val = "", string password_val = "", string adminName_val = "", string email_val = "");
 
         // function to check username is unique or not
-    bool isAdminUserNameUnique();
-    void registerAdmin();
-    bool loginAdmin();
-    void resetMemberPassword();
-    string getAdminName();
-    void setAdminName(string adminName_val);
-    string getEmail();
-    void setEmail(string email_val);
-    void showInfo();
-};
+        bool isAdminUserNameUnique();
+        void registerAdmin();
+        bool loginAdmin();
+        void resetMemberPassword();
+        string getAdminName();
+        void setAdminName(string adminName_val);
+        string getEmail();
+        void setEmail(string email_val);
+        void showInfo();
+    };
 
-
-class Guest {
+    class Guest
+    {
     public:
         void viewSupporters();
-};
+    };
+
+    class AvailableList
+    {
+    public:
+    AvailableList(){};
+        std::vector<Member> userList;
+\
+        void addUser(const Member &member);
+        void displayListedMembers();
+    };
 
 #endif
