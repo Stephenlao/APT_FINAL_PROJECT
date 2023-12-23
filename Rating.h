@@ -13,7 +13,7 @@ private:
 
 public:
     Rating(std::vector<int>* scoresPtr = {}, std::vector<std::string>* commentsPtr = {});
- ~Rating(); 
+    ~Rating(); 
     void addRating(int score, const std::string& comment);
     void displayRating();
     float avgRating() const;

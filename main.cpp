@@ -1,17 +1,16 @@
 #include <iostream>
 #include "User.h"
-// #include "User.cpp"
+#include "Skill.h"
 using std::cin;
 using std::cout;
 
 void mainMenu();
-void LogInadminMenu();
 void adminMenu(Admin &admin);
+void LogInadminMenu();
 void LogInRegMemberMenu();
 void memberMenu(Member &member);
 
-void LogInadminMenu()
-{
+void LogInadminMenu() {
     int choice;
     cout << "1.Register\n";
     cout << "2.Login\n";
@@ -47,8 +46,7 @@ void LogInadminMenu()
     }
 }
 
-void adminMenu(Admin &admin)
-{
+void adminMenu(Admin &admin) {
     int choice;
     cout << "\nAdmin menu\n";
     cout << "1.View admin information\n";
@@ -84,7 +82,7 @@ void LogInRegMemberMenu()
     cout << "1.Register\n";
     cout << "2.Login\n";
     cout << "3.Create new password\n";
-    cout << "4. Back to main menu\n";
+    cout << "4.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     Member member;
@@ -127,21 +125,63 @@ void LogInRegMemberMenu()
     }
 }
 
+
+// vector <Member> availableList;
 void memberMenu(Member &member)
 {
     int choice;
+    string skillName;
+    float creditPerHour;
     cout << "\nMember menu:\n";
     cout << "1.View information\n";
-    cout << "2.Back to main menu\n";
+    cout << "2.Add skills\n";
+    cout << "3.Listed as supporter\n";
+    cout << "4.View all available supporters\n";
+    cout << "5.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
+    string choice1;
+    bool isListed;
     switch (choice)
     {
     case 1:
         member.showInfo();
-        mainMenu();
+        memberMenu(member);
         break;
     case 2:
+        cout << "Enter your skill: ";
+        std::getline(cin >> std::ws, skillName);
+        cout << "Enter credit point per hour: ";
+        cin >> creditPerHour;
+        member.createAndAddSkill(skillName,creditPerHour);
+        member.saveSkillsInFile(member.getUserId());
+        memberMenu(member);
+        break;
+    case 3:
+        cout << "Do you want to listed yourself as supporter (yes/no): ";
+        cin >> choice1;
+        isListed = member.isMemberListed();
+        if (choice1 == "yes") {
+            isListed = true;
+        } else {
+            isListed = false;
+        };
+
+        if (isListed) {
+            member.saveIsListedInFile(member.getUserId(),isListed);
+        } else {
+            member.saveIsListedInFile(member.getUserId(),isListed);
+        };
+        memberMenu(member);
+        break;
+    case 4:
+        // member.showAllAvailableSupporters(availableList);
+        // for (Member member : availableList) {
+        //     member.showInfo();
+        // }
+        memberMenu(member);
+        break;
+    case 5:
         mainMenu();
         break;
     default:
@@ -213,12 +253,12 @@ void mainMenu()
 
 int main()
 {
-    // mainMenu();
-    Member mem1("tuananh", "tuananh", "tuananh", "tuananh", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
-    Member mem2("tom", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
-    Member mem3("tit", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
+    mainMenu();
+    // Member mem1("tuananh", "tuananh", "tuananh", "tuananh", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
+    // Member mem2("tom", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
+    // Member mem3("tit", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
 
-    mem1.showInfo();
+    // mem1.showInfo();
     // mem1.createAndAddSkill("C++", 200);
     // mem1.createAndAddSkill("Java", 200);
     // mem1.createAndAddSkill("ReactJS", 200);
@@ -238,13 +278,13 @@ int main()
     // mem1.getSupportRating();
 
     // cout << "Support avg rating: " << mem1.getSpAvgRating() << "\n";
-    mem1.setListedStatus(true);
-    mem2.setListedStatus(true);
-    mem3.setListedStatus(true);
-    AvailableList list1;
-    list1.addUser(mem1);
-    list1.addUser(mem2);
-    // list1.addUser(mem3);
+    // mem1.setListedStatus(true);
+    // mem2.setListedStatus(true);
+    // mem3.setListedStatus(true);
+    // AvailableList list1;
+    // list1.addUser(mem1);
+    // list1.addUser(mem2);
+    // // list1.addUser(mem3);
 
-    list1.displayListedMembers();
+    // list1.displayListedMembers();
 }

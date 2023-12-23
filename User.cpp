@@ -135,12 +135,12 @@ void User::setPassword(string password_val)
 
 Member::Member(string userId_val, string password_val,
                string userName_val, string fullName_val, string email_val,
-               string phoneNumber_val, string homeAddress_val, string city_val, int creditPoint_val, bool isListed)
+               string phoneNumber_val, string homeAddress_val, string city_val, int creditPoint_val, bool isListed,vector<Skill*> skillsList_val)
 
     : User(userId_val, password_val), userName(userName_val),
       fullName(fullName_val), email(email_val), phoneNumber(phoneNumber_val),
       homeAddress(homeAddress_val), city(city_val),
-      isListed(false)
+      isListed(false), skillsList(skillsList_val)
 {
 
     // Allocate memory for creditPoint and assign the value
@@ -165,6 +165,9 @@ void Member::setListedStatus(bool status) {
 Member::~Member()
 {
     delete creditPoint;
+    for (auto skill : skillsList) {
+            delete skill;
+        }
 };
 
 // Define Member's function outside class
@@ -211,13 +214,15 @@ void Member::saveDataToFile(const Member &member)
         std::ifstream inFile("members.dat");
         if (isFileEmpty(inFile))
         {
-            myFile << "userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint\n";
+            myFile << "userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,SkillRating,IsListed\n";
         }
         inFile.close();
 
+        std::string creditPointStr = (member.creditPoint != nullptr) ? std::to_string(*member.creditPoint) : "0";
+
         myFile << member.userId << "," << member.password << "," << member.userName
                << "," << member.fullName << "," << member.email << "," << member.phoneNumber << ","
-               << member.homeAddress << "," << member.city << "," << *(member.creditPoint) << "\n";
+               << member.homeAddress << "," << member.city << "," << creditPointStr << "," << "\n";
     }
     else
     {
@@ -227,19 +232,211 @@ void Member::saveDataToFile(const Member &member)
     }
 }
 // Skill
-void Member::createAndAddSkill(const std::string &skillName, float creditPerHour)
-{
-    Skill newSkill(skillName, creditPerHour); // Create a Skill object
-    if (newSkill.createSkill(skillName, creditPerHour))
-    {                                   // Check if creation is successful
-        skillsList.push_back(newSkill); // Add the skill to the vector
+// function to add skill to vector
+void Member::createAndAddSkill(const std::string &skillName, float creditPerHour) {
+    Skill* newSkill = new Skill(); // Use dynamic allocation
+    if (newSkill->createSkill(skillName, creditPerHour)) { // Assume createSkill is a method of Skill
+        skillsList.push_back(newSkill);
         std::cout << "Skill added: " << skillName << std::endl;
     }
-    else
-    {
+    else {
+        delete newSkill; // Free memory if not added
         std::cout << "Invalid skill creation!" << std::endl;
     }
 }
+
+//save skill to file
+// function to check userID attrs whether equal userID in file
+void Member::saveSkillsInFile(string userID) {
+    std::fstream myFile;
+    std::vector<std::string> fileLines;
+    std::string line;
+
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file" << "\n";
+        return;
+    }
+
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+        std::string userId_val;
+        std::getline(ss, userId_val, ',');
+
+        if (userID == userId_val) {
+            appendSkillsToLine(line); // Modify line if userID matches
+        }
+
+        fileLines.push_back(line); // Add the (possibly modified) line to the vector
+    }
+    myFile.close(); // Close the file after reading
+
+    // Rewrite the file with updated content
+    std::ofstream myFile1("members.dat", std::ios::out); // Open file in write mode
+    if (!myFile1) {
+        std::cerr << "Unable to open file for writing" << "\n";
+        return;
+    }
+
+    for (const auto& fileLine : fileLines) {
+        myFile1 << fileLine << std::endl; // Write each line back to the file
+    }
+    myFile1.close(); // Close the file after writing
+}
+
+// function to append skill to that user line
+void Member::appendSkillsToLine(string& line) {
+    if (skillsList.empty()) {
+        return; // If there are no skills, don't modify the line
+    }
+
+    // Check if the line already contains skills in the expected format
+    size_t skillsStart = line.find("[[");
+    size_t skillsEnd = line.find_last_of("]]");
+
+    if (skillsStart != string::npos && skillsEnd != string::npos) {
+        // Skills array already exists, append new skills before the last "]]"
+        line.insert(skillsEnd, ";" + formatSkills());
+    } else {
+        // No skills array present, create a new one
+        line += "[" + formatSkills() + "]";
+    }
+}
+
+// combine with appendSkillsToLine function
+std::string Member::formatSkills() {
+    std::string skillsString;
+    for (size_t i = 0; i < skillsList.size(); ++i) {
+        if (i > 0) {
+            skillsString += ";";
+        }
+        const Skill* skill = skillsList[i];
+        skillsString += "[" + skill->getSkillName() + "," + std::to_string(skill->getCreditPerHour()) + "]";
+    }
+    skillsList.clear();
+    return skillsString;
+}
+
+
+
+// save isListed to file 
+// function to check userID attrs whether equal userID in file
+void Member::saveIsListedInFile(string userID, bool isListed_val) {
+    std::fstream myFile;
+    std::vector<std::string> fileLines;
+    std::string line;
+
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file" << "\n";
+        return;
+    }
+
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+        std::string userId_val;
+        std::getline(ss, userId_val, ',');
+
+        if (userID == userId_val) {
+            appendIsListedToLine(line, isListed_val); // Modify line if userID matches
+        }
+
+        fileLines.push_back(line); // Add the (possibly modified) line to the vector
+    }
+    myFile.close(); // Close the file after reading
+
+    // Rewrite the file with updated content
+    std::ofstream myFile1("members.dat", std::ios::out); // Open file in write mode
+    if (!myFile1) {
+        std::cerr << "Unable to open file for writing" << "\n";
+        return;
+    }
+
+    for (const auto& fileLine : fileLines) {
+        myFile1 << fileLine << std::endl; // Write each line back to the file
+    }
+    myFile1.close(); // Close the file after writing
+}
+
+void Member::appendIsListedToLine(string& line, bool isListed_val) {
+    if (isListed_val) {
+        line += ",true";
+    } else {
+        line += ",false";
+    }
+}
+
+std::vector<Skill*> Member::extractSkillNameAndPoint(const std::string& skillsStr) {
+    std::vector<Skill*> skills;
+    std::string trimmedStr = skillsStr.substr(2, skillsStr.length() - 4);
+    std::stringstream skillStream(trimmedStr);
+    std::string skillToken;
+
+    while (std::getline(skillStream, skillToken, ';')) {
+        size_t startPos = skillToken.find('[') + 1;
+        size_t endPos = skillToken.find(']');
+        std::string skillComponent = skillToken.substr(startPos, endPos - startPos);
+
+        std::stringstream componentStream(skillComponent);
+        std::string skillName;
+        std::string skillPointStr;
+        std::getline(componentStream, skillName, ',');
+        std::getline(componentStream, skillPointStr);
+
+        float skillPoint = std::stof(skillPointStr);
+        skills.push_back(new Skill(skillName, skillPoint));
+    }
+
+    return skills;
+}
+
+void Member::showAllAvailableSupporters(vector<Member> &AList) {
+    fstream myFile;
+    string line;
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return;
+    }
+    while(std::getline(myFile, line)) {
+        string skillRating;
+        string isListedTemp;
+        std::string creditPointStr; // Temporary string to hold the creditPoint value
+        stringstream ss(line);
+        std::getline(ss, userId, ',');
+        std::getline(ss, password, ',');
+        std::getline(ss, userName, ',');
+        std::getline(ss, fullName, ',');
+        std::getline(ss, email, ',');
+        std::getline(ss, phoneNumber, ',');
+        std::getline(ss, homeAddress, ',');
+        std::getline(ss, city, ',');
+        std::getline(ss, creditPointStr, ',');
+
+        if (creditPoint) {
+            *creditPoint = std::stoi(creditPointStr);
+        }
+        std::getline(ss, skillRating, ',');
+        std::getline(ss, isListedTemp);
+
+        // extract skill name and credit point of skill (data type: skill vector)
+        auto extractSkillInFile = extractSkillNameAndPoint(skillRating);
+
+        if (isListedTemp == "true") {
+            isListed = true;
+        } else {
+            isListed = false;
+        }
+
+        if (isListed) {
+            AList.push_back(Member(userId,password,userName,fullName,email,phoneNumber,homeAddress,city,*creditPoint,isListed,extractSkillInFile));
+        }
+    }
+    myFile.close();
+}
+
+
+
 
 // Rating
 void Member::addHostRating(int score, const std::string &comment)
@@ -363,27 +560,27 @@ void Member::showInfo()
 {
     cout << "Member user name: " << userName << ", fullName: " << fullName
          << ", email: " << email << ", phoneNumber: " << phoneNumber << ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << *creditPoint << "\n";
-    for (Skill &skill : skillsList)
+    for (Skill* skill : skillsList)
     {
         cout << "Skill name: "
              << "\t";
-        skill.getSkillName();
+        skill->getSkillName();
         cout << "\n";
 
-        cout << "Skill credit: " << skill.getCreditPerHour() << "\n";
+        cout << "Skill credit: " << skill->getCreditPerHour() << "\n";
     }
 }
-void Member::showSupportInfo() {
-    std::cout << "Member user name: " << userName << ", fullName: " << fullName
-         << ", email: " << email << ", phoneNumber: " << phoneNumber << ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << *creditPoint << "\n";
-    for (Skill &skill : skillsList) {
-        std::cout << "Skill name: ";
-        skill.getSkillName() ;
-        cout << "\n";
-        std::cout << "Skill credit: " << skill.getCreditPerHour() << "\n";
-        // std::cout << "Minimum required host-rating score: " << skill.getMinimumHostRating() << "\n";
-    }
-}
+// void Member::showSupportInfo() {
+//     std::cout << "Member user name: " << userName << ", fullName: " << fullName
+//          << ", email: " << email << ", phoneNumber: " << phoneNumber << ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << *creditPoint << "\n";
+//     for (Skill &skill : skillsList) {
+//         std::cout << "Skill name: ";
+//         skill.getSkillName() ;
+//         cout << "\n";
+//         std::cout << "Skill credit: " << skill.getCreditPerHour() << "\n";
+//         // std::cout << "Minimum required host-rating score: " << skill.getMinimumHostRating() << "\n";
+//     }
+// }
 
 // This function is to read mem in file and save in each attrs
 int Member::readDataInFileToCheckLogin(const string userNameIn, const string passwordIn)
@@ -855,16 +1052,16 @@ void Guest::viewSupporters()
 };
 
 
-void AvailableList::addUser(const Member& member) {
-    if (member.isListed) {
-        userList.push_back(member);
-    }
-}
+// void AvailableList::addUser(const Member& member) {
+//     if (member.isListed) {
+//         userList.push_back(member);
+//     }
+// }
 
-void AvailableList::displayListedMembers() {
-    std::cout << "Listed Members:" << std::endl;
-    for (auto& user : userList) {
-        user.showSupportInfo(); 
-    }
-}
+// void AvailableList::displayListedMembers() {
+//     std::cout << "Listed Members:" << std::endl;
+//     for (auto& user : userList) {
+//         user.showSupportInfo(); 
+//     }
+// }
 

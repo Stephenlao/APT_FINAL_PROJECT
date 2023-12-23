@@ -1,7 +1,9 @@
 #ifndef SKILL_H
 #define SKILL_H
 
+#include <iostream>
 #include <string>
+using std::string;
 
 class Skill
 {
@@ -12,8 +14,8 @@ private:
 
 public:
     Skill(std::string skillName = "", float creditPerHour = 0);
-    void getSkillName();
-    float getCreditPerHour();
+    string getSkillName() const;
+    float getCreditPerHour() const;
 
     bool createSkill(std::string skillName, float creditPerHour);
    

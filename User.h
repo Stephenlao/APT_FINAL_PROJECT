@@ -49,7 +49,7 @@ private:
     string homeAddress;
     string city;
     int *creditPoint;
-    vector<Skill> skillsList;
+    vector<Skill*> skillsList;
     Rating hostRating;
     Rating supportRating;
     bool isListed;
@@ -58,7 +58,7 @@ private:
 public:
     Member(string userId_val = "", string password_val = "",
            string userName_val = "", string fullName_val = "", string email_val = "",
-           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0, bool isListed = false);
+           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {});
 
     // Allocate memory for creditPoint and assign the value
 
@@ -80,6 +80,15 @@ public:
 
     // SKILL
     void createAndAddSkill(const std::string &skillName, float creditPerHour);
+    void saveSkillsInFile(string userID);
+    void appendSkillsToLine(string& line);
+    void saveIsListedInFile(string userID,bool isListed_val);
+    void appendIsListedToLine(string& line,bool isListed_val);
+    string formatSkills();
+    std::vector<Skill*> extractSkillNameAndPoint(const std::string& skillsStr);
+    void showAllAvailableSupporters(vector<Member> &AList);
+
+
     // Rating
     void addHostRating(int score, const std::string &comment);
     void addSupportRating(int score, const std::string &comment);
@@ -91,7 +100,7 @@ public:
     // Method to check if the member is listed
     bool isMemberListed() const ;    
 
-        void showSupportInfo();
+    // void showSupportInfo();
 
         friend class AvailableList;
     };
@@ -123,14 +132,14 @@ public:
         void viewSupporters();
     };
 
-    class AvailableList
-    {
-    public:
-    AvailableList(){};
-        std::vector<Member> userList;
-\
-        void addUser(const Member &member);
-        void displayListedMembers();
-    };
+
+    // class AvailableList
+    // {
+    // public:
+    // AvailableList(){};
+    //     std::vector<Member> userList;
+    //     void addUser(const Member &member);
+    //     void displayListedMembers();
+    // };
 
 #endif

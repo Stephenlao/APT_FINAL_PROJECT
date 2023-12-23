@@ -1,14 +1,18 @@
 #include "Skill.h"
 #include <iostream>
+#include <string>
+using std::string;
 
 Skill::Skill(std::string skillName, float creditPerHour)
     : name(skillName), creditPerHour(creditPerHour) {}
 
-void Skill::getSkillName() {
-    std::cout << "Name: " << name << std::endl;
+
+
+string Skill::getSkillName() const {
+    return name;
 }
 
-float Skill::getCreditPerHour() {
+float Skill::getCreditPerHour() const {
     return creditPerHour;
 }
 
