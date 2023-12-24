@@ -390,46 +390,71 @@ std::vector<Skill*> Member::extractSkillNameAndPoint(const std::string& skillsSt
     return skills;
 }
 
-void Member::showAllAvailableSupporters(vector<Member> &AList) {
-    fstream myFile;
-    string line;
+
+void Member::showAllAvailableSupporters(std::vector<Member>& AList) {
+    std::fstream myFile;
+    string skillRating;
     myFile.open("members.dat", std::ios::in);
     if (!myFile) {
         std::cerr << "Unable to open file!" << "\n";
         return;
     }
-    while(std::getline(myFile, line)) {
-        string skillRating;
-        string isListedTemp;
-        std::string creditPointStr; // Temporary string to hold the creditPoint value
-        stringstream ss(line);
-        std::getline(ss, userId, ',');
-        std::getline(ss, password, ',');
-        std::getline(ss, userName, ',');
-        std::getline(ss, fullName, ',');
-        std::getline(ss, email, ',');
-        std::getline(ss, phoneNumber, ',');
-        std::getline(ss, homeAddress, ',');
-        std::getline(ss, city, ',');
-        std::getline(ss, creditPointStr, ',');
 
-        if (creditPoint) {
-            *creditPoint = std::stoi(creditPointStr);
-        }
-        std::getline(ss, skillRating, ',');
-        std::getline(ss, isListedTemp);
+    std::string line;
+    // Skip the first line (header)
+    std::getline(myFile, line);
+    
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+        std::string temp;
+        std::vector<std::string> data;
 
-        // extract skill name and credit point of skill (data type: skill vector)
-        auto extractSkillInFile = extractSkillNameAndPoint(skillRating);
-
-        if (isListedTemp == "true") {
-            isListed = true;
-        } else {
-            isListed = false;
+        // Read data up to the skill data
+        while (std::getline(ss, temp, ',')) {
+            if (temp.find("[[") != std::string::npos) {
+                // Found the beginning of the skill data
+                skillRating = temp;
+                break;
+            } else {
+                data.push_back(temp);
+            }
         }
 
-        if (isListed) {
-            AList.push_back(Member(userId,password,userName,fullName,email,phoneNumber,homeAddress,city,*creditPoint,isListed,extractSkillInFile));
+        // Continue reading the skill data
+        if (!skillRating.empty()) {
+            while (std::getline(ss, temp, ',')) {
+                skillRating += "," + temp;
+                if (temp.find("]]") != std::string::npos) {
+                    break; // Found the end of the skill data
+                }
+            }
+        }
+
+        // Check if the member is listed
+        std::getline(ss, temp);
+        isListed = (temp == "true");
+
+        // Process the data
+        if (isListed && data.size() >= 8) {
+            userId = data[0];
+            password = data[1];
+            userName = data[2];
+            fullName = data[3];
+            email = data[4];
+            phoneNumber = data[5];
+            homeAddress = data[6];
+            city = data[7];
+            *creditPoint = std::stoi(data[8]);
+
+            // Extract skills
+            skillsList = extractSkillNameAndPoint(skillRating);
+
+            std::cout << userId << ", " << userName << ", " << password << ", " << fullName << ", " 
+                      << email << ", " << phoneNumber << ", " << homeAddress << ", " << city << ", "
+                      << *creditPoint << ", " << skillRating << "\n";
+
+            // Add to the list if needed
+            AList.push_back(Member(userId,password,userName,fullName,email,phoneNumber,homeAddress,city,*creditPoint,isListed,skillsList));
         }
     }
     myFile.close();
@@ -560,15 +585,15 @@ void Member::showInfo()
 {
     cout << "Member user name: " << userName << ", fullName: " << fullName
          << ", email: " << email << ", phoneNumber: " << phoneNumber << ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << *creditPoint << "\n";
-    for (Skill* skill : skillsList)
-    {
-        cout << "Skill name: "
-             << "\t";
-        skill->getSkillName();
-        cout << "\n";
+    // for (Skill* skill : skillsList)
+    // {
+    //     cout << "Skill name: "
+    //          << "\t";
+    //     skill->getSkillName();
+    //     cout << "\n";
 
-        cout << "Skill credit: " << skill->getCreditPerHour() << "\n";
-    }
+    //     cout << "Skill credit: " << skill->getCreditPerHour() << "\n";
+    // }
 }
 // void Member::showSupportInfo() {
 //     std::cout << "Member user name: " << userName << ", fullName: " << fullName

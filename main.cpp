@@ -126,7 +126,7 @@ void LogInRegMemberMenu()
 }
 
 
-// vector <Member> availableList;
+vector <Member> availableList;
 void memberMenu(Member &member)
 {
     int choice;
@@ -175,10 +175,10 @@ void memberMenu(Member &member)
         memberMenu(member);
         break;
     case 4:
-        // member.showAllAvailableSupporters(availableList);
-        // for (Member member : availableList) {
-        //     member.showInfo();
-        // }
+        member.showAllAvailableSupporters(availableList);
+        for (Member member : availableList) {
+            member.showInfo();
+        }
         memberMenu(member);
         break;
     case 5:
