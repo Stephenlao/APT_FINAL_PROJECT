@@ -147,28 +147,31 @@ Member::Member(string userId_val, string password_val,
     creditPoint = new int(creditPoint_val);
 };
 
+vector<Skill*> Member::getSkillsLists() {
+    return skillsList;
+}
 
 
 // Method to check if the member is listed
 void Member::setListedStatus(bool status) {
 
         isListed = status;
-    }
+}
 
-    bool Member::isMemberListed() const {
-        return isListed;
-    }
+bool Member::isMemberListed() const {
+    return isListed;
+}
 
 
 
 // Destructor to release memory allocated for creditPoint
-Member::~Member()
-{
-    delete creditPoint;
-    for (auto skill : skillsList) {
-            delete skill;
-        }
-};
+// Member::~Member()
+// {
+//     // delete creditPoint;
+//     for (auto skill : skillsList) {
+//             delete skill;
+//         }
+// };
 
 // Define Member's function outside class
 
@@ -391,7 +394,21 @@ std::vector<Skill*> Member::extractSkillNameAndPoint(const std::string& skillsSt
 }
 
 
-void Member::showAllAvailableSupporters(std::vector<Member>& AList) {
+
+void AvailableList::addUser(const Member& member) {
+    if (member.isListed) {
+        userList.push_back(member);
+    }
+}
+
+void AvailableList::displayListedMembers() {
+    std::cout << "Listed Members:" << std::endl;
+    for (auto& user : userList) {
+        user.showInfo(); 
+    }
+}
+
+void Member::showAllAvailableSupporters() {
     std::fstream myFile;
     string skillRating;
     myFile.open("members.dat", std::ios::in);
@@ -403,6 +420,8 @@ void Member::showAllAvailableSupporters(std::vector<Member>& AList) {
     std::string line;
     // Skip the first line (header)
     std::getline(myFile, line);
+    AvailableList availableList;
+
     
     while (std::getline(myFile, line)) {
         std::stringstream ss(line);
@@ -444,19 +463,38 @@ void Member::showAllAvailableSupporters(std::vector<Member>& AList) {
             phoneNumber = data[5];
             homeAddress = data[6];
             city = data[7];
-            *creditPoint = std::stoi(data[8]);
+            // *creditPoint = (std::stoi(data[8]));
+
+            int* newCreditPoint = new int (std::stoi(data[8]));
+
+
 
             // Extract skills
-            skillsList = extractSkillNameAndPoint(skillRating);
+           skillsList= extractSkillNameAndPoint(skillRating);
 
-            std::cout << userId << ", " << userName << ", " << password << ", " << fullName << ", " 
-                      << email << ", " << phoneNumber << ", " << homeAddress << ", " << city << ", "
-                      << *creditPoint << ", " << skillRating << "\n";
+
+
+            // std::cout << userId << ", " << userName << ", " << password << ", " << fullName << ", " 
+            //           << email << ", " << phoneNumber << ", " << homeAddress << ", " << city << ", "
+            //           << *newCreditPoint << ", ";
+
+            // for (Skill* skill : skillsList) {
+            //     cout << skill->getSkillName() << " " << skill->getCreditPerHour() << "\n";
+            // }
+
+            delete newCreditPoint;
+            
+            // for (Skill* skill : skillMem) {
+            //     delete skill;
+            // }
 
             // Add to the list if needed
-            AList.push_back(Member(userId,password,userName,fullName,email,phoneNumber,homeAddress,city,*creditPoint,isListed,skillsList));
+            // AList.push_back(Member(userId,password,userName,fullName,email,phoneNumber,homeAddress,city,*creditPoint,isListed,skillsList));
+            // push back to Member class vector
         }
+        availableList.addUser(*this);
     }
+    availableList.displayListedMembers();
     myFile.close();
 }
 
@@ -594,6 +632,10 @@ void Member::showInfo()
 
     //     cout << "Skill credit: " << skill->getCreditPerHour() << "\n";
     // }
+    // }
+    for (Skill* skill : skillsList) {
+        cout << skill->getSkillName() << " " << skill->getCreditPerHour() << "\n";
+    }
 }
 // void Member::showSupportInfo() {
 //     std::cout << "Member user name: " << userName << ", fullName: " << fullName
@@ -1077,16 +1119,5 @@ void Guest::viewSupporters()
 };
 
 
-// void AvailableList::addUser(const Member& member) {
-//     if (member.isListed) {
-//         userList.push_back(member);
-//     }
-// }
 
-// void AvailableList::displayListedMembers() {
-//     std::cout << "Listed Members:" << std::endl;
-//     for (auto& user : userList) {
-//         user.showSupportInfo(); 
-//     }
-// }
 

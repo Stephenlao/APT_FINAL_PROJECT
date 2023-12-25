@@ -175,9 +175,13 @@ void memberMenu(Member &member)
         memberMenu(member);
         break;
     case 4:
-        member.showAllAvailableSupporters(availableList);
-        for (Member member : availableList) {
-            member.showInfo();
+        member.showAllAvailableSupporters();
+        // for (Member &member : listMem) {
+        //     member.showInfo();
+        // };
+
+        for (Skill* skill : member.getSkillsLists()) {
+            delete skill;
         }
         memberMenu(member);
         break;

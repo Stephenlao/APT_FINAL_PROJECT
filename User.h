@@ -39,6 +39,7 @@ public:
     void setPassword(string password_val);
 };
 
+class AvailableList;
 class Member : public User
 {
 private:
@@ -63,7 +64,7 @@ public:
     // Allocate memory for creditPoint and assign the value
 
     // Destructor to release memory allocated for creditPoint
-    ~Member();
+    // ~Member();
 
     bool isUsernameUnique(const string &userName);
     void registerMember();
@@ -86,7 +87,8 @@ public:
     void appendIsListedToLine(string& line,bool isListed_val);
     string formatSkills();
     std::vector<Skill*> extractSkillNameAndPoint(const std::string& skillsStr);
-    void showAllAvailableSupporters(vector<Member> &AList);
+    void showAllAvailableSupporters();
+    vector<Skill*> getSkillsLists();
 
 
     // Rating
@@ -133,13 +135,14 @@ public:
     };
 
 
-    // class AvailableList
-    // {
-    // public:
-    // AvailableList(){};
-    //     std::vector<Member> userList;
-    //     void addUser(const Member &member);
-    //     void displayListedMembers();
-    // };
+// AvailableList class
+    class AvailableList
+    {
+    public:
+    AvailableList(){};
+        std::vector<Member> userList;
+        void addUser(const Member &member);
+        void displayListedMembers();
+    };
 
 #endif
