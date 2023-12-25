@@ -88,7 +88,9 @@
     "deque": "cpp",
     "queue": "cpp",
     "span": "cpp",
-    "stack": "cpp"
+    "stack": "cpp",
+    "condition_variable": "cpp",
+    "__nullptr": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "clang",
   "C_Cpp_Runner.cppCompilerPath": "clang++",

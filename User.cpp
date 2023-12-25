@@ -165,13 +165,13 @@ bool Member::isMemberListed() const {
 
 
 // Destructor to release memory allocated for creditPoint
-// Member::~Member()
-// {
-//     // delete creditPoint;
-//     for (auto skill : skillsList) {
-//             delete skill;
-//         }
-// };
+Member::~Member()
+{
+    // delete creditPoint;
+    for (auto skill : skillsList) {
+            delete skill;
+        }
+};
 
 // Define Member's function outside class
 
@@ -395,16 +395,16 @@ std::vector<Skill*> Member::extractSkillNameAndPoint(const std::string& skillsSt
 
 
 
-void AvailableList::addUser(const Member& member) {
+void AvailableList::addUser(const Member &member) {
     if (member.isListed) {
-        userList.push_back(member);
+        userList.push_back(new Member(member)); // Creates a new Member object and stores its raw pointer
     }
 }
 
 void AvailableList::displayListedMembers() {
     std::cout << "Listed Members:" << std::endl;
-    for (auto& user : userList) {
-        user.showInfo(); 
+    for (Member *user : userList) {
+        user->showInfo(); // Accessing and using the pointed-to objects
     }
 }
 
@@ -463,9 +463,9 @@ void Member::showAllAvailableSupporters() {
             phoneNumber = data[5];
             homeAddress = data[6];
             city = data[7];
-            // *creditPoint = (std::stoi(data[8]));
+            *creditPoint = (std::stoi(data[8]));
 
-            int* newCreditPoint = new int (std::stoi(data[8]));
+            // int* newCreditPoint = new int (std::stoi(data[8]));
 
 
 
@@ -482,7 +482,7 @@ void Member::showAllAvailableSupporters() {
             //     cout << skill->getSkillName() << " " << skill->getCreditPerHour() << "\n";
             // }
 
-            delete newCreditPoint;
+            // delete newCreditPoint;
             
             // for (Skill* skill : skillMem) {
             //     delete skill;

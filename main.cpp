@@ -175,16 +175,15 @@ void memberMenu(Member &member)
         memberMenu(member);
         break;
     case 4:
-        member.showAllAvailableSupporters();
-        // for (Member &member : listMem) {
-        //     member.showInfo();
-        // };
+{
+    member.showAllAvailableSupporters();
+    for (const auto &skillPtr : member.getSkillsLists()) {
+        // No need to delete, as smart pointers manage memory automatically
+    }
+    memberMenu(member);
+    break;
+}
 
-        for (Skill* skill : member.getSkillsLists()) {
-            delete skill;
-        }
-        memberMenu(member);
-        break;
     case 5:
         mainMenu();
         break;

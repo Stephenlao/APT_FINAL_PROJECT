@@ -64,7 +64,7 @@ public:
     // Allocate memory for creditPoint and assign the value
 
     // Destructor to release memory allocated for creditPoint
-    // ~Member();
+    ~Member();
 
     bool isUsernameUnique(const string &userName);
     void registerMember();
@@ -140,9 +140,9 @@ public:
     {
     public:
     AvailableList(){};
-        std::vector<Member> userList;
-        void addUser(const Member &member);
-        void displayListedMembers();
+        std::vector<Member*> userList; 
+    void addUser(const Member &member);
+    void displayListedMembers();
     };
 
 #endif
