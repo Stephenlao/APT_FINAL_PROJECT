@@ -224,17 +224,19 @@ void Member::saveDataToFile(const Member &member)
         std::ifstream inFile("members.dat");
         if (isFileEmpty(inFile))
         {
-            myFile << "userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,SkillRating,MinimumHostRating\n";
+            myFile << "userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,,MinimumHostRating,SkillRating\n";
         }
         inFile.close();
 
         std::string creditPointStr = (member.creditPoint != nullptr) ? std::to_string(*member.creditPoint) : "0";
         std::string isListedStr = (member.isListed == false) ? "false" : "";
+        std::string minimumHostRatingScoreStr = (member.minimumHostRatingScore == 0) ? "0" : "";
+
 
 
         myFile << member.userId << "," << member.password << "," << member.userName
                << "," << member.fullName << "," << member.email << "," << member.phoneNumber << ","
-               << member.homeAddress << "," << member.city << "," << creditPointStr << "," << isListedStr << "," << "\n";
+               << member.homeAddress << "," << member.city << "," << creditPointStr << "," << isListedStr << "," << minimumHostRatingScoreStr << "," << "\n";
     }
     else
     {
@@ -427,9 +429,110 @@ std::vector<Skill*> Member::extractSkillNameAndPoint(const std::string& skillsSt
 
 
 
-void Member::saveMinimumHostRating(const std::string& filename, const string& userId) {
+// void Member::saveMinimumHostRating(const std::string& filename, const string& userId) {
+//     std::string userResponse;
+//     float minimumHostRating = 0;
+
+//     // Ask the user if they want to enter a minimum host rating score
+//     std::cout << "Do you want to enter a minimum host rating score (yes/no): ";
+//     std::cin >> userResponse;
+
+//     // Process user response
+//     if (userResponse == "yes") {
+//         do {
+//             std::cout << "Enter score rating from 1 to 5: ";
+//             while (!(std::cin >> minimumHostRating)) {
+//                 std::cout << "Invalid input. Enter a number from 1 to 5: ";
+//                 std::cin.clear(); // clear bad input flag
+//                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard input
+//             }
+//         } while (minimumHostRating < 1 || minimumHostRating > 5);
+//     } else if (userResponse != "no") {
+//         std::cout << "Invalid input. Only type yes or no." << std::endl;
+//         return;
+//     }
+
+
+//     std::ifstream inFile(filename);
+//     std::ofstream tempFile("temp.dat");
+//     std::string line;
+
+//     if (inFile.is_open() && tempFile.is_open()) {
+//         while (std::getline(inFile, line)) {
+//             std::stringstream ss(line);
+//             std::string userIdFile;
+//             std::getline(ss, userIdFile, ',');
+
+//             if (userIdFile == userId) {
+//                 // Append minimum host rating score to the line
+//                 line += "," + std::to_string(minimumHostRating);
+//             }
+
+//             // Write the line to the temporary file
+//             tempFile << line << "\n";
+//         }
+
+//         inFile.close();
+//         tempFile.close();
+
+//         // Replace the original file with the temporary file
+//         std::remove(filename.c_str());
+//         std::rename("temp.dat", filename.c_str());
+
+//         std::cout << "File updated successfully." << std::endl;
+//     } else {
+//         std::cout << "Error opening file." << std::endl;
+//     }
+
+
+// }
+
+
+
+
+// FIX THIS FUNCTION TO DELETE DEFAULT HOST RATING SCORE IN ORDER TO STORE NEW RATING SCORING 
+ void Member::deleteDefaultHostRatingScore(const std::string& userId, const std::string& filename) {
+    std::ifstream inFile(filename);
+    std::string line, updatedContent;
+    bool found = false;
+
+    while (std::getline(inFile, line)) {
+        std::stringstream ss(line);
+        std::string part;
+        std::getline(ss, part, ','); // Read the first part (ID)
+
+        if (part == userId) {
+            // Find the start and end of the host rating score
+            size_t scoreStart = line.rfind(',', line.find(",[[")) ;
+            size_t scoreEnd = line.find(',', scoreStart);
+
+            if (scoreStart != std::string::npos && scoreEnd != std::string::npos) {
+                // Construct a new line without the score
+                std::string beforeScore = line.substr(0, scoreStart);
+                std::string afterScore = line.substr(scoreEnd);
+                line = beforeScore + afterScore;
+            }
+            found = true;
+        }
+        updatedContent += line + "\n";
+    }
+    inFile.close();
+
+    // Write the updated content back to the file
+    if (found) {
+        std::ofstream outFile(filename);
+        outFile << updatedContent;
+        outFile.close();
+    } else {
+        std::cout << "User ID not found in the file." << std::endl;
+    }
+}
+
+
+
+void Member::saveMinimumHostRating(const std::string& filename, const std::string& userId) {
     std::string userResponse;
-    float minimumHostRating = 0;
+    int minimumHostRating = 0;
 
     // Ask the user if they want to enter a minimum host rating score
     std::cout << "Do you want to enter a minimum host rating score (yes/no): ";
@@ -450,40 +553,51 @@ void Member::saveMinimumHostRating(const std::string& filename, const string& us
         return;
     }
 
+       std::ifstream inFile(filename);
+    std::string line, updatedContent;
+    bool updated = false;
 
-    std::ifstream inFile(filename);
-    std::ofstream tempFile("temp.dat");
-    std::string line;
+    while (std::getline(inFile, line)) {
+        std::string currentLine = line;
+        std::stringstream ss(line);
+        std::string part;
+        std::getline(ss, part, ','); // Read the first part (ID)
 
-    if (inFile.is_open() && tempFile.is_open()) {
-        while (std::getline(inFile, line)) {
-            std::stringstream ss(line);
-            std::string userIdFile;
-            std::getline(ss, userIdFile, ',');
+        if (part == userId) {
+            // Find the positions of the commas around the host rating score
+          size_t scoreStart = currentLine.rfind(',', currentLine.find(",[["));
+        size_t scoreEnd = currentLine.find(",[[", scoreStart);
 
-            if (userIdFile == userId) {
-                // Append minimum host rating score to the line
-                line += "," + std::to_string(minimumHostRating);
+
+            if (scoreStart != std::string::npos && scoreEnd != std::string::npos) {
+                // Extract the parts of the string before and after the score
+                std::string beforeScore = currentLine.substr(0, scoreStart);
+                std::string afterScore = currentLine.substr(scoreEnd);
+
+                // Replace the old score with the new score
+                currentLine = beforeScore + std::to_string(minimumHostRating) + afterScore;
+
             }
-
-            // Write the line to the temporary file
-            tempFile << line << "\n";
+            updated = true;
         }
+        updatedContent += currentLine + "\n";
+    }
+    inFile.close();
 
-        inFile.close();
-        tempFile.close();
 
-        // Replace the original file with the temporary file
-        std::remove(filename.c_str());
-        std::rename("temp.dat", filename.c_str());
-
-        std::cout << "File updated successfully." << std::endl;
+    // Write the updated content back to the file
+    if (updated) {
+        std::ofstream outFile(filename);
+        outFile << updatedContent;
+        outFile.close();
     } else {
-        std::cout << "Error opening file." << std::endl;
+        std::cout << "User ID not found in the file." << std::endl;
     }
 
-
+    
 }
+
+
 
 
 
@@ -548,34 +662,11 @@ void Member::showAllAvailableSupporters() {
             homeAddress = data[6];
             city = data[7];
             *creditPoint = (std::stoi(data[8]));
-
-            // int* newCreditPoint = new int (std::stoi(data[8]));
-
-
-
             // Extract skills
            skillsList= extractSkillNameAndPoint(skillRating);
            minimumHostRatingScore = 0;
 
 
-
-            // std::cout << userId << ", " << userName << ", " << password << ", " << fullName << ", " 
-            //           << email << ", " << phoneNumber << ", " << homeAddress << ", " << city << ", "
-            //           << *newCreditPoint << ", ";
-
-            // for (Skill* skill : skillsList) {
-            //     cout << skill->getSkillName() << " " << skill->getCreditPerHour() << "\n";
-            // }
-
-            // delete newCreditPoint;
-            
-            // for (Skill* skill : skillMem) {
-            //     delete skill;
-            // }
-
-            // Add to the list if needed
-            // AList.push_back(Member(userId,password,userName,fullName,email,phoneNumber,homeAddress,city,*creditPoint,isListed,skillsList));
-            // push back to Member class vector
         }
         availableList.addUser(*this);
     }
@@ -657,7 +748,6 @@ string Member::isListedAsSupporterOrNot(const std::string& userId) {
     }
     }
     return isListed_val;
-
 }
 
 bool Member::isListedValidation(const string& isListed) {
@@ -795,20 +885,12 @@ void Member::showInfo()
 {
     cout << "Member user name: " << userName << ", fullName: " << fullName
          << ", email: " << email << ", phoneNumber: " << phoneNumber << ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << *creditPoint << "\n";
-    // for (Skill* skill : skillsList)
-    // {
-    //     cout << "Skill name: "
-    //          << "\t";
-    //     skill->getSkillName();
-    //     cout << "\n";
-
-    //     cout << "Skill credit: " << skill->getCreditPerHour() << "\n";
-    // }
-    // }
     for (Skill* skill : skillsList) {
         cout << skill->getSkillName() << " " << skill->getCreditPerHour() << "\n";
     }
 }
+
+
 void Member::showSupporterInfo() {
     std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "\n";
     cout << "List of skills: \n";

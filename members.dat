@@ -1,5 +1,3 @@
-userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,SkillRating,MinimumHostRating
-M4743,1146502610,usera,Usera,usera@gmail.com,099,truong son,sai gon,20,true,[[excel,8.000000]],4.000000
-M4841,1185638003,userb,userb,userb@gmail.com,088,dien bien phu,sai gon,20,true,[[python,20.000000];[java,8.000000]]
-M7345,1224773396,userc,userc,Userc@gmail.com,066,cmt8,sai gon,20,false,[[garden caring,9.000000];[children,6.000000];[plumbing fix,2.000000]]
-M1682,1263908789,userd,userd,userd,88,truong chinh,ha noi,20,true,7.000000,[[C#,9.000000]]
+userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint
+M1346,1146502610,usera,Usera1234#,usera,099,truong son,sai gon,20,true,04,[[python,8.000000]]
+M1421,1185638003,userb,userb,userb,088,truong son,sai gon,20,false,0

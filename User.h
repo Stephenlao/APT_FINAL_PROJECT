@@ -112,6 +112,8 @@ public:
 
     void showSupporterInfo();
     void saveMinimumHostRating(const std::string& filename, const string& userId);
+    void deleteDefaultHostRatingScore(const std::string& userId, const std::string& filename);
+
 
 
     friend class AvailableList;
@@ -150,7 +152,7 @@ public:
     {
     public:
     AvailableList(){};
-        std::vector<Member*> userList; 
+    std::vector<Member*> userList; 
     void addUser(const Member &member);
     void displayListedMembers();
     string getUserNameByOrderNumber(int numberInput);

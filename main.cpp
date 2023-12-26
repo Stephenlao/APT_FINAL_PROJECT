@@ -186,6 +186,7 @@ void memberMenu(Member &member)
         } else if (member.SkillsExistOrNot(member.getUserId()) && !member.isListedValidation(isListed_value)) {
             if (choice1 == "yes") {
                 isListed = true;
+                member.deleteDefaultHostRatingScore("members.dat", member.getUserId());
                 member.saveMinimumHostRating("members.dat",member.getUserId());
                 // Do u want to enter minimum host rating score (yes/no)
                 // if no continue the next
