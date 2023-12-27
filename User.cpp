@@ -572,69 +572,6 @@ void Member::setDetail(const std::vector<std::string>& data, const std::string& 
 
 
 
-
-// void Member::showAllAvailableSupporters() {
-//     std::fstream myFile;
-//     string skillRating;
-//     string input;
-//     string userNameOfSupporter;
-//     myFile.open("members.dat", std::ios::in);
-//     if (!myFile) {
-//         std::cerr << "Unable to open file!" << "\n";
-//         return;
-//     }
-
-//     std::string line;
-//     // Skip the first line (header)
-//     std::getline(myFile, line);
-//     AvailableList availableList;
-
-    
-//     while (std::getline(myFile, line)) {
-//         Member tempMember; // Create a new temporary member object
-//         std::stringstream ss(line);
-//         std::string temp;
-//         std::vector<std::string> data;
-
-//         // Read data up to the skill data
-//         while (std::getline(ss, temp, ',')) {
-//             if (temp.find("[[") != std::string::npos) {
-//                 // Found the beginning of the skill data
-//                 skillRating = temp;
-//                 break;
-//             } else {
-//                 data.push_back(temp);
-//             }
-//         }
-
-//         // Continue reading the skill data
-//         if (!skillRating.empty()) {
-//             while (std::getline(ss, temp, ',')) {
-//                 skillRating += "," + temp;
-//                 if (temp.find("]]") != std::string::npos) {
-//                     break; // Found the end of the skill data
-//                 }
-//             }
-//         }
-
-
-//          if (data.size() > 9 && data[9] == "true") {
-//             // Populate tempMember with the data extracted from the file
-//             tempMember.setDetail(data, skillRating); // Ensure you have a method to set details of Member
-
-//             // Add the tempMember to the available list
-//             availableList.addUser(tempMember);
-//         }
-//         // availableList.addUser(*this);
-//     }
-//     availableList.displayListedMembers();
-//     myFile.close();
-
-
-
-
-
-
 void Member::showAllAvailableSupporters(const std::string& userID) {
     std::fstream myFile1("members.dat", std::ios::in);
     if (!myFile1) {
@@ -1535,10 +1472,3 @@ bool AvailableList::isValidNumber(const std::string& str) {
     }
     return true;
 }
-
-
-
-
-
-
-
