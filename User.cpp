@@ -573,33 +573,124 @@ void Member::setDetail(const std::vector<std::string>& data, const std::string& 
 
 
 
-void Member::showAllAvailableSupporters() {
-    std::fstream myFile;
-    string skillRating;
-    string input;
-    string userNameOfSupporter;
-    myFile.open("members.dat", std::ios::in);
+// void Member::showAllAvailableSupporters() {
+//     std::fstream myFile;
+//     string skillRating;
+//     string input;
+//     string userNameOfSupporter;
+//     myFile.open("members.dat", std::ios::in);
+//     if (!myFile) {
+//         std::cerr << "Unable to open file!" << "\n";
+//         return;
+//     }
+
+//     std::string line;
+//     // Skip the first line (header)
+//     std::getline(myFile, line);
+//     AvailableList availableList;
+
+    
+//     while (std::getline(myFile, line)) {
+//         Member tempMember; // Create a new temporary member object
+//         std::stringstream ss(line);
+//         std::string temp;
+//         std::vector<std::string> data;
+
+//         // Read data up to the skill data
+//         while (std::getline(ss, temp, ',')) {
+//             if (temp.find("[[") != std::string::npos) {
+//                 // Found the beginning of the skill data
+//                 skillRating = temp;
+//                 break;
+//             } else {
+//                 data.push_back(temp);
+//             }
+//         }
+
+//         // Continue reading the skill data
+//         if (!skillRating.empty()) {
+//             while (std::getline(ss, temp, ',')) {
+//                 skillRating += "," + temp;
+//                 if (temp.find("]]") != std::string::npos) {
+//                     break; // Found the end of the skill data
+//                 }
+//             }
+//         }
+
+
+//          if (data.size() > 9 && data[9] == "true") {
+//             // Populate tempMember with the data extracted from the file
+//             tempMember.setDetail(data, skillRating); // Ensure you have a method to set details of Member
+
+//             // Add the tempMember to the available list
+//             availableList.addUser(tempMember);
+//         }
+//         // availableList.addUser(*this);
+//     }
+//     availableList.displayListedMembers();
+//     myFile.close();
+
+
+
+
+
+
+void Member::showAllAvailableSupporters(const std::string& userID) {
+    std::fstream myFile1("members.dat", std::ios::in);
+    if (!myFile1) {
+        std::cerr << "Unable to open file!" << "\n";
+        return;
+    }
+
+    std::vector<std::string> data1;
+    std::string line1;
+
+    // First read: Look for the user's own data
+    while(std::getline(myFile1,line1)) {
+        std::stringstream ss1(line1);
+        std::string userIdFile;
+        std::getline(ss1, userIdFile, ',');
+        if (userID == userIdFile) {
+            data1.push_back(userIdFile);
+            std::string temp;
+            while(std::getline(ss1,temp,',')) {
+                data1.push_back(temp);
+            }
+            break;
+        }
+    }
+
+    myFile1.close(); // Clears the end-of-file condition
+    // myFile.seekg(0, std::ios::beg); // Seeks back to the beginning of the file
+  std::fstream myFile("members.dat", std::ios::in);
     if (!myFile) {
         std::cerr << "Unable to open file!" << "\n";
         return;
     }
 
-    std::string line;
     // Skip the first line (header)
-    std::getline(myFile, line);
-    AvailableList availableList;
+    std::getline(myFile, line1); // Using line1 to skip header
 
-    
+    AvailableList availableList;
+    std::string line;
+
+    // Second read: Look for all available supporters
     while (std::getline(myFile, line)) {
+        std::vector<std::string> data;
         Member tempMember; // Create a new temporary member object
         std::stringstream ss(line);
-        std::string temp;
-        std::vector<std::string> data;
+        std::string temp, skillRating;
+        std::getline(ss, temp, ','); // Extracts the userId from the line
 
-        // Read data up to the skill data
+        if (temp == userID) {
+            continue; // Skip this line as it matches the current user's ID
+        }
+
+        data.push_back(temp); // Push the first element (userId) as it's not the same as userID
+
+
         while (std::getline(ss, temp, ',')) {
             if (temp.find("[[") != std::string::npos) {
-                // Found the beginning of the skill data
                 skillRating = temp;
                 break;
             } else {
@@ -607,7 +698,6 @@ void Member::showAllAvailableSupporters() {
             }
         }
 
-        // Continue reading the skill data
         if (!skillRating.empty()) {
             while (std::getline(ss, temp, ',')) {
                 skillRating += "," + temp;
@@ -617,19 +707,18 @@ void Member::showAllAvailableSupporters() {
             }
         }
 
-
-         if (data.size() > 9 && data[9] == "true") {
-            // Populate tempMember with the data extracted from the file
-            tempMember.setDetail(data, skillRating); // Ensure you have a method to set details of Member
-
-            // Add the tempMember to the available list
+        if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])
+            && std::stof(data[10]) <= std::stof(data1[10])) {
+            tempMember.setDetail(data, skillRating);
             availableList.addUser(tempMember);
         }
-        // availableList.addUser(*this);
     }
+
     availableList.displayListedMembers();
     myFile.close();
 
+    string input;
+    string userNameOfSupporter;
 
     while(true) {
         cout << "\nFor more detail of supporter information (include listing skills) please choose number\n";
@@ -651,6 +740,7 @@ void Member::showAllAvailableSupporters() {
             cout << "Invalid input. Please enter a valid number or press x to quit.\n";
         }
     }
+
 }
 
 bool Member::SkillsExistOrNot(const std::string& userId) {
@@ -847,10 +937,6 @@ void Member::showInfo()
 
 void Member::showSupporterInfo() {
     std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "\n";
-    // cout << "Skills\n";
-    // for (Skill* skill : skillsList) {
-    //     cout << "name: " << skill->getSkillName() << " ,credit point per hour:  " << skill->getCreditPerHour() << "\n";
-    // }
 }
 
 // This function is to read mem in file and save in each attrs
@@ -1329,14 +1415,18 @@ void AvailableList::addUser(const Member &member) {
 }
 
 void AvailableList::displayListedMembers() {
-    std::cout << "Listed Supporters:\n\n";
-    cout << "cp: credit point\n";
-    int orderNum = 1;
-    for (Member* user : userList) {
-        cout << orderNum << ". ";
-        user->showSupporterInfo(); // Accessing and using the pointed-to objects
-        cout << "\n------------------------------------------------\n";
-        orderNum++; // Increment order number for next member
+ if (!userList.empty()) { // Check if the userList is not empty
+        std::cout << "Listed Supporters:\n\n";
+        cout << "cp: credit point\n";
+        int orderNum = 1;
+        for (Member* user : userList) { // Loop through each user in the userList
+            cout << orderNum << ". ";
+            user->showSupporterInfo(); // Displaying member information
+            cout << "\n------------------------------------------------\n";
+            orderNum++; // Increment order number for next member
+        }
+    } else { // If userList is empty, display a message indicating no supporters found
+        cout << "\nSorry! Can not find any suitable supporters!" << "\n";
     }
 }
 

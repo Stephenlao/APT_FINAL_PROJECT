@@ -90,7 +90,7 @@ public:
     void appendIsListedToLine(string& line,bool isListed_val);
     string formatSkills();
     static std::vector<Skill*> extractSkillNameAndPoint(const std::string& skillsStr);
-    void showAllAvailableSupporters();
+    void showAllAvailableSupporters(const string& userID);
     vector<Skill*> getSkillsLists();
     bool SkillsExistOrNot(const std::string& userId);
     string isListedAsSupporterOrNot(const std::string& userId);

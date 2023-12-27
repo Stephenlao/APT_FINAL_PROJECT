@@ -231,7 +231,7 @@ void memberMenu(Member &member)
     case 4:
     {
 
-    member.showAllAvailableSupporters();
+    member.showAllAvailableSupporters(member.getUserId());
     for (const auto &skillPtr : member.getSkillsLists()) {
         // No need to delete, as smart pointers manage memory automatically
     }
