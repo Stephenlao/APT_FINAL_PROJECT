@@ -616,26 +616,7 @@ void Member::showAllAvailableSupporters() {
             }
         }
 
-        // Check if the member is listed
-        // std::getline(ss, data[9]);
-        // isListed = (data[9] == "true");
 
-        // // Process the data
-        // if (isListed && data.size() >= 8) {
-        //     userId = data[0];
-        //     password = data[1];
-        //     userName = data[2];
-        //     fullName = data[3];
-        //     email = data[4];
-        //     phoneNumber = data[5];
-        //     homeAddress = data[6];
-        //     city = data[7];
-        //     *creditPoint = (std::stoi(data[8]));
-        //     // Extract skills
-        //    skillsList= extractSkillNameAndPoint(skillRating);
-        //    minimumHostRatingScore = 0;
-
-        // }
          if (data.size() > 9 && data[9] == "true") {
             // Populate tempMember with the data extracted from the file
             tempMember.setDetail(data, skillRating); // Ensure you have a method to set details of Member
@@ -860,18 +841,11 @@ void Member::showInfo()
 {
     cout << "Member user name: " << userName << ", fullName: " << fullName
          << ", email: " << email << ", phoneNumber: " << phoneNumber << ", home address: " << homeAddress << ",city: " << city << " ,credit point: " << *creditPoint << "\n";
-    // for (Skill* skill : skillsList) {
-    //     cout << skill->getSkillName() << " " << skill->getCreditPerHour() << "\n";
-    // }
 }
 
 
 void Member::showSupporterInfo() {
     std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "\n";
-    // cout << "List of skills: \n";
-    // for (Skill* skill : skillsList) {
-    //     cout << skill->getSkillName() << " : " << skill->getCreditPerHour() << " cp" << "\n";
-    // }
 }
 
 // This function is to read mem in file and save in each attrs
@@ -1454,15 +1428,6 @@ void AvailableList::showDetailSupporterDetail(string& userName) {
                 cout << "Name: " <<  skill->getSkillName() << " , credit point per hour: " << skill->getCreditPerHour() << "\n";
             }
 
-            // delete newCreditPoint;
-            
-            // for (Skill* skill : skillMem) {
-            //     delete skill;
-            // }
-
-            // Add to the list if needed
-            // AList.push_back(Member(userId,password,userName,fullName,email,phoneNumber,homeAddress,city,*creditPoint,isListed,skillsList));
-            // push back to Member class vector
         }
     }
     myFile.close();
