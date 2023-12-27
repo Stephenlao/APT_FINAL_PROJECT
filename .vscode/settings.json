@@ -90,7 +90,11 @@
     "span": "cpp",
     "stack": "cpp",
     "condition_variable": "cpp",
-    "__nullptr": "cpp"
+    "__nullptr": "cpp",
+    "codecvt": "cpp",
+    "complex": "cpp",
+    "numbers": "cpp",
+    "numeric": "cpp"
   },
   "C_Cpp_Runner.cCompilerPath": "clang",
   "C_Cpp_Runner.cppCompilerPath": "clang++",

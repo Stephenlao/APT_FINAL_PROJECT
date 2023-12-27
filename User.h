@@ -11,6 +11,7 @@
 #include <vector>
 #include "Skill.h"
 #include "Rating.h"
+#include <limits>
 using std::cin;
 using std::cout;
 using std::ctime;
@@ -54,12 +55,13 @@ private:
     Rating hostRating;
     Rating supportRating;
     bool isListed;
+    float minimumHostRatingScore;
 
 
 public:
     Member(string userId_val = "", string password_val = "",
            string userName_val = "", string fullName_val = "", string email_val = "",
-           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {});
+           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0);
 
     // Allocate memory for creditPoint and assign the value
 
@@ -77,6 +79,7 @@ public:
     int getCreditPoint() const;
     // Setter function for creditPoint
     void setCreditPoint(int newCreditPoint);
+    string getUsername() const;
 
 
     // SKILL
@@ -86,9 +89,16 @@ public:
     void saveIsListedInFile(string userID,bool isListed_val);
     void appendIsListedToLine(string& line,bool isListed_val);
     string formatSkills();
-    std::vector<Skill*> extractSkillNameAndPoint(const std::string& skillsStr);
-    void showAllAvailableSupporters();
+    static std::vector<Skill*> extractSkillNameAndPoint(const std::string& skillsStr);
+    void showAllAvailableSupporters(const string& userID);
     vector<Skill*> getSkillsLists();
+    bool SkillsExistOrNot(const std::string& userId);
+    string isListedAsSupporterOrNot(const std::string& userId);
+    bool isListedValidation(const string& isListed);
+    void setDetail(const std::vector<std::string>& data, const std::string& skillRating);
+    static std::string trim(const std::string& str);
+
+
 
 
     // Rating
@@ -102,9 +112,13 @@ public:
     // Method to check if the member is listed
     bool isMemberListed() const ;    
 
-    // void showSupportInfo();
+    void showSupporterInfo();
+    void saveMinimumHostRating(const std::string& filename, const string& userId);
+    void deleteDefaultHostRatingScore(const std::string& userId);
 
-        friend class AvailableList;
+
+
+    friend class AvailableList;
     };
 
     class Admin : public User
@@ -140,9 +154,13 @@ public:
     {
     public:
     AvailableList(){};
-        std::vector<Member*> userList; 
+    std::vector<Member*> userList; 
     void addUser(const Member &member);
     void displayListedMembers();
+    string getUserNameByOrderNumber(int numberInput);
+    void showDetailSupporterDetail(string& userName);
+    bool isValidNumber(const std::string& str);
     };
+
 
 #endif
