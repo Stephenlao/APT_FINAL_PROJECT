@@ -560,6 +560,7 @@ void Member::setDetail(const std::vector<std::string>& data, const std::string& 
             city = data[7];
             *creditPoint = std::stoi(data[8]);
             isListed = (data.size() > 9 && data[9] == "true");
+            // minimumHostRatingScore = std::stof(data[10]);
 
             // Now, parse and set the skill rating
             skillsList = extractSkillNameAndPoint(skillRating);  // You need to define this function
@@ -846,6 +847,10 @@ void Member::showInfo()
 
 void Member::showSupporterInfo() {
     std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "\n";
+    // cout << "Skills\n";
+    // for (Skill* skill : skillsList) {
+    //     cout << "name: " << skill->getSkillName() << " ,credit point per hour:  " << skill->getCreditPerHour() << "\n";
+    // }
 }
 
 // This function is to read mem in file and save in each attrs
@@ -1335,6 +1340,7 @@ void AvailableList::displayListedMembers() {
     }
 }
 
+
 string AvailableList::getUserNameByOrderNumber(int numberInput) {
     int currentOrder = 1;
     for (int i = 0; i < userList.size();i++) {
@@ -1425,9 +1431,8 @@ void AvailableList::showDetailSupporterDetail(string& userName) {
 
             cout << "Skills: \n";
             for (Skill* skill : skillRatingSupporter) {
-                cout << "Name: " <<  skill->getSkillName() << " , credit point per hour: " << skill->getCreditPerHour() << "\n";
+                cout << "Name: " <<  skill->getSkillName() << " , Credit point per hour: " << skill->getCreditPerHour() << "\n";
             }
-
         }
     }
     myFile.close();
