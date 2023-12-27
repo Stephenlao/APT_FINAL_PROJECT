@@ -95,6 +95,8 @@ public:
     bool SkillsExistOrNot(const std::string& userId);
     string isListedAsSupporterOrNot(const std::string& userId);
     bool isListedValidation(const string& isListed);
+    void setDetail(const std::vector<std::string>& data, const std::string& skillRating);
+    static std::string trim(const std::string& str);
 
 
 
@@ -112,7 +114,7 @@ public:
 
     void showSupporterInfo();
     void saveMinimumHostRating(const std::string& filename, const string& userId);
-    void deleteDefaultHostRatingScore(const std::string& userId, const std::string& filename);
+    void deleteDefaultHostRatingScore(const std::string& userId);
 
 
 
