@@ -1,0 +1,7 @@
+userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,SkillRating,IsListed
+M4307,8245537688419450322,usera,Usera,usera,099,truong son,sai gon,20,true,4.000000,[[excel,20.000000]]
+M1289,8245537688458585715,userb,userb,userb,088,truong chinh,sai gon,20,true,3,[[python,8.000000];[java,20.000000]]
+M2139,8245537688497721108,userc,userc,userc@gmail.com,099,truong son,sai gon,20,true,3.500000,[[hello,4.000000];[hi,8.000000]]
+M200,8245537688536856501,userd,userd,userd,055,dbp,sai gon,20,true,0.000000,[[world,4.000000]]
+M7713,13844845592154116107,Tien1,Tran Nhat Tien,trannhattien@gmail.com,0987672631,22 hh,sai gon,4.000000,false,0,
+M3377,13846330759654978603,Tien2,Tran Nhat Tienn,tien123@gmail.com,0987611283,22 kkll,sai gon,200,false,0,
