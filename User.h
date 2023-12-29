@@ -50,7 +50,7 @@ private:
     string phoneNumber;
     string homeAddress;
     string city;
-    int *creditPoint;
+    float *creditPoint;
     vector<Skill*> skillsList;
     Rating hostRating;
     Rating supportRating;

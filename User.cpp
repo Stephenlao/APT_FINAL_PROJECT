@@ -146,7 +146,7 @@ Member::Member(string userId_val, string password_val,
 {
 
     // Allocate memory for creditPoint and assign the value
-    creditPoint = new int(creditPoint_val);
+    creditPoint = new float(creditPoint_val);
 };
 
 vector<Skill*> Member::getSkillsLists() {
@@ -856,7 +856,7 @@ void Member::registerMember()
     int initialPoint = 20;
 
     // allocated memory for credit point
-    creditPoint = new int(initialPoint);
+    creditPoint = new float(initialPoint);
 
     cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
     saveDataToFile(*this);
@@ -1269,7 +1269,7 @@ void Admin::resetMemberPassword()
                   << "\n";
         return;
     }
-    myFile << "userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,SkillRating,IsListed\n";
+    myFile << "userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,,MinimumHostRating,SkillRating\n";
     myFile << newMemberData.str();
     myFile.close();
 

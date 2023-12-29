@@ -1,7 +1,5 @@
-userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,SkillRating,IsListed
-M4307,8245537688419450322,usera,Usera,usera,099,truong son,sai gon,20,true,4.000000,[[excel,20.000000]]
-M1289,8245537688458585715,userb,userb,userb,088,truong chinh,sai gon,20,true,3,[[python,8.000000];[java,20.000000]]
-M2139,8245537688497721108,userc,userc,userc@gmail.com,099,truong son,sai gon,20,true,3.500000,[[hello,4.000000];[hi,8.000000]]
-M200,8245537688536856501,userd,userd,userd,055,dbp,sai gon,20,true,0.000000,[[world,4.000000]]
-M2632,8245537688575991894,usere,usere,usere,055,hoa binh,ha noi,20,true,2.500000,[[cleaning,6.000000]]
-M124,8245537688615127287,userf,Userf,userf,044,ho guom,ha noi,20,true,4.600000,[[driving,6.000000];[diving,8.000000];[joking,10.000000]]
+userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,,MinimumHostRating,SkillRating
+M1518,1146502610,usera,Usera,usera@gmail.com,099,truong son,sai gon,20.000000,true,4.300000,[[python,8.000000];[java,18.000000]]
+M1619,1185638003,userb,userb,userb@gmail.com,099,truong chinh,sai gon,20.000000,true,3.500000,[[C++,9.000000]]
+M2089,1224773396,userc,userc,Userc@gmail.com,088,hoa binh,ha noi,20.000000,true,2.900000,[[html,7.000000];[Css,10.000000];[Javascript,6.000000]]
+M2377,1263908789,userd,userd,Userd@gmail.com,077,ho hoan kiem,ha noi,20.000000,true,0.000000,[[Nodejs,5.500000];[Mongodb,6.800000]]
