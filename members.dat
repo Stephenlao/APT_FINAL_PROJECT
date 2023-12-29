@@ -1,5 +1,5 @@
 userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,,MinimumHostRating,SkillRating
-M1518,1146502610,usera,Usera,usera@gmail.com,099,truong son,sai gon,20.000000,true,4.300000,[[python,8.000000];[java,18.000000]]
-M1619,1185638003,userb,userb,userb@gmail.com,099,truong chinh,sai gon,20.000000,true,3.500000,[[C++,9.000000]]
-M2089,1224773396,userc,userc,Userc@gmail.com,088,hoa binh,ha noi,20.000000,true,2.900000,[[html,7.000000];[Css,10.000000];[Javascript,6.000000]]
-M2377,1263908789,userd,userd,Userd@gmail.com,077,ho hoan kiem,ha noi,20.000000,true,0.000000,[[Nodejs,5.500000];[Mongodb,6.800000]]
+M3097,8245537688419450322,usera,Usera1234#,usera,099,truong son,sai gon,20.000000,true,2.000000,[[aka,2.000000]]
+M921,8245537688458585715,userb,userb,userb,088,truong chinh,sai gon,20.000000,true,4.000000,[[python,20.000000]]
+M6990,8245537688497721108,userc,userc,userc,066,hoa binh,sai gon,20.000000,false,0.000000,
+M2588,8245537688536856501,userd,userd,userd,055,dbp,ha noi,20.000000,false,0,

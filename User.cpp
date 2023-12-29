@@ -644,12 +644,20 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
             }
         }
 
-        if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])
+        if (data1[9] == "false") {
+            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7]) {
+                tempMember.setDetail(data, skillRating);
+                availableList.addUser(tempMember);
+            }
+        } else {
+            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])
             && std::stof(data[10]) <= std::stof(data1[10])) {
-            tempMember.setDetail(data, skillRating);
-            availableList.addUser(tempMember);
+                tempMember.setDetail(data, skillRating);
+                availableList.addUser(tempMember);
         }
-    }
+    }    
+}
+    
 
     availableList.displayListedMembers();
     myFile.close();
