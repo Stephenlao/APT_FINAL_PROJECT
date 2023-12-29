@@ -1,6 +1,7 @@
 #include <iostream>
 #include "User.h"
 #include "Skill.h"
+#include "Request.h"
 #include <algorithm>
 #include <cctype>
 using std::cin;
@@ -141,8 +142,10 @@ void memberMenu(Member &member)
     cout << "1.View information\n";
     cout << "2.Add skills\n";
     cout << "3.Listed as supporter\n";
-    cout << "4.View all available supporters\n";
-    cout << "5.Back to main menu\n";
+    cout << "4.View all available supporters\n"; //view supporter's detail and choose to book
+    cout << "5.Host action\n"; 
+    cout << "6.Support action\n";
+    cout << "7.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     string choice1;
@@ -235,12 +238,26 @@ void memberMenu(Member &member)
     for (const auto &skillPtr : member.getSkillsLists()) {
         // No need to delete, as smart pointers manage memory automatically
     }
+
+    //After choose to view supporter in detail, host have able to choose rent for supporting
    
     memberMenu(member);
     break;
 }
 
     case 5:
+    {
+   
+    hostActionMenu(member);
+    break;
+}
+    case 6:
+    {
+    supporterActionMenu(member);
+    break;
+    }
+
+    case 7:
         mainMenu();
         break;
     default:
@@ -279,6 +296,22 @@ void guestMenu()
         break;
     }
 }
+
+void hostActionMenu(Member &member){
+    int choice;
+    cout << "\nHost action menu:\n";
+    cout << "1.View all current booking requests\n";
+    cout << "2.View all old booking requests\n";
+    cin >> choice;
+}
+void supporterActionMenu(Member &member){
+    int choice;
+    cout << "\nSupporter action menu:\n";
+    cout << "1.View all current requests\n";
+    cout << "2.View all old requests\n";
+    cin >> choice;
+}
+
 void mainMenu()
 {
     int choice;

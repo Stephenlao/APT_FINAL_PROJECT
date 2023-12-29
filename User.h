@@ -99,7 +99,10 @@ public:
     static std::string trim(const std::string& str);
 
 
-
+    //REQUEST
+    void viewRequestHistory();
+    void viewBookingHistory();
+    void listSupporterSkills();
 
     // Rating
     void addHostRating(int score, const std::string &comment);

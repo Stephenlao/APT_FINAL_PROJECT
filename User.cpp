@@ -679,6 +679,9 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
     }
 
 }
+    //Booking's part
+    // Host can able to view all requests have sent to supporters.
+void viewBookingHistory(){}
 
 bool Member::SkillsExistOrNot(const std::string& userId) {
     fstream filePath;
