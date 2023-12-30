@@ -25,4 +25,7 @@ bool Skill::createSkill(std::string skillName, float creditPerHour) {
     return false;
 }
 
+void Skill::setSkillName(string skillName) {
+    this->name = skillName;
+}
 
