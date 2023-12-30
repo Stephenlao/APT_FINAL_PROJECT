@@ -61,7 +61,7 @@ private:
 public:
     Member(string userId_val = "", string password_val = "",
            string userName_val = "", string fullName_val = "", string email_val = "",
-           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", int creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0);
+           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0);
 
     // Allocate memory for creditPoint and assign the value
 
@@ -74,11 +74,13 @@ public:
     void saveDataToFile(const Member &member);
     int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
     int loginMember();
+    string getUserIdByName(string userName);
+    void updateCreditInFile(string userId, float newCreditPoint);
     void updatePasswordInFile();
     // Getter function for creditPoint
-    int getCreditPoint() const;
+    float getCreditPoint() const;
     // Setter function for creditPoint
-    void setCreditPoint(int newCreditPoint);
+    void setCreditPoint(float newCreditPoint);
     string getUsername() const;
 
 
@@ -98,7 +100,9 @@ public:
     void setDetail(const std::vector<std::string>& data, const std::string& skillRating);
     static std::string trim(const std::string& str);
 
-
+    // REQUEST
+    bool checkCredit(float creditPerHour);
+    void createRequest(string skillRequest, string hostID, string supporterID);
 
 
     // Rating
@@ -158,8 +162,10 @@ public:
     void addUser(const Member &member);
     void displayListedMembers();
     string getUserNameByOrderNumber(int numberInput);
+    string getUserIdByOrderNumber(int numberInput);
     void showDetailSupporterDetail(string& userName);
     bool isValidNumber(const std::string& str);
+    Skill getRequestSkillName(string& userName);
     };
 
 

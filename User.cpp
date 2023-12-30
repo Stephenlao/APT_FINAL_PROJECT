@@ -8,6 +8,7 @@
 #include <vector>
 #include "Skill.h"
 #include "Rating.h"
+#include "Request.h"
 #include <limits>
 using std::cin;
 using std::cout;
@@ -137,7 +138,7 @@ void User::setPassword(string password_val)
 Member::Member(string userId_val, string password_val,
                string userName_val, string fullName_val, string email_val,
                string phoneNumber_val, string homeAddress_val, string city_val,
-               int creditPoint_val, bool isListed,vector<Skill*> skillsList_val, float minimumHostRatingScore_val)
+               float creditPoint_val, bool isListed,vector<Skill*> skillsList_val, float minimumHostRatingScore_val)
 
     : User(userId_val, password_val), userName(userName_val),
       fullName(fullName_val), email(email_val), phoneNumber(phoneNumber_val),
@@ -675,11 +676,38 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
             std::cout << "Exiting..." << std::endl;
             break;
         }
-
+        
+        
         if(availableList.isValidNumber(input)) {
             int choiceNumber = std::stoi(input);
             userNameOfSupporter = availableList.getUserNameByOrderNumber(choiceNumber);
             availableList.showDetailSupporterDetail(userNameOfSupporter);
+            // createRequest()
+            // cout << availableList.getUserIdByOrderNumber(choiceNumber) << "real";
+            Skill skillRequest = availableList.getRequestSkillName(userNameOfSupporter);
+
+            // cout << "This is skill name" << skillRequest.getSkillName() << "This is skill credit" << skillRequest.getCreditPerHour();
+
+            Request request;
+
+            if(skillRequest.getSkillName() == "x"){
+                break;
+            }
+
+            if(skillRequest.getSkillName() == ""){
+                cout << "You are entering wrong syntax!" << "\n";
+                break;
+            }
+            
+            //Check user credit point
+            if (checkCredit(skillRequest.getCreditPerHour())){
+                // Update host credit point in file
+                updateCreditInFile(userID, skillRequest.getCreditPerHour());
+                // Save the request to file
+                request.saveRequestDataToFile(userID, getUserIdByName(userNameOfSupporter), skillRequest.getSkillName());
+            } else {
+                cout << "Don't have enough credit point to book." << "\n";
+            }
             break;
         } else {
             cout << "Invalid input. Please enter a valid number or press x to quit.\n";
@@ -750,10 +778,150 @@ bool Member::isListedValidation(const string& isListed) {
     }
 }
 
+string Member::getUserIdByName(string userName){
+    string userId;
+    std::fstream myFile;
+    string skillRating;
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return 0;
+    }
+
+    std::string line;
+    // Skip the first line (header)
+    std::getline(myFile, line);
+    AvailableList availableList;
+
+
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+        std::string temp;
+        std::vector<std::string> data;
+
+        // Read data up to the skill data
+        while (std::getline(ss, temp, ',')) {
+            if (temp.find("[[") != std::string::npos) {
+                // Found the beginning of the skill data
+                skillRating = temp;
+                break;
+            } else {
+                data.push_back(temp);
+            }
+        }
+
+        // Continue reading the skill data
+        if (!skillRating.empty()) {
+            while (std::getline(ss, temp, ',')) {
+                skillRating += "," + temp;
+                if (temp.find("]]") != std::string::npos) {
+                    break; // Found the end of the skill data
+                }
+            }
+        }
+
+        string userId_val, password_val, username_val,fullName_val,email_val, phoneNum_val,homeAddress_val,city_val,skillRating_val;
+        int creditPoint1;
+        // Check if the member is listed
+        std::getline(ss, data[2]);
+
+        // Process the data
+        if (userName == data[2]) {
+            userId_val = data[0];
+            password_val = data[1];
+            userName = data[2];
+            fullName_val = data[3];
+            email_val = data[4];
+            phoneNum_val = data[5];
+            homeAddress_val = data[6];
+            city_val = data[7];
+            // *creditPoint = (std::stoi(data[8]));
+            userId = userId_val;
+        }
+
+    }
+
+    myFile.close();
+
+    return userId;
+}
+
+bool Member::checkCredit(float creditPerHour){
+    if ( creditPerHour <= getCreditPoint()){
+        // float temp = 0;
+        // temp = getCreditPoint() - creditPerHour;
+        // setCreditPoint(temp);
+        return true;
+    } else {
+        return false;
+    }
+}
+
+float Member::getCreditPoint() const{
+    return *creditPoint;
+}
+
+void Member::setCreditPoint(float newCreditPoint) {
+    // Allocate memory for creditPoint if not allocated already
+    if (!creditPoint) {
+        creditPoint = new float;
+    }
+    // Set the value of creditPoint
+    *creditPoint = newCreditPoint;
+}
+
+void Member::updateCreditInFile(string userId, float newCreditPoint){
+    std::fstream myFile("members.dat", std::ios::in | std::ios::out);
+
+    if (!myFile.is_open())
+    {
+        std::cerr << "There is no existence of account !"
+                  << "\n";
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
 
 
 
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+        std::string temp_userID, temp_password, temp_username, tempFullname, tempEmail, tempPhoneNumber, tempHomeAddress, tempCity, tempCreditPoint, restOfLine;
+        std::getline(ss, temp_userID, ',');
+        std::getline(ss, temp_password, ',');
+        std::getline(ss, temp_username, ',');
+        std::getline(ss, tempFullname, ',');
+        std::getline(ss, tempEmail, ',');
+        std::getline(ss, tempPhoneNumber, ',');
+        std::getline(ss, tempHomeAddress, ',');
+        std::getline(ss, tempCity, ',');
+        std::getline(ss, tempCreditPoint, ',');
+        std::getline(ss, restOfLine);
 
+        if (temp_userID == userId)
+        {
+            float tempCreditPoint_val = std::stof(tempCreditPoint);
+            tempCreditPoint_val = tempCreditPoint_val - newCreditPoint;
+            std::string tempCreditPoint_str = std::to_string(tempCreditPoint_val);
+            lines.push_back(temp_userID + "," + temp_password + "," + temp_username + "," + tempFullname + "," + tempEmail + "," + tempPhoneNumber + "," + tempHomeAddress + "," + tempCity + "," + tempCreditPoint_str + "," + restOfLine);
+        }
+        else
+        {
+            lines.push_back(line);
+        }
+    }
+
+    myFile.clear();
+    myFile.seekg(0, std::ios::beg);
+
+    for (const auto &updatedLine : lines)
+    {
+        myFile << updatedLine << "\n";
+    }
+    myFile.close();
+}
 
 // Rating
 void Member::addHostRating(int score, const std::string &comment)
@@ -1389,6 +1557,19 @@ string AvailableList::getUserNameByOrderNumber(int numberInput) {
     return "";
 }
 
+string AvailableList::getUserIdByOrderNumber(int numberInput) {
+    int currentOrder = 1;
+    for (int i = 0; i < userList.size();i++) {
+        if (currentOrder == numberInput) {
+            return userList[i]->getUserId();
+            break;
+        }
+        currentOrder ++;
+    }
+    cout << "There is no ordernumber exist!" << "\n";
+    return "";
+}
+
 // show all supporters info if correct ordernumber is entered
 void AvailableList::showDetailSupporterDetail(string& userName) {
     std::fstream myFile;
@@ -1465,13 +1646,103 @@ void AvailableList::showDetailSupporterDetail(string& userName) {
                 << "City: " << city_val << "\n";
 
             cout << "Skills: \n";
-            for (Skill* skill : skillRatingSupporter) {
-                cout << "Name: " <<  skill->getSkillName() << " , Credit point per hour: " << skill->getCreditPerHour() << "\n";
+            for (size_t i = 0; i < skillRatingSupporter.size(); ++i) {
+                 std::cout << i + 1 << ". Name: " << skillRatingSupporter[i]->getSkillName()
+                  << " , Credit point per hour: " << skillRatingSupporter[i]->getCreditPerHour() << "\n";
             }
         }
     }
     myFile.close();
 
+}
+
+Skill AvailableList::getRequestSkillName(string& userName){
+    std::vector<std::string> skill;
+    Skill skillRequest;
+    // string skillRequest;
+    std::fstream myFile;
+    string skillRating;
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return skillRequest;
+    }
+
+    std::string line;
+    // Skip the first line (header)
+    std::getline(myFile, line);
+    AvailableList availableList;
+
+
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+        std::string temp;
+        std::vector<std::string> data;
+
+        // Read data up to the skill data
+        while (std::getline(ss, temp, ',')) {
+            if (temp.find("[[") != std::string::npos) {
+                // Found the beginning of the skill data
+                skillRating = temp;
+                break;
+            } else {
+                data.push_back(temp);
+            }
+        }
+
+        // Continue reading the skill data
+        if (!skillRating.empty()) {
+            while (std::getline(ss, temp, ',')) {
+                skillRating += "," + temp;
+                if (temp.find("]]") != std::string::npos) {
+                    break; // Found the end of the skill data
+                }
+            }
+        }
+
+        string userId_val, password_val, username_val,fullName_val,email_val, phoneNum_val,homeAddress_val,city_val,skillRating_val;
+        int creditPoint1;
+        // Check if the member is listed
+        std::getline(ss, data[2]);
+
+        // Process the data
+        if (userName == data[2]) {
+            userId_val = data[0];
+            password_val = data[1];
+            userName = data[2];
+            fullName_val = data[3];
+            email_val = data[4];
+            phoneNum_val = data[5];
+            homeAddress_val = data[6];
+            city_val = data[7];
+            // *creditPoint = (std::stoi(data[8]));
+
+            // Extract skills
+            vector<Skill*> skillRatingSupporter = Member::extractSkillNameAndPoint(skillRating);        
+
+            string input;
+            cout << "\n" << "PLease choose number of skill you want to book";
+            cout << "\n" << "Enter number (or press x to quit): ";
+            cin >> input;
+
+            if (input == "x" || input == "X") {
+                skillRequest.setSkillName("x");
+                std::cout << "Exiting..." << std::endl ;
+                return skillRequest;
+                break;
+            }
+            int input_val = std::stoi(input);
+
+            for (size_t i = 0; i < skillRatingSupporter.size(); ++i) {
+                 if(input_val == i + 1 ){
+                    // Creat skill request
+                    skillRequest.createSkill(skillRatingSupporter[i]->getSkillName(), skillRatingSupporter[i]->getCreditPerHour());
+                 }
+            }
+        }
+    }
+    myFile.close();
+    return skillRequest;
 }
 
 bool AvailableList::isValidNumber(const std::string& str) {

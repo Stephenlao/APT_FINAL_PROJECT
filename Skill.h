@@ -16,7 +16,7 @@ public:
     Skill(std::string skillName = "", float creditPerHour = 0);
     string getSkillName() const;
     float getCreditPerHour() const;
-
+    void setSkillName(string skillName);
     bool createSkill(std::string skillName, float creditPerHour);
    
 };
