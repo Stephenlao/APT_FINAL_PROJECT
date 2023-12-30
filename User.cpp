@@ -700,9 +700,7 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
             }
             
             //Check user credit point
-            if (checkCredit(skillRequest.getCreditPerHour())){
-                // Update host credit point in file
-                updateCreditInFile(userID, skillRequest.getCreditPerHour());
+            if (checkCredit(skillRequest.getCreditPerHour())){             
                 // Save the request to file
                 request.saveRequestDataToFile(userID, getUserIdByName(userNameOfSupporter), skillRequest.getSkillName());
             } else {
