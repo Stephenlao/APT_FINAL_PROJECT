@@ -11,6 +11,7 @@ void adminMenu(Admin &admin);
 void LogInadminMenu();
 void LogInRegMemberMenu();
 void memberMenu(Member &member);
+void hostMenu(Member &member);
 
 void LogInadminMenu() {
     int choice;
@@ -142,7 +143,8 @@ void memberMenu(Member &member)
     cout << "2.Add skills\n";
     cout << "3.Listed as supporter\n";
     cout << "4.View all available supporters\n";
-    cout << "5.Back to main menu\n";
+    cout << "5.Host action\n";
+    cout << "7.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     string choice1;
@@ -239,8 +241,10 @@ void memberMenu(Member &member)
     memberMenu(member);
     break;
 }
-
     case 5:
+        hostMenu(member);
+        memberMenu(member);
+    case 7:
         mainMenu();
         break;
     default:
@@ -279,6 +283,33 @@ void guestMenu()
         break;
     }
 }
+
+void hostMenu(Member &member){
+    int choice;
+    cout << "Host menu:\n";
+    cout << "1. View current booking request\n";
+    cout << "2. View history booking request\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    vector<string> listOfRequestsID;
+    string requestID;
+    switch (choice)
+    {
+    case 1:
+        listOfRequestsID = member.getCurrentBooking(member.getUserId());
+        requestID = member.getRequestIDByOrder(listOfRequestsID);
+        member.cancelBooking(requestID);
+        break;
+    case 2:
+        member.getHistoryBooking(member.getUserId());
+        break;
+    default:
+        cout << "Invalid choice!"
+             << "\n";
+        break;
+    }
+}
+
 void mainMenu()
 {
     int choice;
@@ -309,6 +340,7 @@ void mainMenu()
         break;
     }
 }
+
 
 int main()
 {

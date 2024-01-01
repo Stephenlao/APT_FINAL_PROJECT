@@ -56,12 +56,13 @@ private:
     Rating supportRating;
     bool isListed;
     float minimumHostRatingScore;
+    vector<string> historyBooking;
 
 
 public:
     Member(string userId_val = "", string password_val = "",
            string userName_val = "", string fullName_val = "", string email_val = "",
-           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0);
+           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0, vector<string> historyBooking_val = {});
 
     // Allocate memory for creditPoint and assign the value
 
@@ -75,6 +76,7 @@ public:
     int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
     int loginMember();
     string getUserIdByName(string userName);
+    string getUserNamedById(string userId);
     void updateCreditInFile(string userId, float newCreditPoint);
     void updatePasswordInFile();
     // Getter function for creditPoint
@@ -103,7 +105,10 @@ public:
     // REQUEST
     bool checkCredit(float creditPerHour);
     void createRequest(string skillRequest, string hostID, string supporterID);
-
+    void getHistoryBooking(string hostID);
+    vector<string> getCurrentBooking(string hostID);
+    string getRequestIDByOrder(vector<string> listOfRequestsID);
+    void cancelBooking(string requestID);
 
     // Rating
     void addHostRating(int score, const std::string &comment);

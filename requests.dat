@@ -1,6 +1,11 @@
 requestID,hostID,date,supporterID,skill,status
 R7598,M933,M921,30-12-2023,python,Pending
-R8856,M933,M3097,30-12-2023,aka,Pending
-R7776,M933,M3097,30-12-2023,aka,Pending
-R1276,M933,M3097,30-12-2023,aka,Pending
-R490,M933,M921,30-12-2023,python,Pending
+R8856,M933,M3097,30-12-2023,aka,Cancel
+R7776,M933,M3097,30-12-2023,aka,Cancel
+R1276,M933,M3097,30-12-2023,aka,Cancel
+R490,M933,M921,30-12-2023,python,Accepted
+R490,M932,M921,30-12-2023,python,Pending
+R9784,M933,M3097,1-1-2024,aka,Pending
+R3152,M933,M921,1-1-2024,python,Pending
+R7608,M933,M921,1-1-2024,python,Cancel
+
