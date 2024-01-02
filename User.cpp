@@ -1023,7 +1023,7 @@ void Member::getHistoryBooking(string hostID){
     if (result.size() == 0){
         return;
     }
-    cout << "List of history booking:" << "\n";
+    cout << "List of history bookings:" << "\n";
     for (size_t i = 0; i < result.size(); ++i) {
         std::cout << (i + 1) << ". " << result[i] << std::endl;
     }
@@ -1140,10 +1140,215 @@ void Member::cancelBooking(string requestID){
     return;
 }
 
+void Member::getHistoryRequest(string supporterID)
+{
+    std::vector<std::string> result;
+    std::fstream myFile;
+    myFile.open("requests.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return ;
+    }
+
+    std::string line;
+    // Skip the first line (header)
+    std::getline(myFile, line);
+
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+        
+        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+        // Process the data
+        if (supporterID == supporterId_val && status_val != "Accepted") {
+            result.push_back("RequestID: " + requestId_val + ", Host: " + getUserNamedById(hostId_val) + ", Supporter: " + getUserNamedById(supporterID)+ ", Date: " + date_val + ", Skill: " + skill_val + ", Status: " + status_val);
+
+        }
+
+    }
+
+    if (result.size() == 0){
+        return;
+    }
+    cout << "List of history requests:" << "\n";
+    for (size_t i = 0; i < result.size(); ++i) {
+        std::cout << (i + 1) << ". " << result[i] << std::endl;
+    }
+
+    myFile.close();
+    
+  return ;
+}
+
+vector<string> Member::getCurrentRequest(string supporterID)
+{
+    std::vector<std::string> result;
+    std::vector<std::string> result_requestID;
+    std::vector<std::string> checkError;
+    checkError.push_back("error");
+    std::fstream myFile;
+    myFile.open("requests.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return result ;
+    }
+
+    std::string line;
+    // Skip the first line (header)
+    std::getline(myFile, line);
+
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+
+        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+        // Process the data
+        if (supporterID == supporterId_val && status_val == "Pending") {
+            
+            result.push_back("RequestID: " + requestId_val + ", Host: " + getUserNamedById(hostId_val) + ", Supporter: " + getUserNamedById(supporterID)+ ", Date: " + date_val + ", Skill: " + skill_val + ", Status: " + status_val);
+            result_requestID.push_back(requestId_val);
+        }
+
+    }
+
+    if (result.size() == 0){
+        cout << "You did not have any pending request before." << "\n";
+        return checkError;
+    }
+    
+    cout << "List of current requests:" << "\n";
+    for (size_t i = 0; i < result.size(); ++i) {
+        std::cout << (i + 1) << ". " << result[i] << std::endl;
+    }
+    myFile.close();
+    
+  return result_requestID;
+}
+
+void Member::acceptRequest(string requestID){
+    if(requestID == "error"){
+        cout << "Invalid input!\n" ;
+    }
+
+    std::fstream myFile("requests.dat", std::ios::in | std::ios::out);
+
+    if (!myFile.is_open())
+    {
+        std::cerr << "There is no existence of supporter!"
+                  << "\n";
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+
+
+
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+
+        
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+
+        if (requestID == requestId_val)
+        {
+            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + + "," + skill_val + "," +  "Accepted");
+            cout << "Accept the request successfully!" << "\n";
+        }
+        else
+        {
+            lines.push_back(line);
+        }
+    }
+
+    myFile.clear();
+    myFile.seekg(0, std::ios::beg);
+
+    for (const auto &updatedLine : lines)
+    {
+        myFile << updatedLine << "\n";
+    }
+    myFile.close();
+    return;
+}
+
+void Member::rejectRequest(string requestID){
+if(requestID == "error"){
+        cout << "Invalid input!\n" ;
+    }
+
+    std::fstream myFile("requests.dat", std::ios::in | std::ios::out);
+
+    if (!myFile.is_open())
+    {
+        std::cerr << "There is no existence of supporter!"
+                  << "\n";
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+
+
+
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+
+        
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+
+        if (requestID == requestId_val)
+        {
+            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + + "," + skill_val + "," +  "Rejected");
+            cout << "Reject the request successfully!" << "\n";
+        }
+        else
+        {
+            lines.push_back(line);
+        }
+    }
+
+    myFile.clear();
+    myFile.seekg(0, std::ios::beg);
+
+    for (const auto &updatedLine : lines)
+    {
+        myFile << updatedLine << "\n";
+    }
+    myFile.close();
+    return;
+}
+
 string Member::getRequestIDByOrder(vector<string> listOfRequestsID){
     string requestID = "error";
     string input;
-    cout << "PLease choose number of request you want to cancel\n";
+    cout << "PLease choose number of the specific request you want:\n";
     cout << "Enter number (or press x to quit): ";
     cin >> input;
 
