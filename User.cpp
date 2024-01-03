@@ -988,13 +988,15 @@ void Member::updateCreditInFile(string userId, float newCreditPoint){
     myFile.close();
 }
 
-void Member::getHistoryBooking(string hostID){
+vector<string> Member::getHistoryBooking(string hostID){
     std::vector<std::string> result;
+    std::vector<std::string> checkError;
+    checkError.push_back("error");
     std::fstream myFile;
     myFile.open("requests.dat", std::ios::in);
     if (!myFile) {
         std::cerr << "Unable to open file!" << "\n";
-        return ;
+        return checkError;
     }
 
     std::string line;
@@ -1021,8 +1023,10 @@ void Member::getHistoryBooking(string hostID){
     }
 
     if (result.size() == 0){
-        return;
+        cout << "You did not have any booking before." << "\n";
+        return checkError;
     }
+
     cout << "List of history booking:" << "\n";
     for (size_t i = 0; i < result.size(); ++i) {
         std::cout << (i + 1) << ". " << result[i] << std::endl;
@@ -1030,7 +1034,7 @@ void Member::getHistoryBooking(string hostID){
 
     myFile.close();
     
-  return ;
+  return result;
 }
 
 vector<string> Member::getCurrentBooking(string hostID){
@@ -1091,6 +1095,10 @@ void Member::cancelBooking(string requestID){
         cout << "Invalid input!\n" ;
     }
 
+    if(requestID == "invalid"){
+        cout << "Invalid input!\n" ;
+    }
+
     std::fstream myFile("requests.dat", std::ios::in | std::ios::out);
 
     if (!myFile.is_open())
@@ -1125,18 +1133,35 @@ void Member::cancelBooking(string requestID){
         }
         else
         {
+            
             lines.push_back(line);
+            
         }
     }
 
     myFile.clear();
     myFile.seekg(0, std::ios::beg);
-
-    for (const auto &updatedLine : lines)
-    {
-        myFile << updatedLine << "\n";
-    }
     myFile.close();
+
+    std::fstream updateFile("requests.dat", std::ios::out | std::ios::trunc);
+
+    if (!updateFile.is_open()) {
+        std::cerr << "Error opening file!" << std::endl;
+        return;
+    }
+
+    // // Check if the last line is empty and remove it if it is
+    // if (!lines.empty() && lines.back().empty()) {
+    //     lines.pop_back();
+    // }
+    
+   for (const auto &updatedLine : lines)
+    {   
+            cout << updatedLine << "\n";
+            updateFile << updatedLine << "\n";
+    }
+
+    updateFile.close();
     return;
 }
 
@@ -1154,6 +1179,9 @@ string Member::getRequestIDByOrder(vector<string> listOfRequestsID){
     }
 
     int input_val = std::stoi(input);
+    if(input_val > listOfRequestsID.size()){
+        return "invalid";
+    }
     for (size_t i = 0; i < listOfRequestsID.size(); i++) {
         if(input_val == i + 1 ){
             requestID = listOfRequestsID[i];

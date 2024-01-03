@@ -292,16 +292,25 @@ void hostMenu(Member &member){
     cout << "Enter your choice: ";
     cin >> choice;
     vector<string> listOfRequestsID;
+    vector<string> listOfHistoryRequest;
     string requestID;
     switch (choice)
     {
     case 1:
         listOfRequestsID = member.getCurrentBooking(member.getUserId());
-        requestID = member.getRequestIDByOrder(listOfRequestsID);
-        member.cancelBooking(requestID);
-        break;
+        
+        if (listOfRequestsID[0] == "error"){
+            break;
+        } else {
+            requestID = member.getRequestIDByOrder(listOfRequestsID);
+            member.cancelBooking(requestID);
+            break;
+        }
     case 2:
-        member.getHistoryBooking(member.getUserId());
+        listOfHistoryRequest = member.getHistoryBooking(member.getUserId());
+        if (listOfHistoryRequest[0] == "error"){
+            break;
+        }
         break;
     default:
         cout << "Invalid choice!"

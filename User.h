@@ -105,7 +105,7 @@ public:
     // REQUEST
     bool checkCredit(float creditPerHour);
     void createRequest(string skillRequest, string hostID, string supporterID);
-    void getHistoryBooking(string hostID);
+    vector<string> getHistoryBooking(string hostID);
     vector<string> getCurrentBooking(string hostID);
     string getRequestIDByOrder(vector<string> listOfRequestsID);
     void cancelBooking(string requestID);
