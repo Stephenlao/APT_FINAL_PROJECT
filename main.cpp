@@ -12,6 +12,7 @@ void LogInadminMenu();
 void LogInRegMemberMenu();
 void memberMenu(Member &member);
 void hostMenu(Member &member);
+void supporterMenu(Member &member);
 
 void LogInadminMenu() {
     int choice;
@@ -144,6 +145,7 @@ void memberMenu(Member &member)
     cout << "3.Listed as supporter\n";
     cout << "4.View all available supporters\n";
     cout << "5.Host action\n";
+    cout << "6.Supporter action\n";
     cout << "7.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
@@ -244,6 +246,11 @@ void memberMenu(Member &member)
     case 5:
         hostMenu(member);
         memberMenu(member);
+
+    case 6:
+        supporterMenu(member);
+        memberMenu(member);
+
     case 7:
         mainMenu();
         break;
@@ -287,8 +294,8 @@ void guestMenu()
 void hostMenu(Member &member){
     int choice;
     cout << "Host menu:\n";
-    cout << "1. View current booking request\n";
-    cout << "2. View history booking request\n";
+    cout << "1. View current booking requests\n";
+    cout << "2. View history booking requests\n";
     cout << "Enter your choice: ";
     cin >> choice;
     vector<string> listOfRequestsID;
@@ -318,6 +325,56 @@ void hostMenu(Member &member){
         break;
     }
 }
+
+void supporterMenu(Member &member){
+    int choice;
+    cout << "Host menu:\n";
+    cout << "1. View all current requests\n";
+    cout << "2. View all history requests\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    vector<string> listOfRequestsID;
+    vector<string> listOfHistoryRequest;
+    string requestID;
+    string action;
+    switch (choice)
+    {
+    case 1:
+        listOfRequestsID = member.getCurrentRequest(member.getUserId());
+        
+        if (listOfRequestsID[0] == "error"){
+            break;
+        } else {
+            requestID = member.getRequestIDByOrder(listOfRequestsID);
+            cout << "Choose an action for this request (accept/reject): ";
+            cin >> action;
+                if (action == "accept") {
+                // Update the status of the request to Accepted
+                member.acceptRequest(requestID);
+                break;
+            } else if (action == "reject") {
+                // Update the status of the request to Rejected
+                member.rejectRequest(requestID);
+                break;
+            } else {
+                std::cout << "Invalid action. Please choose 'accept' or 'reject'." << std::endl;
+            }   
+                break;
+
+        }
+    case 2:
+        listOfHistoryRequest = member.getHistoryRequest(member.getUserId());
+        if (listOfHistoryRequest[0] == "error"){
+            break;
+        }
+        break;
+    default:
+        cout << "Invalid choice!"
+             << "\n";
+        break;
+    }
+}
+
 
 void mainMenu()
 {

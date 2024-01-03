@@ -109,6 +109,10 @@ public:
     vector<string> getCurrentBooking(string hostID);
     string getRequestIDByOrder(vector<string> listOfRequestsID);
     void cancelBooking(string requestID);
+    vector<string> getHistoryRequest(string supporterID);
+    vector<string> getCurrentRequest(string supporterID);
+    void acceptRequest(string requestID);
+    void rejectRequest(string requestID);
 
     // Rating
     void addHostRating(int score, const std::string &comment);

@@ -59,9 +59,7 @@ void Request::setRequestID(string requestID_val){
     this->requestID = requestID_val;
 }
 
-void Request::setStatus(status newStatus){
-
-}
+//void Request::setStatus(status newStatus){}
 
 bool Request::isFileEmpty(std::ifstream &pfile)
 {
