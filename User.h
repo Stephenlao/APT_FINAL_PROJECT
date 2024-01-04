@@ -57,12 +57,13 @@ private:
     bool isListed;
     float minimumHostRatingScore;
     vector<string> historyBooking;
+    vector<Rating> skillRating;
 
 
 public:
     Member(string userId_val = "", string password_val = "",
            string userName_val = "", string fullName_val = "", string email_val = "",
-           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0, vector<string> historyBooking_val = {});
+           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0, vector<string> historyBooking_val = {}, vector<Rating> skillRating_val = {});
 
     // Allocate memory for creditPoint and assign the value
 
@@ -128,12 +129,18 @@ public:
     float getHostAvgRating();
     float getSpAvgRating();
     void setListedStatus(bool status);
+
     // Method to check if the member is listed
     bool isMemberListed() const ;    
 
     void showSupporterInfo();
     void saveMinimumHostRating(const std::string& filename, const string& userId);
     void deleteDefaultHostRatingScore(const std::string& userId);
+
+
+    // SkillRating
+    void addSkillRatingToFile(vector<Rating> skillRatingVct, string supporterID);
+
 
 
 

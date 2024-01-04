@@ -138,7 +138,7 @@ void User::setPassword(string password_val)
 Member::Member(string userId_val, string password_val,
                string userName_val, string fullName_val, string email_val,
                string phoneNumber_val, string homeAddress_val, string city_val,
-               float creditPoint_val, bool isListed,vector<Skill*> skillsList_val, float minimumHostRatingScore_val, vector<string> historyBooking_val)
+               float creditPoint_val, bool isListed,vector<Skill*> skillsList_val, float minimumHostRatingScore_val, vector<string> historyBooking_val, vector<Rating> skillRating_val)
 
     : User(userId_val, password_val), userName(userName_val),
       fullName(fullName_val), email(email_val), phoneNumber(phoneNumber_val),

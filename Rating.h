@@ -8,14 +8,16 @@
 using std::cout;
 class Rating {
 private:
-    std::vector<int>* scores;
-    std::vector<std::string>* comments;
+    int score;
+    std::string comment;
 
 public:
-    Rating(std::vector<int>* scoresPtr = {}, std::vector<std::string>* commentsPtr = {});
+    Rating(int scoresPtr = 0, std::string commentsPtr = "");
     ~Rating(); 
     void addRating(int score, const std::string& comment);
     void displayRating();
+    int getScore();
+    string getComment();
     float avgRating() const;
 
 };
