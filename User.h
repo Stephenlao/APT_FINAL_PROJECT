@@ -113,6 +113,12 @@ public:
     vector<string> getCurrentRequest(string supporterID);
     void acceptRequest(string requestID);
     void rejectRequest(string requestID);
+    // Add credit point to supporter and minus for host if request is accepted
+    std::pair<std::string, std::string> getSupporterIdAndSkillNameInRequestDat(string requestID);
+    string getHostIdInRequestDat(string requestID);
+    float getSkillRating(const std::string& skillData, const std::string& skillName);
+    float getConsumingPointOfSkillBySupporterId(string supporterID, string skillName);
+    void getHostIdAndDeductCreditPoint(string hostID,float consumingPoint);
 
     // Rating
     void addHostRating(int score, const std::string &comment);

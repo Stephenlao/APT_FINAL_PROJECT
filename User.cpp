@@ -647,8 +647,8 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
 
         if (data1[9] == "false") {
             if (data.size() > 9 && data[9] == "true" && data[7] == data1[7]) {
-                tempMember.setDetail(data, skillRating);
-                availableList.addUser(tempMember);
+                tempMember.setDetail(data, skillRating); // create object (supporter)
+                availableList.addUser(tempMember); // add supporter to vector 
             }
         } else {
             if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])
@@ -1157,7 +1157,7 @@ void Member::cancelBooking(string requestID){
     
    for (const auto &updatedLine : lines)
     {   
-            cout << updatedLine << "\n";
+            // cout << updatedLine << "\n";
             updateFile << updatedLine << "\n";
     }
 
@@ -1333,7 +1333,7 @@ void Member::acceptRequest(string requestID)
     
    for (const auto &updatedLine : lines)
     {   
-            cout << updatedLine << "\n";
+            // cout << updatedLine << "\n";
             updateFile << updatedLine << "\n";
     }
 
@@ -1407,7 +1407,7 @@ void Member::rejectRequest(string requestID)
     
    for (const auto &updatedLine : lines)
     {   
-            cout << updatedLine << "\n";
+            // cout << updatedLine << "\n";
             updateFile << updatedLine << "\n";
     }
 
@@ -1418,7 +1418,7 @@ void Member::rejectRequest(string requestID)
 string Member::getRequestIDByOrder(vector<string> listOfRequestsID){
     string requestID = "error";
     string input;
-    cout << "PLease choose number of the specific request you want:\n";
+    cout << "Please choose number of the specific request you want to cancel:\n";
     cout << "Enter number (or press x to quit): ";
     cin >> input;
 
@@ -1996,49 +1996,46 @@ void Admin::showInfo()
     cout << "Admin name: " << adminName << ", Email: " << email << "\n";
 }
 
-void Guest::viewSupporters()
-{
-    fstream myFile;
-    myFile.open("members.dat", std::ios::in);
-    if (!myFile.is_open())
-    {
-        std::cerr << "Unable to open file!"
-                  << "\n";
+
+
+void Guest::viewSupporters() {
+ 
+    fstream myFile("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!\n";
         return;
     }
-    cout << "All supporters: "
-         << "\n\n";
+
     string line;
+    getline(myFile, line); // Skip the header
 
-    // Skip the first line
-    if (!std::getline(myFile, line))
-    {
-        std::cerr << "Error or empty file.\n";
-        return;
-    }
-
-    while (getline(myFile, line))
-    {
+    while (getline(myFile, line)) {
+        string userId_val,fullName_val, email_val, phoneNumber_val, homeAddress_val, city_val, isListed_val;
         stringstream ss(line);
-        string fullName_val, email_val, phoneNumber_val, homeAddress_val, city_val, temp1, temp2, temp3;
-        getline(ss, temp1, ',');
-        getline(ss, temp2, ',');
-        getline(ss, temp3, ',');
-        // ignore first three information in file which is
-        // ID, password and username
+        vector<string> data;
+        string temp;
 
-        std::getline(ss, fullName_val, ',');
-        std::getline(ss, email_val, ',');
-        std::getline(ss, phoneNumber_val, ',');
-        std::getline(ss, homeAddress_val, ',');
-        std::getline(ss, city_val, ',');
-        // only print these information only for guest
-        cout << "Full name: " << fullName_val << " ,email: " << email_val << ",phone number: "
-             << phoneNumber_val << ", Home address: " << homeAddress_val << ", City: " << city_val
-             << "\n\n";
+        while (getline(ss, temp, ',')) {
+            data.push_back(temp);
+        }
+
+        if (data.size() >= 10 && data[9] == "true") {
+            userId_val = data[0];
+            fullName_val = data[3];
+            email_val = data[4];
+            phoneNumber_val = data[5];
+            homeAddress_val = data[6];
+            city_val = data[7];
+            isListed_val = data[9];
+
+       
+            cout << "Full name: " << fullName_val << " ,email: " << email_val 
+                 << ", phone number: " << phoneNumber_val << ", Home address: " << homeAddress_val
+                 << ", City: " << city_val << "\n\n";
+        }
     }
     myFile.close();
-};
+}
 
 void AvailableList::addUser(const Member &member) {
     if (member.isListed) {
@@ -2240,7 +2237,7 @@ Skill AvailableList::getRequestSkillName(string& userName){
             vector<Skill*> skillRatingSupporter = Member::extractSkillNameAndPoint(skillRating);        
 
             string input;
-            cout << "\n" << "PLease choose number of skill you want to book";
+            cout << "\n" << "Please choose number of skill you want to book";
             cout << "\n" << "Enter number (or press x to quit): ";
             cin >> input;
 
@@ -2263,6 +2260,272 @@ Skill AvailableList::getRequestSkillName(string& userName){
     myFile.close();
     return skillRequest;
 }
+
+
+// Add credit point to supporter and minus for host if request is accepted
+std::pair<std::string, std::string> Member::getSupporterIdAndSkillNameInRequestDat(std::string requestID)
+{
+    if(requestID == "error" || requestID == "invalid")
+    {
+        std::cout << "Invalid input!\n";
+        return std::make_pair("", ""); // Return an empty pair
+    }
+
+    std::fstream myFile("requests.dat", std::ios::in);
+    if (!myFile.is_open())
+    {
+        std::cerr << "There is no existence of supporter yet!\n";
+        return std::make_pair("", ""); // Return an empty pair
+    }
+
+    std::string line;
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+        std::string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+
+        if (requestID == requestId_val)
+        {
+            return std::make_pair(supporterId_val, skill_val); // Return the pair
+        }
+    }
+    return std::make_pair("", ""); // Return an empty pair if no match is found
+}
+
+
+string Member::getHostIdInRequestDat(string requestID) {
+       if(requestID == "error"){
+        cout << "Invalid input!\n" ;
+    }
+
+    if(requestID == "invalid"){
+        cout << "Invalid input!\n" ;
+    }
+
+    std::fstream myFile("requests.dat", std::ios::in | std::ios::out);
+
+    if (!myFile.is_open())
+    {
+        std::cerr << "There is no existence of supporter yet!"
+                  << "\n";
+        return "";
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+
+
+
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+
+        
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+
+        if (requestID == requestId_val)
+        {
+            return hostId_val;
+        }
+    }
+    return "";
+}
+
+
+float Member::getConsumingPointOfSkillBySupporterId(std::string supporterID, std::string skillName) {
+    std::fstream myFile;
+    float consumingPoint;
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!\n";
+        return -1;
+    }
+
+    // Skip the header line
+    std::string line;
+    std::getline(myFile, line);
+    std::vector<std::string> data1;
+    data1.push_back(line); // Add the header line to data1
+
+    while (std::getline(myFile, line)) {
+        std::vector<std::string> data;
+        std::stringstream ss(line);
+        std::string temp, skillRating;
+        float currentCreditPoint = 0.0f;
+        float newCreditPoint = 0.0f;
+        
+        // Parse the line until skill data
+        while (std::getline(ss, temp, ',')) {
+            if (temp.find("[[") != std::string::npos) {
+                skillRating = temp;
+                break;
+            } else {
+                data.push_back(temp);
+            }
+        }
+
+        // Continue parsing skill data
+        if (!skillRating.empty()) {
+            while (std::getline(ss, temp, ',')) {
+                skillRating += "," + temp;
+                if (temp.find("]]") != std::string::npos) {
+                    break;
+                }
+            }
+        }
+
+        if (data[0] == supporterID) {
+            consumingPoint = getSkillRating(skillRating, skillName);
+            currentCreditPoint = std::stof(data[8]);
+            newCreditPoint = currentCreditPoint + consumingPoint;
+            data[8] = std::to_string(newCreditPoint); // Update the credit point in the vector
+        }
+
+        // Create a string from the updated data and add to data1
+        std::stringstream updatedLine;
+        for (size_t i = 0; i < data.size(); ++i) {
+            updatedLine << data[i];
+            // if (i < data.size() - 1) {
+            updatedLine << ",";
+            // }
+        }
+        updatedLine << skillRating; // Add the skill rating at the end
+        data1.push_back(updatedLine.str());
+    }
+    myFile.close();
+
+    // Write the updated data back to the file
+    std::ofstream outFile("members.dat", std::ios::out | std::ios::trunc);
+    if (!outFile) {
+        std::cerr << "Unable to open file for writing!\n";
+        return -2;
+    }
+    for (const auto& line : data1) {
+        outFile << line << "\n";
+    }
+    outFile.close();
+    return consumingPoint;
+}
+
+// get consuming point if skillName is match with skillName in file
+float Member::getSkillRating(const std::string& skillData, const std::string& skillName) {
+    std::string temp;
+    std::stringstream ss(skillData);
+
+    // Removing the initial '[[' and final ']]'
+    if (skillData.size() > 2) {
+        ss.ignore(2);
+    }
+
+    while (std::getline(ss, temp, ';')) {
+        std::stringstream skillStream(temp);
+
+        std::string extractedSkill;
+        double rating = 0.0;
+
+        // Getting skill name
+        if (std::getline(skillStream, extractedSkill, ',')) {
+            // Removing possible leading '['
+            size_t start = extractedSkill.find('[');
+            if (start != std::string::npos) {
+                extractedSkill = extractedSkill.substr(start + 1);
+            }
+
+            // Getting rating
+            if (extractedSkill == skillName && skillStream >> rating) {
+                return rating; // Return the rating if skill matches
+            }
+        }
+    }
+
+    return -1; // Return -1 or any indicator for "not found"
+}
+
+
+void Member::getHostIdAndDeductCreditPoint(string hostID,float consumingPoint) {
+    std::fstream myFile;
+    myFile.open("members.dat", std::ios::in);
+    if (!myFile) {
+        std::cerr << "Unable to open file!\n";
+        return;
+    }
+
+    // Skip the header line
+    std::string line;
+    std::getline(myFile, line);
+    std::vector<std::string> data1;
+    data1.push_back(line); // Add the header line to data1
+
+    while (std::getline(myFile, line)) {
+        std::vector<std::string> data;
+        std::stringstream ss(line);
+        std::string temp, skillRating;
+        float currentCreditPoint = 0.0f;
+        float newCreditPoint = 0.0f;
+        
+        // Parse the line until skill data
+        while (std::getline(ss, temp, ',')) {
+            if (temp.find("[[") != std::string::npos) {
+                skillRating = temp;
+                break;
+            } else {
+                data.push_back(temp);
+            }
+        }
+
+        // Continue parsing skill data
+        if (!skillRating.empty()) {
+            while (std::getline(ss, temp, ',')) {
+                skillRating += "," + temp;
+                if (temp.find("]]") != std::string::npos) {
+                    break;
+                }
+            }
+        }
+
+        if (data[0] == hostID) {
+            currentCreditPoint = std::stof(data[8]);
+            newCreditPoint = currentCreditPoint - consumingPoint;
+            data[8] = std::to_string(newCreditPoint); // Update the credit point in the vector
+        }
+
+        // Create a string from the updated data and add to data1
+        std::stringstream updatedLine;
+        for (size_t i = 0; i < data.size(); ++i) {
+            updatedLine << data[i];
+            updatedLine << ",";
+        }
+        updatedLine << skillRating; // Add the skill rating at the end
+        data1.push_back(updatedLine.str());
+    }
+    myFile.close();
+
+    // Write the updated data back to the file
+    std::ofstream outFile("members.dat", std::ios::out | std::ios::trunc);
+    if (!outFile) {
+        std::cerr << "Unable to open file for writing!\n";
+        return;
+    }
+    for (const auto& line : data1) {
+        outFile << line << "\n";
+    }
+    outFile.close();
+}
+
+
 
 bool AvailableList::isValidNumber(const std::string& str) {
     for (char const &c : str) {

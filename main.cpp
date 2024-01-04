@@ -171,7 +171,7 @@ void memberMenu(Member &member)
         break;
     case 3:
        while (true) {
-        std::cout << "Do you want to listed yourself as a supporter (yes/no): ";
+        std::cout << "Do you want to listed yourself as a supporter (list/unlist): ";
         std::cin >> choice1;
 
         // Convert the input to lowercase for case-insensitive comparison
@@ -188,7 +188,7 @@ void memberMenu(Member &member)
 
         // Check if the user has skills but is not listed as a supporter (False)
         } else if (member.SkillsExistOrNot(member.getUserId()) && !member.isListedValidation(isListed_value)) {
-            if (choice1 == "yes") {
+            if (choice1 == "list") {
                 isListed = true;
                 member.deleteDefaultHostRatingScore(member.getUserId());
                 member.saveMinimumHostRating("members.dat",member.getUserId());
@@ -209,7 +209,7 @@ void memberMenu(Member &member)
 
             // The user has skills and is already listed as a supporter (True)
         } else {
-            if (choice1 == "yes") {
+            if (choice1 == "list") {
                 cout << "You are already a supporter!" << "\n";
                 memberMenu(member);
                 break;
@@ -220,7 +220,7 @@ void memberMenu(Member &member)
             }
           
         }
-        std::cout << "Please type 'yes' or 'no'." << std::endl;
+        std::cout << "Please type 'list' or 'unlist'." << std::endl;
 }
 
         if (isListed) {
@@ -328,7 +328,7 @@ void hostMenu(Member &member){
 
 void supporterMenu(Member &member){
     int choice;
-    cout << "Host menu:\n";
+    cout << "Supporter menu:\n";
     cout << "1. View all current requests\n";
     cout << "2. View all history requests\n";
     cout << "Enter your choice: ";
@@ -346,20 +346,30 @@ void supporterMenu(Member &member){
             break;
         } else {
             requestID = member.getRequestIDByOrder(listOfRequestsID);
-            cout << "Choose an action for this request (accept/reject): ";
-            cin >> action;
+            if (requestID == "x" || requestID == "X") {
+                memberMenu(member);
+            } else {
+                cout << "Choose an action for this request (accept/reject): ";
+                cin >> action;
                 if (action == "accept") {
                 // Update the status of the request to Accepted
                 member.acceptRequest(requestID);
+                std::pair<std::string, std::string> supporterIdAndSkill = member.getSupporterIdAndSkillNameInRequestDat(requestID);
+                float consumingPoint = member.getConsumingPointOfSkillBySupporterId(supporterIdAndSkill.first, supporterIdAndSkill.second);
+                string hostId = member.getHostIdInRequestDat(requestID);
+                member.getHostIdAndDeductCreditPoint(hostId,consumingPoint);
                 break;
-            } else if (action == "reject") {
+                } else if (action == "reject") {
                 // Update the status of the request to Rejected
                 member.rejectRequest(requestID);
                 break;
-            } else {
+                } else {
                 std::cout << "Invalid action. Please choose 'accept' or 'reject'." << std::endl;
-            }   
+                }   
                 break;
+
+            }
+            
 
         }
     case 2:
@@ -379,33 +389,49 @@ void supporterMenu(Member &member){
 void mainMenu()
 {
     int choice;
-    cout << "Use the app as 1. Guest      2. Member       3. Admin        4. Exit\n";
-    cout << "Enter choice: ";
-    cin >> choice;
-    Member member;
+    bool running = true; // Flag to keep the menu running
 
-    switch (choice)
+    while (running) // Loop to keep showing the menu
     {
-    case 1:
-        guestMenu();
-        break;
+        cout << "Use the app as 1. Guest      2. Member       3. Admin        4. Exit\n";
+        cout << "Enter choice: ";
+        cin >> choice;
 
-    case 2:
-        LogInRegMemberMenu();
-        break;
+        // Clear the input buffer to handle invalid input
+        if (cin.fail())
+        {
+            cin.clear(); // Clear the error flags
+            cin.ignore(INT_MAX, '\n'); // Ignore the remaining input
+            cout << "Invalid input! Please enter a number." << "\n";
+            continue; // Skip the rest of the loop and start over
+        }
 
-    case 3:
-        LogInadminMenu();
-        break;
-    case 4:
-        cout << "Exiting the application.\n";
-        exit(0);
-    default:
-        cout << "Invalid choice!"
-             << "\n";
-        break;
+        switch (choice)
+        {
+            case 1:
+                guestMenu();
+                break;
+
+            case 2:
+                LogInRegMemberMenu();
+                break;
+
+            case 3:
+                LogInadminMenu();
+                break;
+
+            case 4:
+                cout << "Exiting the application.\n";
+                running = false; // Stop the loop to exit the application
+                break;
+
+            default:
+                cout << "Invalid choice! Please try again." << "\n";
+                break; // No need to call mainMenu() again
+        }
     }
 }
+
 
 
 int main()
