@@ -3,6 +3,7 @@
 #include "Skill.h"
 #include <algorithm>
 #include <cctype>
+#include <climits>
 using std::cin;
 using std::cout;
 
@@ -423,6 +424,7 @@ void mainMenu()
             case 4:
                 cout << "Exiting the application.\n";
                 running = false; // Stop the loop to exit the application
+                exit(0);
                 break;
 
             default:

@@ -156,10 +156,10 @@ vector<Skill*> Member::getSkillsLists() {
 
 
 // Method to check if the member is listed
-void Member::setListedStatus(bool status) {
+// void Member::setListedStatus(bool status) {
 
-        isListed = status;
-}
+//         isListed = status;
+// }
 
 bool Member::isMemberListed() const {
     return isListed;
@@ -1443,35 +1443,35 @@ string Member::getRequestIDByOrder(vector<string> listOfRequestsID){
 
 
 // Rating
-void Member::addHostRating(int score, const std::string &comment)
-{
+// void Member::addHostRating(int score, const std::string &comment)
+// {
 
-    hostRating.addRating(score, comment);
-}
+//     hostRating.addRating(score, comment);
+// }
 
-void Member::addSupportRating(int score, const std::string &comment)
-{
-    supportRating.addRating(score, comment);
-}
+// void Member::addSupportRating(int score, const std::string &comment)
+// {
+//     supportRating.addRating(score, comment);
+// }
 
-void Member::getHostRating()
-{
-    hostRating.displayRating();
-}
+// void Member::getHostRating()
+// {
+//     hostRating.displayRating();
+// }
 
-void Member::getSupportRating()
-{
-    supportRating.displayRating();
-}
-float Member::getSpAvgRating()
-{
-    return supportRating.avgRating();
-}
+// void Member::getSupportRating()
+// {
+//     supportRating.displayRating();
+// }
+// float Member::getSpAvgRating()
+// {
+//     return supportRating.avgRating();
+// }
 
-float Member::getHostAvgRating()
-{
-    return hostRating.avgRating();
-}
+// float Member::getHostAvgRating()
+// {
+//     return hostRating.avgRating();
+// }
 
 void Member::registerMember()
 {
@@ -2392,6 +2392,8 @@ float Member::getConsumingPointOfSkillBySupporterId(std::string supporterID, std
             currentCreditPoint = std::stof(data[8]);
             newCreditPoint = currentCreditPoint + consumingPoint;
             data[8] = std::to_string(newCreditPoint); // Update the credit point in the vector
+            cout << "Your current credit point: " << currentCreditPoint <<  " cp\n";
+            cout << "Your credit point after accepted booking: " << newCreditPoint <<  " cp\n";
         }
 
         // Create a string from the updated data and add to data1

@@ -122,13 +122,13 @@ public:
     void getHostIdAndDeductCreditPoint(string hostID,float consumingPoint);
 
     // Rating
-    void addHostRating(int score, const std::string &comment);
-    void addSupportRating(int score, const std::string &comment);
-    void getHostRating();
-    void getSupportRating();
-    float getHostAvgRating();
-    float getSpAvgRating();
-    void setListedStatus(bool status);
+    // void addHostRating(int score, const std::string &comment);
+    // void addSupportRating(int score, const std::string &comment);
+    // void getHostRating();
+    // void getSupportRating();
+    // float getHostAvgRating();
+    // float getSpAvgRating();
+    // void setListedStatus(bool status);
 
     // Method to check if the member is listed
     bool isMemberListed() const ;    

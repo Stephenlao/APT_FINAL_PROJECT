@@ -4,8 +4,9 @@ R280,M9311,M3097,3-1-2024,aka,Cancel
 R5327,M9311,M3097,3-1-2024,aka,Cancel
 R6519,M9311,M3097,3-1-2024,aka,Cancel
 R9832,M9311,M3097,3-1-2024,aka,Cancel
-R53,M9249,M1671,3-1-2024,cleaning,Rejected
+R53,M9249,M1671,3-1-2024,cleaning,Rejected,[score:comment],[score:comment],[s:c]
 R6193,M9249,M2267,3-1-2024,cleaning,Accepted
 R3842,M9249,M1671,3-1-2024,cleaning,Pending
 R1024,M6846,M7568,4-1-2024,caring,Accepted
 R9070,M6846,M8720,4-1-2024,playing,Accepted
+R7855,M5471,M3097,5-1-2024,aka,Accepted

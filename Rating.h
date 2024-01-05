@@ -13,12 +13,12 @@ private:
 
 public:
     Rating(int scoresPtr = 0, std::string commentsPtr = "");
-    ~Rating(); 
-    void addRating(int score, const std::string& comment);
-    void displayRating();
+    // ~Rating(); 
+    // void addRating(int score, const std::string& comment);
+    // void displayRating();
     int getScore();
-    string getComment();
-    float avgRating() const;
+    std::string getComment();
+    // float avgRating() const;
 
 };
 
