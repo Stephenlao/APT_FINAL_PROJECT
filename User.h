@@ -60,14 +60,19 @@ private:
     vector<Rating> skillRating;
     vector<Rating> supporterRating;
     vector<Rating> hostRating;
+    float avgHostRating;
+
 
 
 
 
 public:
     Member(string userId_val = "", string password_val = "",
-           string userName_val = "", string fullName_val = "", string email_val = "",
-           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0, vector<string> historyBooking_val = {}, vector<Rating> skillRating_val = {});
+       string userName_val = "", string fullName_val = "", string email_val = "",
+       string phoneNumber_val = "", string homeAddress_val = "", string city_val = "",
+       float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},
+       float minimumHostRatingScore_val = 0, vector<string> historyBooking_val = {},
+       vector<Rating> skillRating_val = {}, float avgHostRating = 0);
 
     // Allocate memory for creditPoint and assign the value
 
@@ -89,7 +94,11 @@ public:
     // Setter function for creditPoint
     void setCreditPoint(float newCreditPoint);
     string getUsername() const;
-
+    //Get avgRating
+    float calculateAvgHostRating(string userID);
+    void updateAvgHostRating();
+    void saveAvgRatingToFile(const std::string& userID);
+    void appendAvgRatingToLine(std::string &line, float avgRating);
 
     // SKILL
     void createAndAddSkill(const std::string &skillName, float creditPerHour);
