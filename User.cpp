@@ -1185,7 +1185,7 @@ vector<string> Member::getHistoryRequest(string supporterID)
     while (std::getline(myFile, line)) {
         std::stringstream ss(line);
         
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val, skillRating;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
@@ -1193,6 +1193,7 @@ vector<string> Member::getHistoryRequest(string supporterID)
         std::getline(ss, date_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
+
         // Process the data
         if (supporterID == supporterId_val && status_val != "Pending") {
             result.push_back("RequestID: " + requestId_val + ", Host: " + getUserNamedById(hostId_val) + ", Supporter: " + getUserNamedById(supporterID)+ ", Date: " + date_val + ", Skill: " + skill_val + ", Status: " + status_val);
@@ -1215,6 +1216,9 @@ vector<string> Member::getHistoryRequest(string supporterID)
     
   return result;
 }
+
+
+
 
 vector<string> Member::getCurrentRequest(string supporterID)
 {
@@ -2525,6 +2529,378 @@ void Member::getHostIdAndDeductCreditPoint(string hostID,float consumingPoint) {
         outFile << line << "\n";
     }
     outFile.close();
+}
+
+
+
+
+
+
+// SKILL RATING
+
+string Member::getRequestIdByOrderNumber(const vector<string>& requestIdVct, int num) {
+    int currentOrder = 1;
+    for (int i = 0; i < requestIdVct.size(); i++) {
+        if (currentOrder == num) {
+            // Extract requestId_val from the string in requestIdVct
+            string requestId_val = requestIdVct[i].substr(11, requestIdVct[i].find(",") - 11);
+            return requestId_val;
+        }
+        currentOrder++;
+    }
+    return "";
+}
+
+string Member::checkStatus(const string& requestId) {
+    std::ifstream fileIn("requests.dat");
+    std::string line;
+
+    while (std::getline(fileIn, line)) {
+        std::stringstream ss(line);
+        std::string part;
+
+        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val, skillRating;
+
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+
+        // Extract the requestId
+        
+     
+        // Check if the requestId matches and return the status
+        if (requestId_val == requestId) {
+            return status_val;
+        }
+    }
+
+    return "None"; // Return "None" if not found
+
+}
+
+
+
+
+
+
+
+
+// HOST RATING
+void Member::saveHostRatingToFile(const std::vector<Rating>& hostRating_val, const std::string& requestId) {
+    std::ifstream fileIn("requests.dat");
+    std::stringstream buffer;
+    buffer << fileIn.rdbuf(); // Read the entire file into a stringstream
+    fileIn.close();
+
+    std::ofstream fileOut("requests.dat");
+    std::string line;
+    bool isFirstLine = true;
+
+    // Process each line in the file
+    while (std::getline(buffer, line)) {
+        if (isFirstLine) {
+            isFirstLine = false; // Skip the first header line
+            fileOut << line << std::endl;
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string requestIdInFile;
+        std::getline(ss, requestIdInFile, ','); // Extract requestId
+
+        if (requestIdInFile == requestId) {
+            // Append skillRating_val to the line
+            fileOut << line;
+            for (auto rating : hostRating_val) {
+                // hostRatingStr = "[host|" + std::to_string(rating.getScore()) + ":" + rating.getComment() + "]";
+                fileOut << ",[host|" << std::to_string(rating.getScore()) << ":" << rating.getComment() << "]";
+            }
+            fileOut << std::endl;
+            cout << "Save host rating score successfully!\n";
+        } else {
+            // Write the line as is
+            fileOut << line << std::endl;
+        }
+    }
+    fileOut.close();
+};
+
+
+void Member::saveHostRatingToFileV2(const std::vector<Rating>& hostRating_val, const std::string& requestId) {
+    std::ifstream fileIn("requests.dat");
+    std::stringstream buffer;
+    buffer << fileIn.rdbuf(); // Read the entire file into a stringstream
+    fileIn.close();
+
+    std::ofstream fileOut("requests.dat");
+    std::string line;
+    bool isFirstLine = true;
+
+    // Process each line in the file
+    while (std::getline(buffer, line)) {
+        if (isFirstLine) {
+            isFirstLine = false; // Skip the first header line
+            fileOut << line << std::endl;
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string requestIdInFile;
+        std::getline(ss, requestIdInFile, ','); // Extract requestId
+
+        if (requestIdInFile == requestId) {
+            // Append skillRating_val to the line
+            fileOut << line;
+            for (auto rating : hostRating_val) {
+                // hostRatingStr = "[host|" + std::to_string(rating.getScore()) + ":" + rating.getComment() + "]";
+                fileOut << ",[skillDefault|0:none],[supporterDefault|0:none],[host|" << std::to_string(rating.getScore()) << ":" << rating.getComment() << "]";
+            }
+            fileOut << std::endl;
+            cout << "Save host rating score successfully!\n";
+        } else {
+            // Write the line as is
+            fileOut << line << std::endl;
+        }
+    }
+    fileOut.close();
+}
+
+
+// function to check if skill rating score has not been added before
+// supporter rating. Skill rating should add first then supporter for consitency in file
+int Member::isSkillAndSupporterRatingExistOrNot(const std::string& requestId) {
+    std::ifstream file("requests.dat");
+    std::string line;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string requestIdInFile;
+        std::getline(ss, requestIdInFile, ','); // Extract requestId from the line
+
+        // Check if this is the line with the matching requestId
+        if (requestIdInFile == requestId) {
+            // Check if the line contains '[skill'
+            if (line.find("[skill|") != std::string::npos) {
+                return 1; // Skill rating has been added
+            } else {
+                return 2; // Skill rating has not been added
+            }
+        }
+    }
+    file.close();
+    return 3; // Return false if the requestId is not found in the file
+
+}
+
+
+vector<Rating> Member::getHostRatingVct() {
+    return hostRating;
+};
+
+
+
+//Skill and Supporter Rating
+void Member::saveSkillAndSupporterRatingToFile(const std::vector<Rating>& skillRating_val,const std::vector<Rating>& supporterRating_val, const std::string& requestId) {
+    std::ifstream fileIn("requests.dat");
+    std::stringstream buffer;
+    buffer << fileIn.rdbuf(); // Read the entire file into a stringstream
+    fileIn.close();
+
+    std::ofstream fileOut("requests.dat");
+    std::string line;
+    bool isFirstLine = true;
+
+    // Process each line in the file
+    while (std::getline(buffer, line)) {
+        if (isFirstLine) {
+            isFirstLine = false; // Skip the first header line
+            fileOut << line << std::endl;
+            continue;
+        }
+
+        std::stringstream ss(line);
+        std::string requestIdInFile;
+        std::getline(ss, requestIdInFile, ','); // Extract requestId
+
+        if (requestIdInFile == requestId) {
+            // Append skillRating_val to the line
+            fileOut << line;
+            // std::string skillRatingStr;
+            for (auto skillRating : skillRating_val) {
+                // skillRatingStr = "[skill|" + std::to_string(rating.getScore()) + ":" + rating.getComment() + "]";
+                fileOut << ",[skill|" << std::to_string(skillRating.getScore()) << ":" << skillRating.getComment() << "]";
+            }
+            for (auto supporterRating : supporterRating_val) {
+                // skillRatingStr = "[skill|" + std::to_string(rating.getScore()) + ":" + rating.getComment() + "]";
+                fileOut << ",[supporter|" << std::to_string(supporterRating.getScore()) << ":" << supporterRating.getComment() << "]";
+            }
+            fileOut << std::endl;
+            cout << "Save skill and supporter rating score successfully!\n";
+        } else {
+            // Write the line as is
+            fileOut << line << std::endl;
+        }
+    }
+    fileOut.close();
+}
+
+
+void Member::saveSkillAndSupporterRatingToFileV2(const std::vector<Rating>& skillRating_val, const std::vector<Rating>& supporterRating_val, const std::string& requestId) {
+    std::ifstream fileIn("requests.dat");
+    std::stringstream buffer;
+    buffer << fileIn.rdbuf();
+    fileIn.close();
+
+    std::ofstream fileOut("requests.dat");
+    std::string line;
+
+    while (std::getline(buffer, line)) {
+        std::stringstream ss(line);
+        std::string requestIdInFile;
+        std::getline(ss, requestIdInFile, ',');
+
+        if (requestIdInFile == requestId) {
+            // Update skillDefault rating
+            size_t skillPos = line.find("[skillDefault|");
+            std::string newSkillRating;
+            if (skillPos != std::string::npos) {
+                size_t skillEnd = line.find("]", skillPos);
+                for (auto skillRating : skillRating_val) {
+                    newSkillRating = "[skill|" + std::to_string(skillRating.getScore()) + ":" + skillRating.getComment() + "]";
+                }
+                line.replace(skillPos, skillEnd - skillPos + 1, newSkillRating);
+            }
+
+            // Update supporterDefault rating
+            size_t supporterPos = line.find("[supporterDefault|");
+            std::string newSupporterRating;
+            if (supporterPos != std::string::npos) {
+                size_t supporterEnd = line.find("]", supporterPos);
+                for (auto supporterRating : supporterRating_val) {
+                    newSupporterRating = "[supporter|" + std::to_string(supporterRating.getScore()) + ":" + supporterRating.getComment() + "]";
+                }
+                line.replace(supporterPos, supporterEnd - supporterPos + 1, newSupporterRating);
+            }
+
+            fileOut << line << std::endl;
+            std::cout << "Save skill and supporter default rating score successfully!\n";
+        } else {
+            fileOut << line << std::endl;
+        }
+    }
+    fileOut.close();
+}
+
+
+int Member::isHostRatingExistOrNot(const std::string& requestId) {
+    std::ifstream file("requests.dat");
+    std::string line;
+
+    while (std::getline(file, line)) {
+        std::stringstream ss(line);
+        std::string requestIdInFile;
+        std::getline(ss, requestIdInFile, ','); // Extract requestId from the line
+
+        // Check if this is the line with the matching requestId
+        if (requestIdInFile == requestId) {
+            // Check if the line contains '[skill'
+            if (line.find("[host|") != std::string::npos) {
+                return 1; // Skill rating has been added
+            } else {
+                return 2; // Skill rating has not been added
+            }
+        }
+    }
+    file.close();
+    return 3; // Return false if the requestId is not found in the file
+}
+
+
+// function to clear skill and supporter score and comment default
+void clearSkillAndSupporterRatings(const std::string& requestId) {
+    std::ifstream fileIn("requests.dat");
+    std::stringstream buffer;
+    buffer << fileIn.rdbuf();
+    fileIn.close();
+
+    std::ofstream fileOut("requests.dat");
+    std::string line;
+
+    while (std::getline(buffer, line)) {
+        std::stringstream ss(line);
+        std::string requestIdInFile;
+        std::getline(ss, requestIdInFile, ',');
+
+        if (requestIdInFile == requestId) {
+            // Clear skill and supporter ratings
+            size_t skillPos = line.find("[skillDefault|");
+            size_t supporterPos = line.find("[supporterDefault|");
+
+            if (skillPos != std::string::npos) {
+                size_t skillEnd = line.find("]", skillPos);
+                line.replace(skillPos + 7, skillEnd - skillPos - 7, ":");  // Replace score and comment with ":"
+            }
+
+            if (supporterPos != std::string::npos) {
+                size_t supporterEnd = line.find("]", supporterPos);
+                line.replace(supporterPos + 11, supporterEnd - supporterPos - 11, ":");  // Replace score and comment with ":"
+            }
+
+            fileOut << line << std::endl;
+        } else {
+            fileOut << line << std::endl;
+        }
+    }
+    fileOut.close();
+}
+
+
+
+vector<Rating> Member::getSkillRatingVct() {
+    return skillRating;
+};
+
+
+
+vector<Rating> Member::getSupporterRatingVct() {
+    return supporterRating;
+};
+
+
+
+// SCORE AND COMMENT TO ALL RATING
+Rating Member::addScoreAndComment() {
+    float score;
+    std::string comment;
+
+    while (true) {
+        std::cout << "Enter score (1 to 5): ";
+        std::cin >> score;
+
+        // Check if the input is a floating point number
+        if (std::cin.fail()) {
+            std::cin.clear(); // Clear the error flags
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // Ignore the incorrect input
+            std::cout << "Invalid input. Please enter a number." << std::endl;
+            continue;
+        }
+
+        // Check if the score is in the range 1 to 5
+        if (score < 1.0 || score > 5.0) {
+            std::cout << "Score must be between 1 and 5." << std::endl;
+            continue;
+        }
+
+        break; // Exit the loop if valid score
+    }
+
+    std::cout << "Enter comment: ";
+    std::getline(std::cin >> std::ws, comment);
+
+    return Rating(score, comment);
 }
 
 

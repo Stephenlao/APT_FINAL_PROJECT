@@ -14,6 +14,8 @@ void LogInRegMemberMenu();
 void memberMenu(Member &member);
 void hostMenu(Member &member);
 void supporterMenu(Member &member);
+void HostRatingMenu(Member &member,const string& requestId);
+void SupporterRatingMenu(Member &member,const string& requestId);
 
 void LogInadminMenu() {
     int choice;
@@ -292,6 +294,8 @@ void guestMenu()
     }
 }
 
+
+
 void hostMenu(Member &member){
     int choice;
     cout << "Host menu:\n";
@@ -302,6 +306,8 @@ void hostMenu(Member &member){
     vector<string> listOfRequestsID;
     vector<string> listOfHistoryRequest;
     string requestID;
+    string input;
+    int number;
     switch (choice)
     {
     case 1:
@@ -316,10 +322,44 @@ void hostMenu(Member &member){
         }
     case 2:
         listOfHistoryRequest = member.getHistoryBooking(member.getUserId());
-        if (listOfHistoryRequest[0] == "error"){
+        // if (listOfHistoryRequest[0] == "error"){
+        //     break;
+        // }
+
+        cout << "Enter number for choosing rating supporter (or press x to quit): ";
+        cin >> input;
+
+        if (input == "x" || input == "X") {
+            cout << "Exiting\n";
+            break;
+        };
+
+
+
+        number = std::stoi(input);
+        if (member.getRequestIdByOrderNumber(listOfHistoryRequest,number) == "") {
+            cout << "Incorrect order number!\n";
+            memberMenu(member);
+            break;
+        } else {
+            string requestId_val = member.getRequestIdByOrderNumber(listOfHistoryRequest,number);
+            if (member.checkStatus(requestId_val) == "Accepted" && member.isSkillAndSupporterRatingExistOrNot(requestId_val) == 1 ) {
+                cout << "\n\nYou have already rating.Thank you!\n\n";
+                memberMenu(member);
+           
+            } else if(member.checkStatus(requestId_val) == "Rejected") {
+                cout << "\n\nSorry! this booking is rejected. You can not rating!\n\n";
+                memberMenu(member);
+
+            } else if(member.checkStatus(requestId_val) == "Accepted") {
+                cout << "\nYou are eligible for rating!\n";
+                HostRatingMenu(member,requestId_val);            
+            } else {
+                cout << "\n\nSorry! this booking is cancel. You can not rating!\n\n";
+                memberMenu(member);
+            }
             break;
         }
-        break;
     default:
         cout << "Invalid choice!"
              << "\n";
@@ -338,6 +378,8 @@ void supporterMenu(Member &member){
     vector<string> listOfHistoryRequest;
     string requestID;
     string action;
+    string input;
+    int number;
     switch (choice)
     {
     case 1:
@@ -374,8 +416,41 @@ void supporterMenu(Member &member){
 
         }
     case 2:
+    // debug getHistoryRequest
         listOfHistoryRequest = member.getHistoryRequest(member.getUserId());
         if (listOfHistoryRequest[0] == "error"){
+            break;
+        }
+
+        cout << "Enter number for choosing rating supporter (or press x to quit): ";
+        cin >> input;
+
+        if (input == "x" || input == "X") {
+            cout << "Exiting...\n";
+            break;
+        }
+
+        number = std::stoi(input);
+        if (member.getRequestIdByOrderNumber(listOfHistoryRequest,number) == "") {
+            cout << "Incorrect order number!\n";
+            memberMenu(member);
+            break;
+        } else {
+            string requestId_val = member.getRequestIdByOrderNumber(listOfHistoryRequest,number);
+            if (member.checkStatus(requestId_val) == "Accepted" && member.isHostRatingExistOrNot(requestId_val) == 1) {
+                cout << "\n\nYou have already rated.Thank you!\n\n";
+                memberMenu(member);
+              
+            } else if(member.checkStatus(requestId_val) == "Rejected") {
+                cout << "\n\nSorry! this booking is rejected. You can not rating!\n\n";
+                memberMenu(member);
+            } else if (member.checkStatus(requestId_val) == "Accepted") {
+                cout << "\n\nYou are eligible for rating!\n\n";
+                SupporterRatingMenu(member,requestId_val);
+            } else  {
+                cout << "\n\nSorry! this rating is cancel. You can not rating!\n\n";
+                memberMenu(member);
+            }
             break;
         }
         break;
@@ -385,6 +460,119 @@ void supporterMenu(Member &member){
         break;
     }
 }
+
+void HostRatingMenu(Member &member,const string& requestId) {
+    int choice;
+    cout << "Host Rating menu:\n";
+    cout << "1. Skill and Supporter rating\n";
+    cout << "2. Back to member menu\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    Rating skillRating;
+    Rating supporterRating;
+    vector<Rating> skillRatingVct;
+    vector<Rating> supporterRatingVct;
+
+    switch (choice)
+    {
+    case 1:
+        // check whether skill and supporter is whether create if yes => not allow to user enter twice
+        if (member.isSkillAndSupporterRatingExistOrNot(requestId) == 2) {
+            // if host rating has already exist
+            if (member.isHostRatingExistOrNot(requestId) == 1) {
+                cout << "Skill rating V2\n";
+                skillRating = member.addScoreAndComment();
+                skillRatingVct = member.getSkillRatingVct();
+                skillRatingVct.push_back(skillRating);
+                cout << "\n";
+
+                cout << "Supporter rating V2\n";
+                supporterRating = member.addScoreAndComment();
+                supporterRatingVct = member.getSupporterRatingVct();
+                supporterRatingVct.push_back(supporterRating);
+                member.saveSkillAndSupporterRatingToFileV2(skillRatingVct,supporterRatingVct,requestId);
+                cout << "\n\n";
+                HostRatingMenu(member,requestId);
+
+        } else {
+                cout << "Skill rating\n";
+                skillRating = member.addScoreAndComment();
+                skillRatingVct = member.getSkillRatingVct();
+                skillRatingVct.push_back(skillRating);
+                cout << "\n";
+
+                cout << "Supporter rating\n";
+                supporterRating = member.addScoreAndComment();
+                supporterRatingVct = member.getSupporterRatingVct();
+                supporterRatingVct.push_back(supporterRating);
+                member.saveSkillAndSupporterRatingToFile(skillRatingVct,supporterRatingVct,requestId);
+                cout << "\n\n";
+                HostRatingMenu(member,requestId);
+            }
+        } else {
+            cout << "\nSorry rating is implemeted once only. You have already rating this supporter!\n\n";
+            HostRatingMenu(member,requestId);
+        }
+        break;
+    case 2:
+        memberMenu(member);
+        break;
+    default:
+        cout << "Invalid choice!\n";
+        memberMenu(member);
+        break;
+    }
+}
+
+
+
+void SupporterRatingMenu(Member &member,const string& requestId) {
+    int choice;
+    cout << "Supporter Rating menu:\n";
+    cout << "1. Host rating\n";
+    cout << "2. Back to member menu\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    Rating hostRating;
+    vector<Rating> hostRatingVct;
+
+    switch (choice)
+    {
+    case 1:
+        if (member.isHostRatingExistOrNot(requestId) == 2) {
+            // skill and supporter rating is exist
+            if (member.isSkillAndSupporterRatingExistOrNot(requestId) == 1) {
+                hostRating = member.addScoreAndComment();
+                hostRatingVct = member.getHostRatingVct();
+                hostRatingVct.push_back(hostRating);
+                member.saveHostRatingToFile(hostRatingVct,requestId);
+                cout << "\n\n";
+                SupporterRatingMenu(member,requestId);
+                // if skill and supporter rating is not exist
+            } else {
+                hostRating = member.addScoreAndComment();
+                hostRatingVct = member.getHostRatingVct();
+                hostRatingVct.push_back(hostRating);
+                member.saveHostRatingToFileV2(hostRatingVct,requestId);
+                cout << "\n\n";
+                SupporterRatingMenu(member,requestId);
+            }
+        } else {
+            cout << "\nSorry rating is implemeted once only.You have already rating this host!\n\n";
+            SupporterRatingMenu(member,requestId);
+        }
+        
+       
+        break;
+    case 2:
+        memberMenu(member);
+        break;
+    default:
+        cout << "Invalid choice!\n";
+        memberMenu(member);
+        break;
+    }
+};
 
 
 void mainMenu()
@@ -439,37 +627,4 @@ void mainMenu()
 int main()
 {
     mainMenu();
-    // Member mem1("tuananh", "tuananh", "tuananh", "tuananh", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
-    // Member mem2("tom", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
-    // Member mem3("tit", "tom", "tom", "tom Name", "tuananh@example.com", "1234567890", "123 Street, City", "Sai Gon", 20);
-
-    // mem1.showInfo();
-    // mem1.createAndAddSkill("C++", 200);
-    // mem1.createAndAddSkill("Java", 200);
-    // mem1.createAndAddSkill("ReactJS", 200);
-
-    // mem1.showInfo();
-    // mem1.addHostRating(5, "Verygood");
-    // mem1.addHostRating(3, "Normal");
-    // mem1.addHostRating(1, "Bad");
-    // mem1.addSupportRating(4, "Good");
-    // mem1.addSupportRating(1, "OK");
-    // cout << "Host Rating: "
-    //      << "\n";
-    // mem1.getHostRating();
-    // cout << "Support Rating: "
-    //      << "\n";
-
-    // mem1.getSupportRating();
-
-    // cout << "Support avg rating: " << mem1.getSpAvgRating() << "\n";
-    // mem1.setListedStatus(true);
-    // mem2.setListedStatus(true);
-    // mem3.setListedStatus(true);
-    // AvailableList list1;
-    // list1.addUser(mem1);
-    // list1.addUser(mem2);
-    // // list1.addUser(mem3);
-
-    // list1.displayListedMembers();
 }

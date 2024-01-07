@@ -52,12 +52,16 @@ private:
     string city;
     float *creditPoint;
     vector<Skill*> skillsList;
-    Rating hostRating;
-    Rating supportRating;
+    // Rating hostRating;
+    // Rating supportRating;
     bool isListed;
     float minimumHostRatingScore;
     vector<string> historyBooking;
     vector<Rating> skillRating;
+    vector<Rating> supporterRating;
+    vector<Rating> hostRating;
+
+
 
 
 public:
@@ -131,16 +135,30 @@ public:
     // void setListedStatus(bool status);
 
     // Method to check if the member is listed
-    bool isMemberListed() const ;    
+    bool isMemberListed() const;    
 
     void showSupporterInfo();
     void saveMinimumHostRating(const std::string& filename, const string& userId);
     void deleteDefaultHostRatingScore(const std::string& userId);
 
 
-    // SkillRating
-    void addSkillRatingToFile(vector<Rating> skillRatingVct, string supporterID);
 
+    //RATING SCORE (SKILL,SUPPORTER AND HOST RATING)
+    string getRequestIdByOrderNumber(const vector<string>& requestIdVct, int num);
+    // SkillAndSupporterRating (Host role)
+    void saveSkillAndSupporterRatingToFile(const std::vector<Rating>& skillRating_val,const std::vector<Rating>& supporterRating_val, const std::string& requestId);
+    int isHostRatingExistOrNot(const std::string& requestId);
+    void saveSkillAndSupporterRatingToFileV2(const std::vector<Rating>& skillRating_val, const std::vector<Rating>& supporterRating_val, const std::string& requestId);
+    vector<Rating> getSkillRatingVct();
+    vector<Rating> getSupporterRatingVct();
+    // HostRating (Supporter role)
+    void saveHostRatingToFile(const std::vector<Rating>& hostRating_val, const std::string& requestId);
+    void saveHostRatingToFileV2(const std::vector<Rating>& hostRating_val, const std::string& requestId);
+    int isSkillAndSupporterRatingExistOrNot(const std::string& requestId);
+    vector<Rating> getHostRatingVct();
+    // score and comment to all rating
+    Rating addScoreAndComment();
+    string checkStatus(const string& requestId);
 
 
 

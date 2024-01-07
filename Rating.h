@@ -8,17 +8,19 @@
 using std::cout;
 class Rating {
 private:
-    int score;
+    float score;
     std::string comment;
 
 public:
-    Rating(int scoresPtr = 0, std::string commentsPtr = "");
+    Rating(float scoresPtr = 0, std::string commentsPtr = "");
     // ~Rating(); 
     // void addRating(int score, const std::string& comment);
     // void displayRating();
-    int getScore();
+    float getScore();
     std::string getComment();
     // float avgRating() const;
+    static void insertRating(std::string& line, const std::string& ratingTag, const std::string& ratingString);
+
 
 };
 

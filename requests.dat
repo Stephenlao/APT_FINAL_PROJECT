@@ -4,9 +4,13 @@ R280,M9311,M3097,3-1-2024,aka,Cancel
 R5327,M9311,M3097,3-1-2024,aka,Cancel
 R6519,M9311,M3097,3-1-2024,aka,Cancel
 R9832,M9311,M3097,3-1-2024,aka,Cancel
-R53,M9249,M1671,3-1-2024,cleaning,Rejected,[score:comment],[score:comment],[s:c]
+R53,M9249,M1671,3-1-2024,cleaning,Rejected
 R6193,M9249,M2267,3-1-2024,cleaning,Accepted
 R3842,M9249,M1671,3-1-2024,cleaning,Pending
-R1024,M6846,M7568,4-1-2024,caring,Accepted
-R9070,M6846,M8720,4-1-2024,playing,Accepted
+R1024,M6846,M7568,4-1-2024,caring,Accepted,[skill|4.000000:good],[supporter|5.000000:great]
+R9070,M6846,M8720,4-1-2024,playing,Accepted,[skill|4.000000:goo],[supporter|3.000000:fine],[host|4.000000:good]
 R7855,M5471,M3097,5-1-2024,aka,Accepted
+R5877,M6846,M3687,6-1-2024,play games,Accepted,[skill|1.000000:bad],[supporter|4.000000:mid]
+R835,M6846,M2267,6-1-2024,cleaning,Rejected
+R9763,M6846,M8720,7-1-2024,playing,Accepted,[skill|5.000000:good],[supporter|4.500000:very good],[host|4.000000:wonderful]
+R9799,M6846,M8720,7-1-2024,guitar,Rejected
