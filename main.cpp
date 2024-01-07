@@ -257,8 +257,8 @@ void memberMenu(Member &member)
         memberMenu(member);
 
     case 7:
-    cout << "Please login again for top-up the credit points\n";
-
+    member.getCurrentCreditPoints(member.getUserId());
+    cout << "Please login again if you want to top-up the credit points\n";
     // Store the result of loginMember in a variable
     int loginResult;
     loginResult = member.loginMember();
@@ -482,15 +482,13 @@ void supporterMenu(Member &member){
 }
 void topUpMenu (Member &member){
     string choice;
-    member.getCurrentCreditPoints(member.getUserId());
-
     while (true){
-        cout << "Do you want to continue to top-up (yes/no): \n";
+        cout << "\nDo you want to continue topping up your credit points? (yes/no): ";
         cin >> choice;
 
         if (choice == "yes"){
             float creditToAdd;
-            cout << "Enter the number of credit point you want to top-up ($1 = 1 credit point): \n";
+            cout << "Enter the number of credit points you want to top-up ($1 = 1 credit point): ";
             cin >> creditToAdd;
             member.topUpCreditPoints(member.getUserId(), creditToAdd);
             member.getCurrentCreditPoints(member.getUserId());

@@ -959,7 +959,7 @@ void Member::getCurrentCreditPoints(string userId) {
 
         if (temp_userID == userId) {
             float creditPoints = std::stof(tempCreditPoint);
-            std::cout << "Your current credit points: " << creditPoints << "\n";
+            std::cout << "Your current credit points: " << creditPoints << " credit points\n";
             myFile.close();
             return;
         }
