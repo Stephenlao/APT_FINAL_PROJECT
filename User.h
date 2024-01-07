@@ -83,13 +83,15 @@ public:
     string getUserIdByName(string userName);
     string getUserNamedById(string userId);
     void updateCreditInFile(string userId, float newCreditPoint);
+    void topUpCreditPoints(string userId, float additionalCreditPoint);
+    void getCurrentCreditPoints(string userId);
     void updatePasswordInFile();
     // Getter function for creditPoint
     float getCreditPoint() const;
     // Setter function for creditPoint
     void setCreditPoint(float newCreditPoint);
     string getUsername() const;
-
+    
 
     // SKILL
     void createAndAddSkill(const std::string &skillName, float creditPerHour);

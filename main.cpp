@@ -16,6 +16,7 @@ void hostMenu(Member &member);
 void supporterMenu(Member &member);
 void HostRatingMenu(Member &member,const string& requestId);
 void SupporterRatingMenu(Member &member,const string& requestId);
+void topUpMenu(Member &member);
 
 void LogInadminMenu() {
     int choice;
@@ -149,7 +150,8 @@ void memberMenu(Member &member)
     cout << "4.View all available supporters\n";
     cout << "5.Host action\n";
     cout << "6.Supporter action\n";
-    cout << "7.Back to main menu\n";
+    cout << "7.Top-up credit points\n";
+    cout << "8.Back to main menu\n";
     cout << "Enter your choice: ";
     cin >> choice;
     string choice1;
@@ -255,6 +257,26 @@ void memberMenu(Member &member)
         memberMenu(member);
 
     case 7:
+    cout << "Please login again for top-up the credit points\n";
+
+    // Store the result of loginMember in a variable
+    int loginResult;
+    loginResult = member.loginMember();
+        if (loginResult == 0)
+        {
+            mainMenu();
+        }
+        else if (loginResult == 1)
+        {
+            topUpMenu(member);
+        }
+        else
+        {
+            mainMenu();
+        }
+        break;
+
+    case 8:
         mainMenu();
         break;
     default:
@@ -333,8 +355,6 @@ void hostMenu(Member &member){
             cout << "Exiting\n";
             break;
         };
-
-
 
         number = std::stoi(input);
         if (member.getRequestIdByOrderNumber(listOfHistoryRequest,number) == "") {
@@ -460,6 +480,30 @@ void supporterMenu(Member &member){
         break;
     }
 }
+void topUpMenu (Member &member){
+    string choice;
+    member.getCurrentCreditPoints(member.getUserId());
+
+    while (true){
+        cout << "Do you want to continue to top-up (yes/no): \n";
+        cin >> choice;
+
+        if (choice == "yes"){
+            float creditToAdd;
+            cout << "Enter the number of credit point you want to top-up ($1 = 1 credit point): \n";
+            cin >> creditToAdd;
+            member.topUpCreditPoints(member.getUserId(), creditToAdd);
+            member.getCurrentCreditPoints(member.getUserId());
+            memberMenu(member);
+        } else if (choice == "no") {
+            memberMenu(member);
+            break;
+        } else {
+            std::cout << "Invalid action. Please choose 'yes' or 'no'." << std::endl;
+        } 
+    }  
+}
+
 
 void HostRatingMenu(Member &member,const string& requestId) {
     int choice;
@@ -573,7 +617,18 @@ void SupporterRatingMenu(Member &member,const string& requestId) {
         break;
     }
 };
+void welcomeScreen(){
+    cout << "\n EEET2482/ COSC2082 ASSIGNMENT \n";
+    cout << "“TIME BANK” APPLICATION \n";
 
+    cout << "Instructor: Mr.Tran Duc Linh \n";
+    cout << "\n Group: Group No.7 \n";
+    cout << "s3970375, Bui Tuan Anh \n";
+    cout << "s3891925, Lao Vinh Khang  \n";
+    cout << "s3919657, Tran Nhat Tien \n";
+    cout << "s3932105, Ton Nu Ngoc Khanh \n";
+    mainMenu();
+}
 
 void mainMenu()
 {
@@ -626,5 +681,5 @@ void mainMenu()
 
 int main()
 {
-    mainMenu();
+    welcomeScreen();
 }
