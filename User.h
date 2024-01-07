@@ -52,16 +52,22 @@ private:
     string city;
     float *creditPoint;
     vector<Skill*> skillsList;
-    Rating hostRating;
-    Rating supportRating;
+    // Rating hostRating;
+    // Rating supportRating;
     bool isListed;
     float minimumHostRatingScore;
+    vector<string> historyBooking;
+    vector<Rating> skillRating;
+    vector<Rating> supporterRating;
+    vector<Rating> hostRating;
+
+
 
 
 public:
     Member(string userId_val = "", string password_val = "",
            string userName_val = "", string fullName_val = "", string email_val = "",
-           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0);
+           string phoneNumber_val = "", string homeAddress_val = "", string city_val = "", float creditPoint_val = 0, bool isListed = false, vector<Skill*> skillsList_val = {},float minimumHostRatingScore_val = 0, vector<string> historyBooking_val = {}, vector<Rating> skillRating_val = {});
 
     // Allocate memory for creditPoint and assign the value
 
@@ -75,6 +81,7 @@ public:
     int readDataInFileToCheckLogin(string userNameIn, string passwordIn);
     int loginMember();
     string getUserIdByName(string userName);
+    string getUserNamedById(string userId);
     void updateCreditInFile(string userId, float newCreditPoint);
     void updatePasswordInFile();
     // Getter function for creditPoint
@@ -103,22 +110,55 @@ public:
     // REQUEST
     bool checkCredit(float creditPerHour);
     void createRequest(string skillRequest, string hostID, string supporterID);
-
+    vector<string> getHistoryBooking(string hostID);
+    vector<string> getCurrentBooking(string hostID);
+    string getRequestIDByOrder(vector<string> listOfRequestsID);
+    void cancelBooking(string requestID);
+    vector<string> getHistoryRequest(string supporterID);
+    vector<string> getCurrentRequest(string supporterID);
+    void acceptRequest(string requestID);
+    void rejectRequest(string requestID);
+    // Add credit point to supporter and minus for host if request is accepted
+    std::pair<std::string, std::string> getSupporterIdAndSkillNameInRequestDat(string requestID);
+    string getHostIdInRequestDat(string requestID);
+    float getSkillRating(const std::string& skillData, const std::string& skillName);
+    float getConsumingPointOfSkillBySupporterId(string supporterID, string skillName);
+    void getHostIdAndDeductCreditPoint(string hostID,float consumingPoint);
 
     // Rating
-    void addHostRating(int score, const std::string &comment);
-    void addSupportRating(int score, const std::string &comment);
-    void getHostRating();
-    void getSupportRating();
-    float getHostAvgRating();
-    float getSpAvgRating();
-    void setListedStatus(bool status);
+    // void addHostRating(int score, const std::string &comment);
+    // void addSupportRating(int score, const std::string &comment);
+    // void getHostRating();
+    // void getSupportRating();
+    // float getHostAvgRating();
+    // float getSpAvgRating();
+    // void setListedStatus(bool status);
+
     // Method to check if the member is listed
-    bool isMemberListed() const ;    
+    bool isMemberListed() const;    
 
     void showSupporterInfo();
     void saveMinimumHostRating(const std::string& filename, const string& userId);
     void deleteDefaultHostRatingScore(const std::string& userId);
+
+
+
+    //RATING SCORE (SKILL,SUPPORTER AND HOST RATING)
+    string getRequestIdByOrderNumber(const vector<string>& requestIdVct, int num);
+    // SkillAndSupporterRating (Host role)
+    void saveSkillAndSupporterRatingToFile(const std::vector<Rating>& skillRating_val,const std::vector<Rating>& supporterRating_val, const std::string& requestId);
+    int isHostRatingExistOrNot(const std::string& requestId);
+    void saveSkillAndSupporterRatingToFileV2(const std::vector<Rating>& skillRating_val, const std::vector<Rating>& supporterRating_val, const std::string& requestId);
+    vector<Rating> getSkillRatingVct();
+    vector<Rating> getSupporterRatingVct();
+    // HostRating (Supporter role)
+    void saveHostRatingToFile(const std::vector<Rating>& hostRating_val, const std::string& requestId);
+    void saveHostRatingToFileV2(const std::vector<Rating>& hostRating_val, const std::string& requestId);
+    int isSkillAndSupporterRatingExistOrNot(const std::string& requestId);
+    vector<Rating> getHostRatingVct();
+    // score and comment to all rating
+    Rating addScoreAndComment();
+    string checkStatus(const string& requestId);
 
 
 

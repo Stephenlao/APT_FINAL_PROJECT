@@ -35,7 +35,7 @@ void Request::saveRequestDataToFile(string hostID, string supporterID, string sk
         std::ifstream inFile("requests.dat");
         if (isFileEmpty(inFile))
         {
-            myFile << "requestID,hostID,date,supporterID,skill,status\n";
+            myFile << "requestID,hostID,supporterID,date,skill,status" << "\n";
         }
         inFile.close();
 
@@ -59,9 +59,7 @@ void Request::setRequestID(string requestID_val){
     this->requestID = requestID_val;
 }
 
-void Request::setStatus(status newStatus){
-
-}
+//void Request::setStatus(status newStatus){}
 
 bool Request::isFileEmpty(std::ifstream &pfile)
 {
