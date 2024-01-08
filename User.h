@@ -98,8 +98,8 @@ public:
     float calculateAvgHostRating(string userID);
     void updateAvgHostRating();
     void saveAvgRatingToFile(const std::string& userID);
-    void appendAvgRatingToLine(std::string &line, float avgRating);
-
+    float getHostRatingByUserID(const std::string &userID);
+    void setAvgHostRating(float amount);
     // SKILL
     void createAndAddSkill(const std::string &skillName, float creditPerHour);
     void saveSkillsInFile(string userID);

@@ -138,7 +138,7 @@ void User::setPassword(string password_val)
 Member::Member(string userId_val, string password_val,
                string userName_val, string fullName_val, string email_val,
                string phoneNumber_val, string homeAddress_val, string city_val,
-               float creditPoint_val, bool isListed, vector<Skill*> skillsList_val,
+               float creditPoint_val, bool isListed, vector<Skill *> skillsList_val,
                float minimumHostRatingScore_val, vector<string> historyBooking_val,
                vector<Rating> skillRating_val, float avgHostRating)
     : User(userId_val, password_val), userName(userName_val),
@@ -166,7 +166,10 @@ bool Member::isMemberListed() const
 {
     return isListed;
 }
-
+void Member::setAvgHostRating(float amount)
+{
+    this->avgHostRating = amount;
+}
 string Member::getUsername() const
 {
     return userName;
@@ -216,17 +219,20 @@ bool Member::isUsernameUnique(const string &userName)
     }
 }
 
-void Member::saveDataToFile(const Member &member) {
+void Member::saveDataToFile(const Member &member)
+{
     std::fstream myFile;
     myFile.open("members.dat", std::ios::app | std::ios::out);
-    
-    if (!myFile.is_open()) {
+
+    if (!myFile.is_open())
+    {
         std::cerr << "Unable to open file!" << std::endl;
         return;
     }
 
     std::ifstream inFile("members.dat");
-    if (isFileEmpty(inFile)) {
+    if (isFileEmpty(inFile))
+    {
         myFile << "userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,MinimumHostRating,SkillRating,AvgHostRating\n";
     }
     inFile.close();
@@ -237,12 +243,12 @@ void Member::saveDataToFile(const Member &member) {
     std::string avgHostRatingStr = std::to_string(member.avgHostRating);
 
     myFile << member.userId << "," << member.password << "," << member.userName
-               << "," << member.fullName << "," << member.email << "," << member.phoneNumber << ","
-               << member.homeAddress << "," << member.city << "," << creditPointStr << "," << isListedStr << "," << minimumHostRatingScoreStr << "," << "\n";
+           << "," << member.fullName << "," << member.email << "," << member.phoneNumber << ","
+           << member.homeAddress << "," << member.city << "," << creditPointStr << "," << isListedStr << "," << minimumHostRatingScoreStr << ","
+           << "\n";
 
     myFile.close();
 }
-
 
 // Skill
 // function to add skill to vector
@@ -309,26 +315,31 @@ void Member::saveSkillsInFile(string userID)
 }
 
 // function to append skill to that user line
-void Member::appendSkillsToLine(string &line) {
+void Member::appendSkillsToLine(string &line)
+{
     size_t avgRatingPos = line.find(",,");
-    if (avgRatingPos != string::npos) {
+    if (avgRatingPos != string::npos)
+    {
         // Insert skillsList between the commas
         line.insert(avgRatingPos + 1, "[" + formatSkills() + "]");
-    } else {
+    }
+    else
+    {
         size_t skillsStart = line.find("[[");
         size_t skillsEnd = line.find_last_of("]]");
 
-        if (skillsStart != string::npos && skillsEnd != string::npos) {
+        if (skillsStart != string::npos && skillsEnd != string::npos)
+        {
             // Skills array already exists, append new skills before the last "]]"
             line.insert(skillsEnd, ";" + formatSkills());
-        } else {
+        }
+        else
+        {
             // No skills array present, create a new one
             line += "[" + formatSkills() + "]";
         }
     }
 }
-
-
 
 // combine with appendSkillsToLine function
 std::string Member::formatSkills()
@@ -452,25 +463,31 @@ std::vector<Skill *> Member::extractSkillNameAndPoint(const std::string &skillsS
     return skills;
 }
 
-float Member::calculateAvgHostRating(string userID) {
+float Member::calculateAvgHostRating(string userID)
+{
     std::fstream requestsFile("requests.dat");
 
     float totalRating = 0.0;
     int count = 0;
 
-    if (!requestsFile.is_open()) {
+    if (!requestsFile.is_open())
+    {
         std::cerr << "Unable to open requests file!" << std::endl;
         return 0.0; // Return 0 if unable to open file
     }
 
     std::string line;
-    try {
-        while (std::getline(requestsFile, line)) {
+    try
+    {
+        while (std::getline(requestsFile, line))
+        {
             // Check if the line contains the current user ID as a host
-            if (line.find(userID) != std::string::npos) {
+            if (line.find(userID) != std::string::npos)
+            {
                 // Search for the [host| segment
                 size_t hostIndex = line.find("[host|");
-                if (hostIndex != std::string::npos) {
+                if (hostIndex != std::string::npos)
+                {
                     // Extract the host rating from the line
                     std::string hostRatingStr = line.substr(hostIndex + 6);
                     float hostRating = std::stof(hostRatingStr.substr(0, hostRatingStr.find(":")));
@@ -480,7 +497,9 @@ float Member::calculateAvgHostRating(string userID) {
                 }
             }
         }
-    } catch (const std::exception& e) {
+    }
+    catch (const std::exception &e)
+    {
         std::cerr << "Exception caught: " << e.what() << std::endl;
         // Close the file and return 0 if an exception occurs
         requestsFile.close();
@@ -490,86 +509,100 @@ float Member::calculateAvgHostRating(string userID) {
     requestsFile.close();
 
     // Calculate the average host rating if there are ratings found
-    if (count > 0) {
+    if (count > 0)
+    {
         float avgRating = totalRating / count;
         return avgRating;
-    } else {
+    }
+    else
+    {
         std::cerr << "No ratings found for the user as a host." << std::endl;
         return 0.0; // Return 0 if no ratings found for the user as a host
     }
 }
 
-void Member::updateAvgHostRating() {
+void Member::updateAvgHostRating()
+{
     float avgRating = calculateAvgHostRating(userId); // Assuming 'userId' is the ID of the member
     avgHostRating = avgRating;
-    
 }
 
-void Member::saveAvgRatingToFile(const std::string& userID) {
-    float avgHostRating = calculateAvgHostRating(userID);
+float Member::getHostRatingByUserID(const std::string &userID)
+{
+    std::ifstream ratingFile("Rating.dat");
+    if (!ratingFile)
+    {
+        std::cerr << "Unable to open Rating.dat for reading" << std::endl;
+        return -1.0f; // Return an error value if the file cannot be opened
+    }
 
-    std::fstream myFile;
-    std::vector<std::string> fileLines;
     std::string line;
-
-    myFile.open("members.dat", std::ios::in);
-    if (!myFile) {
-        std::cerr << "Unable to open file" << std::endl;
-        return;
-    }
-
-    while (std::getline(myFile, line)) {
+    while (std::getline(ratingFile, line))
+    {
         std::stringstream ss(line);
-        std::string userId_val;
-        std::getline(ss, userId_val, ',');
+        std::string userId;
+        std::getline(ss, userId, ','); // Extract the userID
 
-        if (userID == userId_val) {
-            appendAvgRatingToLine(line, avgHostRating); // Append avgRating if userID matches
+        if (userID == userId)
+        {
+            std::string ratingValueStr;
+            std::getline(ss, ratingValueStr, ','); // Extract the first value after the comma
+
+            try
+            {
+                return std::stof(ratingValueStr); // Convert the extracted string to float
+            }
+            catch (const std::exception &e)
+            {
+                std::cerr << "Error converting string to float: " << e.what() << std::endl;
+                return -1.0f; // Return an error value if conversion fails
+            }
         }
-
-        fileLines.push_back(line); // Add the (possibly modified) line to the vector
     }
-    myFile.close(); // Close the file after reading
 
-    // Rewrite the file with updated content
-    std::ofstream myFile1("members.dat", std::ios::out); // Open file in write mode
-    if (!myFile1) {
-        std::cerr << "Unable to open file for writing" << std::endl;
+    std::cerr << "User ID not found in Rating.dat" << std::endl;
+    return -1.0f; // Return an error value if userID is not found
+}
+
+void Member::saveAvgRatingToFile(const std::string &userID)
+{
+    float avgHostRatingVal = calculateAvgHostRating(userID);
+    setAvgHostRating(avgHostRatingVal);
+
+    std::ofstream ratingFile("Rating.dat", std::ios::app); // Open or create Rating.dat in append mode
+    if (!ratingFile)
+    {
+        std::cerr << "Unable to open Rating.dat for writing" << std::endl;
         return;
     }
 
-    for (const auto &fileLine : fileLines) {
-        myFile1 << fileLine << std::endl; // Write each line back to the file
-    }
-    myFile1.close(); // Close the file after writing
-}
-void Member::appendAvgRatingToLine(std::string &line, float avgRating) {
-    size_t skillsStart = line.find("[[");
-    size_t skillsEnd = line.find_last_of("]]");
-
-    if (skillsStart != std::string::npos && skillsEnd != std::string::npos) {
-        // Append avgRating after the skillList
-        std::string avgRatingStr = "," + std::to_string(avgRating);
-        line.insert(skillsEnd + 1, avgRatingStr);
-    } else {
-        // No skillList present, reserve a place for skillList and append avgRating
-        size_t lastComma = line.find_last_of(',');
-        if (lastComma != std::string::npos) {
-            line.insert(lastComma + 1, ",");
-        }
-        line += std::to_string(avgRating);
-    }
+    // Write the userID and avgHostRating to Rating.dat
+    ratingFile << userID << "," << avgHostRatingVal << std::endl;
+    ratingFile.close(); // Close Rating.dat
 }
 
+// void Member::appendAvgRatingToLine(std::string &line, float avgRating)
+// {
+//     size_t skillsStart = line.find("[[");
+//     size_t skillsEnd = line.find_last_of("]]");
 
-
-
-
-
-
-
-
-
+//     if (skillsStart != std::string::npos && skillsEnd != std::string::npos)
+//     {
+//         // Append avgRating after the skillList
+//         std::string avgRatingStr = "," + std::to_string(avgRating);
+//         line.insert(skillsEnd + 1, avgRatingStr);
+//     }
+//     else
+//     {
+//         // No skillList present, reserve a place for skillList and append avgRating
+//         size_t lastComma = line.find_last_of(',');
+//         if (lastComma != std::string::npos)
+//         {
+//             line.insert(lastComma + 1, ",");
+//         }
+//         line += std::to_string(avgRating);
+//     }
+// }
 
 // FIX THIS FUNCTION TO DELETE DEFAULT HOST RATING SCORE IN ORDER TO STORE NEW RATING SCORING
 void Member::deleteDefaultHostRatingScore(const std::string &userId)
@@ -715,8 +748,8 @@ void Member::setDetail(const std::vector<std::string> &data, const std::string &
         city = data[7];
         *creditPoint = std::stoi(data[8]);
         isListed = (data.size() > 9 && data[9] == "true");
-        // minimumHostRatingScore = std::stof(data[10]);
-
+        minimumHostRatingScore = std::stof(data[10]);
+        // avgHostRating = std::stoi(data[12]);
         // Now, parse and set the skill rating
         skillsList = extractSkillNameAndPoint(skillRating); // You need to define this function
     }
@@ -731,7 +764,7 @@ void Member::showAllAvailableSupporters(const std::string &userID)
                   << "\n";
         return;
     }
-
+    
     std::vector<std::string> data1;
     std::string line1;
 
@@ -809,19 +842,28 @@ void Member::showAllAvailableSupporters(const std::string &userID)
                 }
             }
         }
-
+        // cout << "Current host rating" << getHostRatingByUserID(temp) << "\n";
+        // cout << "Host Avg" << data1[14] << "\n";
+        // cout << "Require avg" << data[10] << "\n";
+        float hostRating = getHostRatingByUserID(userID);
+        cout << "Data" << data[10] << "\n";
+        cout << "Host rating: " << hostRating << "\n";
         if (data1[9] == "false")
         {
-            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7])
+            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && (hostRating > stof(data[10])))
             {
+                cout << "Frist" << "\n";
                 tempMember.setDetail(data, skillRating); // create object (supporter)
                 availableList.addUser(tempMember);       // add supporter to vector
             }
         }
         else
+
         {
-            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8]) && std::stof(data[10]) <= std::stof(data1[10]))
+            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])&& (hostRating > stof(data[10])))
             {
+                cout << "second" << "\n";
+
                 tempMember.setDetail(data, skillRating);
                 availableList.addUser(tempMember);
             }
@@ -1821,7 +1863,7 @@ void Member::showInfo()
 
 void Member::showSupporterInfo()
 {
-    std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "\n";
+    std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "Avg Rating: " << avgHostRating << "\n";
 }
 
 // This function is to read mem in file and save in each attrs
@@ -1852,6 +1894,7 @@ int Member::readDataInFileToCheckLogin(const string userNameIn, const string pas
             std::getline(ss, phoneNumber, ',');
             std::getline(ss, homeAddress, ',');
             std::getline(ss, city, ',');
+
             ss >> *creditPoint;
 
             // check whether password is reset by admin

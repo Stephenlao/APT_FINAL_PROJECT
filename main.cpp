@@ -252,7 +252,7 @@ void memberMenu(Member &member)
         break;
     case 4:
     {
-
+        
         member.showAllAvailableSupporters(member.getUserId());
         for (const auto &skillPtr : member.getSkillsLists())
         {
@@ -275,7 +275,7 @@ void memberMenu(Member &member)
         break;
     case 8:
 
-        member.saveAvgRatingToFile(member.getUserId());
+        cout << "Current host rating" << member.getHostRatingByUserID(member.getUserId()) << "\n";
         memberMenu(member);
 
     default:
