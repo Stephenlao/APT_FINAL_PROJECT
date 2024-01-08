@@ -616,11 +616,11 @@ void SupporterRatingMenu(Member &member,const string& requestId) {
     }
 };
 void welcomeScreen(){
-    cout << "\n EEET2482/ COSC2082 ASSIGNMENT \n";
-    cout << "“TIME BANK” APPLICATION \n";
+    cout << "\nEEET2482/ COSC2082 ASSIGNMENT\n";
+    cout << "TIME BANK APPLICATION \n";
 
     cout << "Instructor: Mr.Tran Duc Linh \n";
-    cout << "\n Group: Group No.7 \n";
+    cout << "\nGroup: Group No.7\n";
     cout << "s3970375, Bui Tuan Anh \n";
     cout << "s3891925, Lao Vinh Khang  \n";
     cout << "s3919657, Tran Nhat Tien \n";
