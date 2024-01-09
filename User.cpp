@@ -1499,8 +1499,92 @@ void Member::setCreditPoint(float newCreditPoint)
     *creditPoint = newCreditPoint;
 }
 
-void Member::updateCreditInFile(string userId, float newCreditPoint)
-{
+void Member::getCurrentCreditPoints(string userId) {
+    std::ifstream myFile("members.dat");
+    if (!myFile.is_open()) {
+        std::cerr << "Failed to open the file!" << std::endl;
+        return;
+    }
+
+    std::string line;
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+        std::string temp_userID, temp_password, temp_username, tempFullname, tempEmail, tempPhoneNumber, tempHomeAddress, tempCity, tempCreditPoint, restOfLine;
+        std::getline(ss, temp_userID, ',');
+        std::getline(ss, temp_password, ',');
+        std::getline(ss, temp_username, ',');
+        std::getline(ss, tempFullname, ',');
+        std::getline(ss, tempEmail, ',');
+        std::getline(ss, tempPhoneNumber, ',');
+        std::getline(ss, tempHomeAddress, ',');
+        std::getline(ss, tempCity, ',');
+        std::getline(ss, tempCreditPoint, ',');
+        std::getline(ss, restOfLine);
+
+        if (temp_userID == userId) {
+            float creditPoints = std::stof(tempCreditPoint);
+            std::cout << "Your current credit points: " << creditPoints << " credit points\n";
+            myFile.close();
+            return;
+        }
+    }
+
+    std::cout << "User ID not found or error retrieving credit points." << std::endl;
+    myFile.close();
+}
+
+void Member::topUpCreditPoints(string userId, float additionalCreditPoint){
+   std::fstream myFile("members.dat", std::ios::in | std::ios::out);
+
+    if (!myFile.is_open())
+    {
+        std::cerr << "There is no existence of account !"
+                  << "\n";
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+        std::string temp_userID, temp_password, temp_username, tempFullname, tempEmail, tempPhoneNumber, tempHomeAddress, tempCity, tempCreditPoint, restOfLine;
+        std::getline(ss, temp_userID, ',');
+        std::getline(ss, temp_password, ',');
+        std::getline(ss, temp_username, ',');
+        std::getline(ss, tempFullname, ',');
+        std::getline(ss, tempEmail, ',');
+        std::getline(ss, tempPhoneNumber, ',');
+        std::getline(ss, tempHomeAddress, ',');
+        std::getline(ss, tempCity, ',');
+        std::getline(ss, tempCreditPoint, ',');
+        std::getline(ss, restOfLine);
+
+        if (temp_userID == userId)
+        {
+            float currentCreditPoint = std::stof(tempCreditPoint);
+            currentCreditPoint += additionalCreditPoint;  // Add the additional credit
+            std::string updatedCreditPoint = std::to_string(currentCreditPoint);
+            lines.push_back(temp_userID + "," + temp_password + "," + temp_username + "," + tempFullname + "," + tempEmail + "," + tempPhoneNumber + "," + tempHomeAddress + "," + tempCity + "," + updatedCreditPoint + "," + restOfLine);
+        }
+        else
+        {
+            lines.push_back(line);
+        }
+    }
+
+    myFile.clear();
+    myFile.seekg(0, std::ios::beg);
+
+    for (const auto &updatedLine : lines)
+    {
+        myFile << updatedLine << "\n";
+    }
+    myFile.close();
+}
+
+void Member::updateCreditInFile(string userId, float newCreditPoint){
     std::fstream myFile("members.dat", std::ios::in | std::ios::out);
 
     if (!myFile.is_open())

@@ -88,6 +88,8 @@ public:
     string getUserIdByName(string userName);
     string getUserNamedById(string userId);
     void updateCreditInFile(string userId, float newCreditPoint);
+    void topUpCreditPoints(string userId, float additionalCreditPoint);
+    void getCurrentCreditPoints(string userId);
     void updatePasswordInFile();
     // Getter function for creditPoint
     float getCreditPoint() const;
@@ -104,8 +106,6 @@ public:
     void appendSupporterRatingToFile(const std::string& userID, float supporterRating);
     string findSupporterIDbyRequestID(const std::string& requestID);
     float calculateSkillRating(const std::string &supporterID, const std::string &skillName) ;
-
-
 
     // SKILL
     void createAndAddSkill(const std::string &skillName, float creditPerHour);

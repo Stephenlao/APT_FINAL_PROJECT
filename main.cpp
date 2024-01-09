@@ -274,7 +274,7 @@ void memberMenu(Member &member)
         mainMenu();
         break;
     case 8:
-        // cout << member.calculateSkillRating("M3617","testing");
+        cout << member.calculateAvgHostRating(member.getUserId());
         memberMenu(member);
 
     default:
