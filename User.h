@@ -100,6 +100,13 @@ public:
     void saveAvgRatingToFile(const std::string& userID);
     float getHostRatingByUserID(const std::string &userID);
     void setAvgHostRating(float amount);
+    float calculateAvgSupporterRating(string userID);
+    void appendSupporterRatingToFile(const std::string& userID, float supporterRating);
+    string findSupporterIDbyRequestID(const std::string& requestID);
+    float calculateSkillRating(const std::string &supporterID, const std::string &skillName) ;
+
+
+
     // SKILL
     void createAndAddSkill(const std::string &skillName, float creditPerHour);
     void saveSkillsInFile(string userID);

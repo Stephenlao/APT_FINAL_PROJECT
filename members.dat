@@ -1,17 +1,5 @@
 userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,,MinimumHostRating,SkillRating
-M3097,8245537688419450322,usera,Usera1234#,usera,099,truong son,sai gon,22.000000,true,2.000000,[[aka,2.000000]]
-M921,8245537688458585715,userb,userb,userb,088,truong chinh,sai gon,20.000000,true,4.000000,[[python,20.000000]]
-M6990,8245537688497721108,userc,userc,userc,066,hoa binh,sai gon,20.000000,false,0.000000,
-M2588,8245537688536856501,userd,userd,userd,055,dbp,ha noi,20.000000,false,0,
-M933,13846330759654978603,TIen1,Tran Nhat Tien123456!,nhattien@gmail.com,09876172342,22 lld,sai gon,74.000000,false,0,
-M9311,13846330759654978603,Tien2,Tien,tien@gmail.comm,09876281234,24ggg,sai gon,20.000000,false,0,
-M1671,249850197615562782,khanh,khanh,khanh@gmail.com,09,3/2,sai gon,20.000000,true,0.000000,[[cleaning,1.000000]]
-M2267,7571219401040316,a,a,a,09,2/3,sai gon,20.000000,true,0.000000,[[cleaning,1.000000]]
-M9249,249857297628314562,phuc,p,p,08,h,sai gon,20.000000,true,0.000000,[[cleaning,2.000000]]
-M6846,1134716091,khang,khanglao,khang,88,truong son,sai gon,18.000000,true,0.000000,[[python,8.000000];[java,10.000000]]
-M7568,1303044182,usere,Usere,usere,066,truong chinh,sai gon,28.000000,true,2.800000,[[caring,8.000000]]
-M952,1342179575,userf,Userf,userf,066,son la,sai gon,20.000000,false,0.000000,[[driving,8.000000]]
-M8720,1420450361,userh,userh,userh,055,cong hoa,sai gon,22.000000,true,0.000000,[[playing,2.000000];[guitar,15.000000]]
-M3687,1381314968,userg,userg,userg,044,cmt8,sai gon,20.000000,true,0.000000,[[play games,6.000000]]
-M4521,249863209292695647,tuananhhost,ta,ta,21,12,sai gon,17.000000,false,0,[[coding,12.000000];[gaming,1.000000]]
-M5363,249863209292695647,tuananhsp,as,as,as,as,sai gon,20.000000,true,3.800000,[[badminton,2.000000]]
+M495,249863209292695647,host1,host,as,as,as,sai gon,20.000000,true,0.000000,[[Piano,2.000000]]
+M6635,249863209292695647,host2,s,s,s,s,sai gon,20.000000,false,0.000000,[[skill,2.000000]]
+M1933,249863209292695647,sp1,as,as,as,as,sai gon,20.000000,true,4.500000,[[testing,2.000000]]
+M3617,249863209292695647,sp2,T,as,as,as,sai gon,20.000000,true,0.000000,[[testing,2.000000]]

@@ -252,7 +252,7 @@ void memberMenu(Member &member)
         break;
     case 4:
     {
-        
+
         member.showAllAvailableSupporters(member.getUserId());
         for (const auto &skillPtr : member.getSkillsLists())
         {
@@ -274,8 +274,7 @@ void memberMenu(Member &member)
         mainMenu();
         break;
     case 8:
-
-        cout << "Current host rating" << member.getHostRatingByUserID(member.getUserId()) << "\n";
+        // cout << member.calculateSkillRating("M3617","testing");
         memberMenu(member);
 
     default:
@@ -544,6 +543,8 @@ void HostRatingMenu(Member &member, const string &requestId)
                 supporterRatingVct = member.getSupporterRatingVct();
                 supporterRatingVct.push_back(supporterRating);
                 member.saveSkillAndSupporterRatingToFileV2(skillRatingVct, supporterRatingVct, requestId);
+                string supportID = member.findSupporterIDbyRequestID(requestId);
+                member.appendSupporterRatingToFile(supportID, member.calculateAvgSupporterRating(supportID));
                 cout << "\n\n";
 
                 HostRatingMenu(member, requestId);
@@ -561,6 +562,8 @@ void HostRatingMenu(Member &member, const string &requestId)
                 supporterRatingVct = member.getSupporterRatingVct();
                 supporterRatingVct.push_back(supporterRating);
                 member.saveSkillAndSupporterRatingToFile(skillRatingVct, supporterRatingVct, requestId);
+                string supportID = member.findSupporterIDbyRequestID(requestId);
+                member.appendSupporterRatingToFile(supportID, member.calculateAvgSupporterRating(supportID));
                 cout << "\n\n";
                 HostRatingMenu(member, requestId);
             }
@@ -581,24 +584,29 @@ void HostRatingMenu(Member &member, const string &requestId)
     }
 }
 
-string getHostIDByID(const std::string& targetID) {
+string getHostIDByID(const std::string &targetID)
+{
     std::ifstream file("requests.dat");
-    if (!file) {
+    if (!file)
+    {
         std::cerr << "Unable to open file\n";
         return "";
     }
 
     std::string line;
-    while (std::getline(file, line)) {
+    while (std::getline(file, line))
+    {
         std::stringstream ss(line);
         std::vector<std::string> tokens;
         std::string token;
 
-        while (std::getline(ss, token, ',')) {
+        while (std::getline(ss, token, ','))
+        {
             tokens.push_back(token);
         }
 
-        if (tokens.size() >= 2 && tokens[0] == targetID) {
+        if (tokens.size() >= 2 && tokens[0] == targetID)
+        {
             return tokens[1];
         }
     }
@@ -630,7 +638,7 @@ void SupporterRatingMenu(Member &member, const string &requestId)
                 hostRatingVct.push_back(hostRating);
                 member.saveHostRatingToFile(hostRatingVct, requestId);
                 cout << "\n\n";
-                
+
                 string hostId = getHostIDByID(requestId);
                 member.saveAvgRatingToFile(hostId);
                 cout << hostId << "\n";

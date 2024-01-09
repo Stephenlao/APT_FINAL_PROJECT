@@ -481,16 +481,26 @@ float Member::calculateAvgHostRating(string userID)
     {
         while (std::getline(requestsFile, line))
         {
-            // Check if the line contains the current user ID as a host
-            if (line.find(userID) != std::string::npos)
+            std::stringstream ss(line);
+            std::string token;
+
+            // Get the first token separated by comma
+            std::getline(ss, token, ',');
+            std::getline(ss, token, ',');
+
+            cout << "Token: " << token << "\n";
+            cout << "ID: " << userID << "\n";
+            // Check if the token matches the userID
+            if (token == userID)
             {
-                // Search for the [host| segment
+                // Look for the [host| segment
                 size_t hostIndex = line.find("[host|");
                 if (hostIndex != std::string::npos)
                 {
                     // Extract the host rating from the line
                     std::string hostRatingStr = line.substr(hostIndex + 6);
                     float hostRating = std::stof(hostRatingStr.substr(0, hostRatingStr.find(":")));
+
                     totalRating += hostRating;
                     std::cout << "Total rating: " << totalRating << "\n";
                     count++;
@@ -517,7 +527,7 @@ float Member::calculateAvgHostRating(string userID)
     else
     {
         std::cerr << "No ratings found for the user as a host." << std::endl;
-        return 0.0; // Return 0 if no ratings found for the user as a host
+        return 0; // Return 0 if no ratings found for the user as a host
     }
 }
 
@@ -555,13 +565,88 @@ float Member::getHostRatingByUserID(const std::string &userID)
             catch (const std::exception &e)
             {
                 std::cerr << "Error converting string to float: " << e.what() << std::endl;
-                return -1.0f; // Return an error value if conversion fails
+                return 0; // Return an error value if conversion fails
             }
         }
     }
 
     std::cerr << "User ID not found in Rating.dat" << std::endl;
-    return -1.0f; // Return an error value if userID is not found
+    return 0;
+}
+
+float calculateSkillRating(const std::string &supporterID, const std::string &skillName)
+{
+    std::ifstream file("requests.dat");
+    std::string line;
+    std::vector<float> ratings;
+
+    while (std::getline(file, line))
+    {
+        std::istringstream iss(line);
+        std::string token;
+        int tokenCounter = 0;
+        std::string foundSupporterID;
+        std::string foundSkillRating;
+
+        while (std::getline(iss, token, ','))
+        {
+            tokenCounter++;
+            if (tokenCounter == 3)
+            { // supporterID at position [2]
+                foundSupporterID = token;
+            }
+            if (tokenCounter == 5)
+            { // skill at position [4]
+                // Remove the text after the '|' delimiter to get the skill name
+                size_t pos = token.find("|");
+                if (pos != std::string::npos)
+                {
+                    token = token.substr(0, pos);
+                }
+                if (token == skillName && foundSupporterID == supporterID)
+                {
+                    // Extract the skill rating after [skill| or [skillDefault|
+                    size_t ratingPos = line.find("[skill|");
+                    if (ratingPos != std::string::npos)
+                    {
+                        ratingPos += 7; // Move to the beginning of the rating
+                        foundSkillRating = line.substr(ratingPos, line.find(":", ratingPos) - ratingPos);
+                    }
+                    else
+                    {
+                        ratingPos = line.find("[skillDefault|");
+                        if (ratingPos != std::string::npos)
+                        {
+                            ratingPos += 14; // Move to the beginning of the rating
+                            foundSkillRating = line.substr(ratingPos, line.find(":", ratingPos) - ratingPos);
+                        }
+                    }
+
+                    if (!foundSkillRating.empty())
+                    {
+                        std::istringstream ratingStream(foundSkillRating);
+                        float rating = 0.0f;
+                        ratingStream >> rating;
+                        ratings.push_back(rating);
+                    }
+                }
+            }
+        }
+    }
+
+    // Calculate average rating if any ratings were found
+    if (!ratings.empty())
+    {
+        float totalRating = 0.0f;
+        for (float r : ratings)
+        {
+            totalRating += r;
+        }
+        return totalRating / ratings.size();
+    }
+
+    // Return a default value if the skill rating isn't found
+    return 0.0f;
 }
 
 void Member::saveAvgRatingToFile(const std::string &userID)
@@ -569,40 +654,249 @@ void Member::saveAvgRatingToFile(const std::string &userID)
     float avgHostRatingVal = calculateAvgHostRating(userID);
     setAvgHostRating(avgHostRatingVal);
 
-    std::ofstream ratingFile("Rating.dat", std::ios::app); // Open or create Rating.dat in append mode
-    if (!ratingFile)
+    std::ifstream ratingFileIn("Rating.dat"); // Open the file for reading
+    if (!ratingFileIn)
+    {
+        std::cerr << "Unable to open Rating.dat for reading" << std::endl;
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    bool found = false;
+
+    // Read the contents of the file and search for the userID
+    while (std::getline(ratingFileIn, line))
+    {
+        std::stringstream ss(line);
+        std::string token;
+        std::getline(ss, token, ',');
+        std::string updatedEntry = token;
+
+        if (token == userID)
+        {
+            std::string secondVal;
+            std::getline(ss, secondVal, ','); // Get the second value after the comma
+
+            updatedEntry += "," + std::to_string(avgHostRatingVal);
+            std::string restOfLine = ss.str(); // Get the rest of the line
+
+            if (!secondVal.empty())
+            {
+                updatedEntry += restOfLine.substr(restOfLine.find(',', restOfLine.find(',') + 1)); // Keep the rest of the line after the second comma
+            }
+            else
+            {
+                updatedEntry += ",0"; // If there's no data after AvgHostRating, add '0'
+            }
+
+            lines.push_back(updatedEntry);
+            found = true;
+        }
+        else
+        {
+            lines.push_back(line);
+        }
+    }
+
+    ratingFileIn.close(); // Close Rating.dat
+
+    // If userID not found, add a new entry
+    if (!found)
+    {
+        std::string newEntry = userID + "," + std::to_string(avgHostRatingVal) + ",0"; // New entry format with '0' at the end
+        lines.push_back(newEntry);
+    }
+
+    std::ofstream ratingFileOut("Rating.dat"); // Open the file for writing
+    if (!ratingFileOut)
     {
         std::cerr << "Unable to open Rating.dat for writing" << std::endl;
         return;
     }
 
-    // Write the userID and avgHostRating to Rating.dat
-    ratingFile << userID << "," << avgHostRatingVal << std::endl;
-    ratingFile.close(); // Close Rating.dat
+    // Write the modified contents back to the file
+    for (const auto &entry : lines)
+    {
+        ratingFileOut << entry << std::endl;
+    }
+    ratingFileOut.close(); // Close Rating.dat
 }
 
-// void Member::appendAvgRatingToLine(std::string &line, float avgRating)
-// {
-//     size_t skillsStart = line.find("[[");
-//     size_t skillsEnd = line.find_last_of("]]");
+float Member::calculateAvgSupporterRating(string userID)
+{
+    std::ifstream requestsFile("requests.dat");
 
-//     if (skillsStart != std::string::npos && skillsEnd != std::string::npos)
-//     {
-//         // Append avgRating after the skillList
-//         std::string avgRatingStr = "," + std::to_string(avgRating);
-//         line.insert(skillsEnd + 1, avgRatingStr);
-//     }
-//     else
-//     {
-//         // No skillList present, reserve a place for skillList and append avgRating
-//         size_t lastComma = line.find_last_of(',');
-//         if (lastComma != std::string::npos)
-//         {
-//             line.insert(lastComma + 1, ",");
-//         }
-//         line += std::to_string(avgRating);
-//     }
-// }
+    float totalRating = 0.0;
+    int count = 0;
+
+    if (!requestsFile.is_open())
+    {
+        std::cerr << "Unable to open requests file!" << std::endl;
+        return 0.0; // Return 0 if unable to open file
+    }
+
+    std::string line;
+    try
+    {
+        while (std::getline(requestsFile, line))
+        {
+            std::stringstream ss(line);
+            std::string token;
+
+            // Skip the first two tokens separated by comma
+            for (int i = 0; i < 2; ++i)
+            {
+                std::getline(ss, token, ','); // Skip the first two tokens separated by comma
+            }
+            std::getline(ss, token, ',');
+
+            cout << "Token check: " << token << "\n";
+            cout << "user id check: " << userID << "\n";
+            // Check if the token matches the userID
+            if (token == userID)
+            {
+                // Look for the [supporter| segment
+                size_t supporterIndex = line.find("[supporter|");
+                if (supporterIndex != std::string::npos)
+                {
+                    // Extract the supporter rating from the line
+                    std::string supporterRatingStr = line.substr(supporterIndex + 11);
+                    float supporterRating = std::stof(supporterRatingStr.substr(0, supporterRatingStr.find(":")));
+                    cout << "sp rating: " << supporterRating;
+                    totalRating += supporterRating;
+                    std::cout << "Total rating: " << totalRating << "\n";
+                    count++;
+                }
+            }
+            else
+            {
+                cout << "No userID found"
+                     << "\n";
+            }
+        }
+    }
+    catch (const std::exception &e)
+    {
+        std::cerr << "Exception caught: " << e.what() << std::endl;
+        // Close the file and return 0 if an exception occurs
+        requestsFile.close();
+        return 0.0;
+    }
+
+    requestsFile.close();
+
+    // Calculate the average supporter rating if there are ratings found
+    if (count > 0)
+    {
+        float avgRating = totalRating / count;
+        return avgRating;
+    }
+    else
+    {
+        std::cerr << "No ratings found for the user as a supporter." << std::endl;
+        return 0.0; // Return 0 if no ratings found for the user as a supporter
+    }
+}
+
+void Member::appendSupporterRatingToFile(const std::string &userID, float supporterRating)
+{
+    std::fstream ratingFile("Rating.dat", std::ios::in | std::ios::out);
+
+    if (!ratingFile.is_open())
+    {
+        std::cerr << "Unable to open ratings file!" << std::endl;
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    bool found = false;
+
+    while (std::getline(ratingFile, line))
+    {
+        std::stringstream ss(line);
+        std::string token;
+
+        std::getline(ss, token, ','); // Get the first token (UserID)
+
+        if (token == userID)
+        {
+            found = true;
+            std::string entry = userID;
+
+            // Get the existing values
+            std::getline(ss, token, ','); // Get the second token
+            entry += "," + token;
+
+            std::getline(ss, token, ','); // Get the third token (SupporterRating) and update it
+            entry += "," + std::to_string(supporterRating);
+
+            lines.push_back(entry);
+        }
+        else
+        {
+            lines.push_back(line);
+        }
+    }
+
+    if (!found)
+    {
+        std::string newEntry = userID + ",0," + std::to_string(supporterRating); // New entry format
+        lines.push_back(newEntry);
+    }
+
+    ratingFile.close();
+
+    std::ofstream outFile("Rating.dat", std::ios::out);
+    if (!outFile.is_open())
+    {
+        std::cerr << "Unable to open ratings file for writing!" << std::endl;
+        return;
+    }
+
+    for (const auto &line : lines)
+    {
+        outFile << line << "\n";
+    }
+
+    outFile.close();
+}
+
+string Member::findSupporterIDbyRequestID(const std::string &requestID)
+{
+    std::ifstream dataFile("requests.dat");
+
+    if (!dataFile.is_open())
+    {
+        std::cerr << "Unable to open data file!" << std::endl;
+        return "";
+    }
+
+    std::string line;
+    std::string supporterID = "";
+
+    while (std::getline(dataFile, line))
+    {
+        std::stringstream ss(line);
+        std::string token;
+
+        std::getline(ss, token, ','); // Get the first token (requestID)
+
+        if (token == requestID)
+        {
+            for (int i = 0; i < 2; ++i)
+            { // Move to the third token (supporterID)
+                std::getline(ss, token, ',');
+            }
+            supporterID = token;
+            break;
+        }
+    }
+
+    dataFile.close();
+    return supporterID;
+}
 
 // FIX THIS FUNCTION TO DELETE DEFAULT HOST RATING SCORE IN ORDER TO STORE NEW RATING SCORING
 void Member::deleteDefaultHostRatingScore(const std::string &userId)
@@ -764,7 +1058,7 @@ void Member::showAllAvailableSupporters(const std::string &userID)
                   << "\n";
         return;
     }
-    
+
     std::vector<std::string> data1;
     std::string line1;
 
@@ -846,13 +1140,23 @@ void Member::showAllAvailableSupporters(const std::string &userID)
         // cout << "Host Avg" << data1[14] << "\n";
         // cout << "Require avg" << data[10] << "\n";
         float hostRating = getHostRatingByUserID(userID);
+
         cout << "Data" << data[10] << "\n";
         cout << "Host rating: " << hostRating << "\n";
         if (data1[9] == "false")
         {
+            if (hostRating == 0)
+            {
+                if (data.size() > 9 && data[9] == "true" && data[7] == data1[7])
+                {
+
+                    tempMember.setDetail(data, skillRating); // create object (supporter)
+                    availableList.addUser(tempMember);       // add supporter to vector
+                }
+            }
             if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && (hostRating > stof(data[10])))
             {
-                cout << "Frist" << "\n";
+
                 tempMember.setDetail(data, skillRating); // create object (supporter)
                 availableList.addUser(tempMember);       // add supporter to vector
             }
@@ -860,9 +1164,8 @@ void Member::showAllAvailableSupporters(const std::string &userID)
         else
 
         {
-            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])&& (hostRating > stof(data[10])))
+            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8]) && (hostRating > stof(data[10])))
             {
-                cout << "second" << "\n";
 
                 tempMember.setDetail(data, skillRating);
                 availableList.addUser(tempMember);
@@ -887,12 +1190,12 @@ void Member::showAllAvailableSupporters(const std::string &userID)
             std::cout << "Exiting..." << std::endl;
             break;
         }
-
         if (availableList.isValidNumber(input))
         {
             int choiceNumber = std::stoi(input);
             userNameOfSupporter = availableList.getUserNameByOrderNumber(choiceNumber);
             availableList.showDetailSupporterDetail(userNameOfSupporter);
+
             // createRequest()
             // cout << availableList.getUserIdByOrderNumber(choiceNumber) << "real";
             Skill skillRequest = availableList.getRequestSkillName(userNameOfSupporter);
@@ -1863,7 +2166,7 @@ void Member::showInfo()
 
 void Member::showSupporterInfo()
 {
-    std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "Avg Rating: " << avgHostRating << "\n";
+    std::cout << "Username: " << userName << " ,city: " << city << " , phone number: " << phoneNumber << "\n";
 }
 
 // This function is to read mem in file and save in each attrs
@@ -2342,7 +2645,37 @@ void AvailableList::addUser(const Member &member)
         userList.push_back(new Member(member)); // Creates a new Member object and stores its raw pointer
     }
 }
+float getSupporterRating(const std::string &userID)
+{
+    std::ifstream ratingFile("Rating.dat");
+    if (!ratingFile.is_open())
+    {
+        std::cerr << "Unable to open ratings file!" << std::endl;
+        return -1.0; // Return a default value to indicate an error
+    }
 
+    std::string line;
+    while (std::getline(ratingFile, line))
+    {
+        std::stringstream ss(line);
+        std::string token;
+
+        std::getline(ss, token, ','); // Get the first token (UserID)
+
+        if (token == userID)
+        {
+            std::string secondVal, supporterRating;
+            std::getline(ss, secondVal, ',');       // Get the second token
+            std::getline(ss, supporterRating, ','); // Get the third token (SupporterRating)
+
+            ratingFile.close();
+            return std::stof(supporterRating); // Convert the string to float and return the supporter rating
+        }
+    }
+
+    ratingFile.close();
+    return -1.0; // Return a default value to indicate userID not found
+}
 void AvailableList::displayListedMembers()
 {
     if (!userList.empty())
@@ -2353,7 +2686,17 @@ void AvailableList::displayListedMembers()
         for (Member *user : userList)
         { // Loop through each user in the userList
             cout << orderNum << ". ";
-            user->showSupporterInfo(); // Displaying member information
+            user->showSupporterInfo();
+            if (getSupporterRating(user->getUserId()) == -1)
+            {
+                cout << "Avg Rating: This is new supporter!"
+                     << "\n";
+            }
+            else
+            {
+                cout << "Avg Rating: " << getSupporterRating(user->getUserId()) << "\n"; // Displaying member information
+            }
+
             cout << "\n------------------------------------------------\n";
             orderNum++; // Increment order number for next member
         }
@@ -2483,8 +2826,10 @@ void AvailableList::showDetailSupporterDetail(string &userName)
             cout << "Skills: \n";
             for (size_t i = 0; i < skillRatingSupporter.size(); ++i)
             {
+                float skillRating = calculateSkillRating(userId_val, skillRatingSupporter[i]->getSkillName());
+
                 std::cout << i + 1 << ". Name: " << skillRatingSupporter[i]->getSkillName()
-                          << " , Credit point per hour: " << skillRatingSupporter[i]->getCreditPerHour() << "\n";
+                          << " , Credit point per hour: " << skillRatingSupporter[i]->getCreditPerHour() << " , Skill Rating: " << skillRating << "\n";
             }
         }
     }
