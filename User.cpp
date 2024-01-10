@@ -574,6 +574,42 @@ void Member::setDetail(const std::vector<std::string>& data, const std::string& 
 
 
 void Member::showAllAvailableSupporters(const std::string& userID) {
+    fstream blockFile;
+
+    vector <string> blockList;
+
+    blockFile.open("block.dat", std::ios::in | std::ios::out);
+    if (!blockFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return ;
+    }
+
+    std::string line2;
+    // Skip the first line (header)
+    std::getline(blockFile, line2);
+
+    while (std::getline(blockFile, line2)) {
+        std::stringstream ss(line2);
+
+        string userId_val, listOfBlockID_val, newLine;
+        
+        std::getline(ss, userId_val, ',');
+        std::getline(ss, listOfBlockID_val);
+        // cout << "id" << userId_val << "\n";
+        // cout << listOfBlockID_val << "\n";
+        if(userId_val == userID){
+            listOfBlockID_val = listOfBlockID_val.substr(1, listOfBlockID_val.size() - 2);
+            std::istringstream listOfBlockID(listOfBlockID_val);
+            std::string id;
+                while (getline(listOfBlockID, id, ',')) {
+                    blockList.push_back(id);
+                }    
+        } 
+    }
+
+
+
+
     std::fstream myFile1("members.dat", std::ios::in);
     if (!myFile1) {
         std::cerr << "Unable to open file!" << "\n";
@@ -614,6 +650,7 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
 
     // Second read: Look for all available supporters
     while (std::getline(myFile, line)) {
+        bool block = false;
         std::vector<std::string> data;
         Member tempMember; // Create a new temporary member object
         std::stringstream ss(line);
@@ -645,20 +682,30 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
             }
         }
 
-        if (data1[9] == "false") {
-            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7]) {
-                tempMember.setDetail(data, skillRating); // create object (supporter)
-                availableList.addUser(tempMember); // add supporter to vector 
+
+        for (const auto& id : blockList) {
+            if(data[0] == id){
+                block = true;
             }
-        } else {
-            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])
-            && std::stof(data[10]) <= std::stof(data1[10])) {
-                tempMember.setDetail(data, skillRating);
-                availableList.addUser(tempMember);
         }
-    }    
+
+        if (block == false){
+            if (data1[9] == "false") {
+                if (data.size() > 9 && data[9] == "true" && data[7] == data1[7]) {
+                    tempMember.setDetail(data, skillRating); // create object (supporter)
+                    availableList.addUser(tempMember); // add supporter to vector 
+                }
+            } else {
+                if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8])
+                && std::stof(data[10]) <= std::stof(data1[10])) {
+                    tempMember.setDetail(data, skillRating);
+                    availableList.addUser(tempMember);
+             }
+            }    
+        }
+        
 }
-    
+    cout << "blocklist: " << blockList[0] << blockList[1]  << "\n";
 
     availableList.displayListedMembers();
     myFile.close();
@@ -696,6 +743,12 @@ void Member::showAllAvailableSupporters(const std::string& userID) {
 
             if(skillRequest.getSkillName() == ""){
                 cout << "You are entering wrong syntax!" << "\n";
+                break;
+            }
+
+            if(skillRequest.getSkillName() == "block"){
+                blockUser(userID,getUserIdByName(userNameOfSupporter));
+                cout << "Block successfully" << "\n";
                 break;
             }
             
@@ -1149,11 +1202,6 @@ void Member::cancelBooking(string requestID){
         std::cerr << "Error opening file!" << std::endl;
         return;
     }
-
-    // // Check if the last line is empty and remove it if it is
-    // if (!lines.empty() && lines.back().empty()) {
-    //     lines.pop_back();
-    // }
     
    for (const auto &updatedLine : lines)
     {   
@@ -1549,6 +1597,8 @@ void Member::registerMember()
     userId = "M" + std::to_string(randomID);
     User::setUserId(userId);
 
+
+
     // called method createpassword
     string password = User::createPassword();
 
@@ -1559,6 +1609,15 @@ void Member::registerMember()
 
     cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
     saveDataToFile(*this);
+
+    fstream blockFile;
+    blockFile.open("block.dat", std::ios::app | std::ios::out);
+    if (!blockFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return ;
+    }
+    blockFile << userId + ",[]" << "\n";
+    blockFile.close();
 
     // delete creditPoint to free up memory
     delete creditPoint;
@@ -2241,8 +2300,8 @@ Skill AvailableList::getRequestSkillName(string& userName){
             vector<Skill*> skillRatingSupporter = Member::extractSkillNameAndPoint(skillRating);        
 
             string input;
-            cout << "\n" << "Please choose number of skill you want to book";
-            cout << "\n" << "Enter number (or press x to quit): ";
+            cout << "\n" << "Please enter number of skill you want to book or enter word 'block' to block this supporter";
+            cout << "\n" << "Enter your choice (or press x to quit): ";
             cin >> input;
 
             if (input == "x" || input == "X") {
@@ -2251,6 +2310,13 @@ Skill AvailableList::getRequestSkillName(string& userName){
                 return skillRequest;
                 break;
             }
+
+            if (input == "block" || input == "Block") {
+                skillRequest.setSkillName("block");
+                return skillRequest;
+                break;
+            }
+
             int input_val = std::stoi(input);
 
             for (size_t i = 0; i < skillRatingSupporter.size(); ++i) {
@@ -2910,4 +2976,71 @@ bool AvailableList::isValidNumber(const std::string& str) {
         if (!std::isdigit(c)) return false;
     }
     return true;
+}
+
+void Member::blockUser(string userID, string blockID){
+    vector <string> blockList;
+    bool found = false;
+    fstream myFile;
+    myFile.open("block.dat", std::ios::in | std::ios::out);
+    if (!myFile) {
+        std::cerr << "Unable to open file!" << "\n";
+        return ;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    // Skip the first line (header)
+    std::getline(myFile, line);
+
+    while (std::getline(myFile, line)) {
+        std::stringstream ss(line);
+
+        string userId_val, listOfBlockID_val, newLine;
+        
+        std::getline(ss, userId_val, ',');
+        std::getline(ss, listOfBlockID_val);
+        // cout << "id" << userId_val << "\n";
+        // cout << listOfBlockID_val << "\n";
+        if(userId_val == userID){
+            listOfBlockID_val = listOfBlockID_val.substr(1, listOfBlockID_val.size() - 2);
+            std::istringstream listOfBlockID(listOfBlockID_val);
+            std::string id;
+                while (getline(listOfBlockID, id, ',')) {
+                    blockList.push_back(id);
+                }
+            // for (const auto& id : blockList) {
+            //     std::cout << id << std::endl;
+            // }
+            newLine = userID + ",[";
+            for (const auto& id : blockList) {
+                newLine = newLine + id + ",";
+            }
+            newLine = newLine + blockID + "]";
+            // cout << "new:" << newLine << "\n";
+            lines.push_back(newLine);
+        } else {
+            lines.push_back(line);
+        }
+    }
+
+    myFile.clear();
+    myFile.seekg(0, std::ios::beg);
+    myFile.close();
+
+    std::fstream updateFile("block.dat", std::ios::out | std::ios::trunc);
+
+    if (!updateFile.is_open()) {
+        std::cerr << "Error opening file!" << std::endl;
+        return;
+    }
+    updateFile << "userID,listOfBlockID" << "\n";
+    
+   for (const auto &updatedLine : lines)
+    {   
+            updateFile << updatedLine << "\n";
+    }
+
+    updateFile.close();
+
 }

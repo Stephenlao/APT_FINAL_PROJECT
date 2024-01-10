@@ -125,6 +125,9 @@ public:
     float getConsumingPointOfSkillBySupporterId(string supporterID, string skillName);
     void getHostIdAndDeductCreditPoint(string hostID,float consumingPoint);
 
+    //BLOCK
+    void blockUser(string userID, string blockID);
+
     // Rating
     // void addHostRating(int score, const std::string &comment);
     // void addSupportRating(int score, const std::string &comment);

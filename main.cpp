@@ -257,6 +257,9 @@ void memberMenu(Member &member)
     case 7:
         mainMenu();
         break;
+    case 8:
+        member.blockUser("M952", "M955");
+        break;
     default:
         cout << "Invalid choice!"
              << "\n";
