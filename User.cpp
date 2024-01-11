@@ -1051,6 +1051,44 @@ void Member::setDetail(const std::vector<std::string> &data, const std::string &
 
 void Member::showAllAvailableSupporters(const std::string &userID)
 {
+    fstream blockFile;
+
+    vector<string> blockList;
+
+    blockFile.open("block.dat", std::ios::in | std::ios::out);
+    if (!blockFile)
+    {
+        std::cerr << "Unable to open file!"
+                  << "\n";
+        return;
+    }
+
+    std::string line2;
+    // Skip the first line (header)
+    std::getline(blockFile, line2);
+
+    while (std::getline(blockFile, line2))
+    {
+        std::stringstream ss(line2);
+
+        string userId_val, listOfBlockID_val, newLine;
+
+        std::getline(ss, userId_val, ',');
+        std::getline(ss, listOfBlockID_val);
+        // cout << "id" << userId_val << "\n";
+        // cout << listOfBlockID_val << "\n";
+        if (userId_val == userID)
+        {
+            listOfBlockID_val = listOfBlockID_val.substr(1, listOfBlockID_val.size() - 2);
+            std::istringstream listOfBlockID(listOfBlockID_val);
+            std::string id;
+            while (getline(listOfBlockID, id, ','))
+            {
+                blockList.push_back(id);
+            }
+        }
+    }
+
     std::fstream myFile1("members.dat", std::ios::in);
     if (!myFile1)
     {
@@ -1099,6 +1137,7 @@ void Member::showAllAvailableSupporters(const std::string &userID)
     // Second read: Look for all available supporters
     while (std::getline(myFile, line))
     {
+        bool block = false;
         std::vector<std::string> data;
         Member tempMember; // Create a new temporary member object
         std::stringstream ss(line);
@@ -1141,34 +1180,41 @@ void Member::showAllAvailableSupporters(const std::string &userID)
         // cout << "Require avg" << data[10] << "\n";
         float hostRating = getHostRatingByUserID(userID);
 
-        cout << "Data" << data[10] << "\n";
-        cout << "Host rating: " << hostRating << "\n";
-        if (data1[9] == "false")
+        for (const auto &id : blockList)
         {
-            if (hostRating == 0)
+            if (data[0] == id)
             {
-                if (data.size() > 9 && data[9] == "true" && data[7] == data1[7])
-                {
+                block = true;
+            }
+        }
 
+        if (block == false)
+        {
+            if (data1[9] == "false")
+            {
+                // If host is a new user
+                if (hostRating == 0)
+                {
+                    if (data.size() > 9 && data[9] == "true" && data[7] == data1[7])
+                    {
+
+                        tempMember.setDetail(data, skillRating); // create object (supporter)
+                        availableList.addUser(tempMember);       // add supporter to vector
+                    }
+                }
+                if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && (hostRating > stof(data[10])))
+                {
                     tempMember.setDetail(data, skillRating); // create object (supporter)
                     availableList.addUser(tempMember);       // add supporter to vector
                 }
             }
-            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && (hostRating > stof(data[10])))
+            else
             {
-
-                tempMember.setDetail(data, skillRating); // create object (supporter)
-                availableList.addUser(tempMember);       // add supporter to vector
-            }
-        }
-        else
-
-        {
-            if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8]) && (hostRating > stof(data[10])))
-            {
-
-                tempMember.setDetail(data, skillRating);
-                availableList.addUser(tempMember);
+                if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8]) && (hostRating > stof(data[10])))
+                {
+                    tempMember.setDetail(data, skillRating);
+                    availableList.addUser(tempMember);
+                }
             }
         }
     }
@@ -1212,6 +1258,14 @@ void Member::showAllAvailableSupporters(const std::string &userID)
             if (skillRequest.getSkillName() == "")
             {
                 cout << "You are entering wrong syntax!"
+                     << "\n";
+                break;
+            }
+
+            if (skillRequest.getSkillName() == "block")
+            {
+                blockUser(userID, getUserIdByName(userNameOfSupporter));
+                cout << "Block successfully"
                      << "\n";
                 break;
             }
@@ -1499,15 +1553,18 @@ void Member::setCreditPoint(float newCreditPoint)
     *creditPoint = newCreditPoint;
 }
 
-void Member::getCurrentCreditPoints(string userId) {
+void Member::getCurrentCreditPoints(string userId)
+{
     std::ifstream myFile("members.dat");
-    if (!myFile.is_open()) {
+    if (!myFile.is_open())
+    {
         std::cerr << "Failed to open the file!" << std::endl;
         return;
     }
 
     std::string line;
-    while (std::getline(myFile, line)) {
+    while (std::getline(myFile, line))
+    {
         std::stringstream ss(line);
         std::string temp_userID, temp_password, temp_username, tempFullname, tempEmail, tempPhoneNumber, tempHomeAddress, tempCity, tempCreditPoint, restOfLine;
         std::getline(ss, temp_userID, ',');
@@ -1521,7 +1578,8 @@ void Member::getCurrentCreditPoints(string userId) {
         std::getline(ss, tempCreditPoint, ',');
         std::getline(ss, restOfLine);
 
-        if (temp_userID == userId) {
+        if (temp_userID == userId)
+        {
             float creditPoints = std::stof(tempCreditPoint);
             std::cout << "Your current credit points: " << creditPoints << " credit points\n";
             myFile.close();
@@ -1533,8 +1591,9 @@ void Member::getCurrentCreditPoints(string userId) {
     myFile.close();
 }
 
-void Member::topUpCreditPoints(string userId, float additionalCreditPoint){
-   std::fstream myFile("members.dat", std::ios::in | std::ios::out);
+void Member::topUpCreditPoints(string userId, float additionalCreditPoint)
+{
+    std::fstream myFile("members.dat", std::ios::in | std::ios::out);
 
     if (!myFile.is_open())
     {
@@ -1564,7 +1623,7 @@ void Member::topUpCreditPoints(string userId, float additionalCreditPoint){
         if (temp_userID == userId)
         {
             float currentCreditPoint = std::stof(tempCreditPoint);
-            currentCreditPoint += additionalCreditPoint;  // Add the additional credit
+            currentCreditPoint += additionalCreditPoint; // Add the additional credit
             std::string updatedCreditPoint = std::to_string(currentCreditPoint);
             lines.push_back(temp_userID + "," + temp_password + "," + temp_username + "," + tempFullname + "," + tempEmail + "," + tempPhoneNumber + "," + tempHomeAddress + "," + tempCity + "," + updatedCreditPoint + "," + restOfLine);
         }
@@ -1584,7 +1643,8 @@ void Member::topUpCreditPoints(string userId, float additionalCreditPoint){
     myFile.close();
 }
 
-void Member::updateCreditInFile(string userId, float newCreditPoint){
+void Member::updateCreditInFile(string userId, float newCreditPoint)
+{
     std::fstream myFile("members.dat", std::ios::in | std::ios::out);
 
     if (!myFile.is_open())
@@ -2237,6 +2297,18 @@ void Member::registerMember()
 
     cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
     saveDataToFile(*this);
+
+    fstream blockFile;
+    blockFile.open("block.dat", std::ios::app | std::ios::out);
+    if (!blockFile)
+    {
+        std::cerr << "Unable to open file!"
+                  << "\n";
+        return;
+    }
+    blockFile << userId + ",[]"
+              << "\n";
+    blockFile.close();
 
     // delete creditPoint to free up memory
     delete creditPoint;
@@ -2912,8 +2984,11 @@ void AvailableList::showDetailSupporterDetail(string &userName)
             {
                 float skillRating = calculateSkillRating(userId_val, skillRatingSupporter[i]->getSkillName());
 
+                cout << "Skill number" << skillRating << "\n";
+
                 std::cout << i + 1 << ". Name: " << skillRatingSupporter[i]->getSkillName()
-                          << " , Credit point per hour: " << skillRatingSupporter[i]->getCreditPerHour() << " , Skill Rating: " << skillRating << "\n";
+                          << " , Credit point per hour: " << skillRatingSupporter[i]->getCreditPerHour() << " , Skill Rating: " << (skillRating == 0 ? "New supporter, not have rating yet" : std::to_string(skillRating)) << "\n";
+               
             }
         }
     }
@@ -2997,9 +3072,9 @@ Skill AvailableList::getRequestSkillName(string &userName)
 
             string input;
             cout << "\n"
-                 << "Please choose number of skill you want to book";
+                 << "Please enter number of skill you want to book or enter word 'block' to block this supporter";
             cout << "\n"
-                 << "Enter number (or press x to quit): ";
+                 << "Enter your choice (or press x to quit): ";
             cin >> input;
 
             if (input == "x" || input == "X")
@@ -3009,6 +3084,14 @@ Skill AvailableList::getRequestSkillName(string &userName)
                 return skillRequest;
                 break;
             }
+
+            if (input == "block" || input == "Block")
+            {
+                skillRequest.setSkillName("block");
+                return skillRequest;
+                break;
+            }
+
             int input_val = std::stoi(input);
 
             for (size_t i = 0; i < skillRatingSupporter.size(); ++i)
@@ -3735,4 +3818,81 @@ bool AvailableList::isValidNumber(const std::string &str)
             return false;
     }
     return true;
+}
+
+void Member::blockUser(string userID, string blockID)
+{
+    vector<string> blockList;
+    bool found = false;
+    fstream myFile;
+    myFile.open("block.dat", std::ios::in | std::ios::out);
+    if (!myFile)
+    {
+        std::cerr << "Unable to open file!"
+                  << "\n";
+        return;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+    // Skip the first line (header)
+    std::getline(myFile, line);
+
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+
+        string userId_val, listOfBlockID_val, newLine;
+
+        std::getline(ss, userId_val, ',');
+        std::getline(ss, listOfBlockID_val);
+        // cout << "id" << userId_val << "\n";
+        // cout << listOfBlockID_val << "\n";
+        if (userId_val == userID)
+        {
+            listOfBlockID_val = listOfBlockID_val.substr(1, listOfBlockID_val.size() - 2);
+            std::istringstream listOfBlockID(listOfBlockID_val);
+            std::string id;
+            while (getline(listOfBlockID, id, ','))
+            {
+                blockList.push_back(id);
+            }
+            // for (const auto& id : blockList) {
+            //     std::cout << id << std::endl;
+            // }
+            newLine = userID + ",[";
+            for (const auto &id : blockList)
+            {
+                newLine = newLine + id + ",";
+            }
+            newLine = newLine + blockID + "]";
+            // cout << "new:" << newLine << "\n";
+            lines.push_back(newLine);
+        }
+        else
+        {
+            lines.push_back(line);
+        }
+    }
+
+    myFile.clear();
+    myFile.seekg(0, std::ios::beg);
+    myFile.close();
+
+    std::fstream updateFile("block.dat", std::ios::out | std::ios::trunc);
+
+    if (!updateFile.is_open())
+    {
+        std::cerr << "Error opening file!" << std::endl;
+        return;
+    }
+    updateFile << "userID,listOfBlockID"
+               << "\n";
+
+    for (const auto &updatedLine : lines)
+    {
+        updateFile << updatedLine << "\n";
+    }
+
+    updateFile.close();
 }
