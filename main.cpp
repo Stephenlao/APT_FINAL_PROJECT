@@ -151,7 +151,7 @@ void memberMenu(Member &member)
     cout << "5.Host action\n";
     cout << "6.Supporter action\n";
     cout << "7.Back to main menu\n";
-    cout << "8. Calculate avgHost\n";
+    // cout << "8.Calculate avgHost\n";
     cout << "Enter your choice: ";
     cin >> choice;
     string choice1;
@@ -273,9 +273,9 @@ void memberMenu(Member &member)
     case 7:
         mainMenu();
         break;
-    case 8:
-        cout << member.calculateAvgHostRating(member.getUserId());
-        memberMenu(member);
+    // case 8:
+    //     cout << member.calculateAvgHostRating(member.getUserId());
+    //     memberMenu(member);
 
     default:
         cout << "Invalid choice!"
@@ -641,7 +641,7 @@ void SupporterRatingMenu(Member &member, const string &requestId)
 
                 string hostId = getHostIDByID(requestId);
                 member.saveAvgRatingToFile(hostId);
-                cout << hostId << "\n";
+                // cout << hostId << "\n";
                 SupporterRatingMenu(member, requestId);
                 // if skill and supporter rating is not exist
             }
@@ -654,7 +654,7 @@ void SupporterRatingMenu(Member &member, const string &requestId)
                 cout << "\n\n";
                 string hostId = getHostIDByID(requestId);
                 member.saveAvgRatingToFile(hostId);
-                cout << hostId << "\n";
+                // cout << hostId << "\n";
                 SupporterRatingMenu(member, requestId);
             }
         }

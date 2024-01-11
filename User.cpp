@@ -2984,7 +2984,7 @@ void AvailableList::showDetailSupporterDetail(string &userName)
             {
                 float skillRating = calculateSkillRating(userId_val, skillRatingSupporter[i]->getSkillName());
 
-                cout << "Skill number" << skillRating << "\n";
+                // cout << "Skill number" << skillRating << "\n";
 
                 std::cout << i + 1 << ". Name: " << skillRatingSupporter[i]->getSkillName()
                           << " , Credit point per hour: " << skillRatingSupporter[i]->getCreditPerHour() << " , Skill Rating: " << (skillRating == 0 ? "New supporter, not have rating yet" : std::to_string(skillRating)) << "\n";
