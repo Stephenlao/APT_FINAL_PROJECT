@@ -245,6 +245,7 @@ void memberMenu(Member &member)
         {
             member.saveIsListedInFile(member.getUserId(), isListed);
             cout << "Listed successfully!\n";
+            member.updateTimePeriod(member.getUserId());
         }
         else
         {
@@ -355,7 +356,7 @@ void hostMenu(Member &member)
     {
     case 1:
         listOfRequestsID = member.getCurrentBooking(member.getUserId());
-
+        cout << "You can enter number to cancel booking request \n";
         if (listOfRequestsID[0] == "error")
         {
             break;
@@ -426,6 +427,7 @@ void supporterMenu(Member &member)
     cout << "Supporter menu:\n";
     cout << "1. View all current requests\n";
     cout << "2. View all history requests\n";
+    cout << "3. Update your time period\n";
     cout << "Enter your choice: ";
     cin >> choice;
     vector<string> listOfRequestsID;
@@ -459,7 +461,7 @@ void supporterMenu(Member &member)
                     // Update the status of the request to Accepted
                     member.acceptRequest(requestID);
                     std::pair<std::string, std::string> supporterIdAndSkill = member.getSupporterIdAndSkillNameInRequestDat(requestID);
-                    float consumingPoint = member.getConsumingPointOfSkillBySupporterId(supporterIdAndSkill.first, supporterIdAndSkill.second);
+                    float consumingPoint = (member.getConsumingPointOfSkillBySupporterId(supporterIdAndSkill.first, supporterIdAndSkill.second));
                     string hostId = member.getHostIdInRequestDat(requestID);
                     member.getHostIdAndDeductCreditPoint(hostId, consumingPoint);
                     break;
@@ -526,6 +528,9 @@ void supporterMenu(Member &member)
             }
             break;
         }
+        break;
+    case 3:
+        member.updateTimePeriod(member.getUserId());
         break;
     default:
         cout << "Invalid choice!"

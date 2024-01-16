@@ -1051,6 +1051,8 @@ void Member::setDetail(const std::vector<std::string> &data, const std::string &
 
 void Member::showAllAvailableSupporters(const std::string &userID)
 {
+    string timePeriod;
+    bool validateTime = false;
     fstream blockFile;
 
     vector<string> blockList;
@@ -1269,18 +1271,26 @@ void Member::showAllAvailableSupporters(const std::string &userID)
                      << "\n";
                 break;
             }
+            timePeriod = getRequestTime(getUserIdByName(userNameOfSupporter));
 
+            if(timePeriod == "x"){
+               cout << "Your requested time is not in the supporter available time period\n";
+               break;
+            }
+            
             // Check user credit point
             if (checkCredit(skillRequest.getCreditPerHour()))
             {
                 // Save the request to file
-                request.saveRequestDataToFile(userID, getUserIdByName(userNameOfSupporter), skillRequest.getSkillName());
+                request.saveRequestDataToFile(userID, getUserIdByName(userNameOfSupporter), skillRequest.getSkillName(), timePeriod);
             }
             else
             {
                 cout << "Don't have enough credit point to book."
                      << "\n";
             }
+            
+            
             break;
         }
         else
@@ -1290,6 +1300,149 @@ void Member::showAllAvailableSupporters(const std::string &userID)
     }
 }
 
+string Member::getRequestTime(string userID){
+    string timeRequest = "x";
+    int startHour, startMin, endHour, endMin;
+    int hours;
+    bool validateHour = false;
+    bool validateMin = false;
+    while (validateHour == false || validateMin == false)
+    {
+        validateHour = false;
+        validateMin = false;
+        cout << "Enter the start time you want to request: \n";
+        cout << "Start Hour: ";
+        cin >> startHour;
+        cout << "Start Minute: ";
+        cin >> startMin;
+
+        cout << "Enter number of hours you want to request: ";
+        cin >> hours;
+
+        if(startHour > 0 && startHour < 24 ){
+            validateHour = true;
+        }
+        if(startMin < 60){
+            validateMin = true;
+        }
+        if(validateHour == false){
+            cout << "Hour is invalid. PLease enter hour again from 1 to 23 \n";
+        }
+        if(validateMin == false){
+            cout << "Minute is invalid. PLease enter minute again from 1 to 59 \n";
+        }
+    };
+    endHour = startHour + hours;
+    endMin = startMin;
+    std::string startMin_str = "00";
+    std::string endMin_str = "00";
+    if(startMin > 0){
+        startMin_str = std::to_string(startMin);
+    }
+
+    if(endMin > 0){
+        endMin_str = std::to_string(endMin);
+    }
+    
+
+    std::string startHour_str = std::to_string(startHour);
+    std::string endHour_str = std::to_string(endHour);
+
+    fstream timeFile;
+    timeFile.open("time.dat", std::ios::out | std::ios::in);
+    if (!timeFile.is_open())
+    {
+        std::cerr << "There is no existence of user!"
+                  << "\n";
+        return timeRequest;
+    }
+
+    std::string line;
+    std::getline(timeFile, line);
+    
+
+   while (std::getline(timeFile, line)) {
+        std::stringstream ss(line);
+
+        string userID_val, timePeriod_val;
+
+        std::getline(ss, userID_val, ',');
+        std::getline(ss, timePeriod_val);
+
+        if (userID == userID_val) {
+            if(timePeriod_val == "[all]"){
+                timeRequest = "[" + startHour_str + ":" + startMin_str + "-" + endHour_str + ":" + endMin_str + "]";
+            } else {
+                std::stringstream ss1(timePeriod_val);
+                string startHourSup, endHourSup, startMinSup, endMinSup, blank;
+                std::getline(ss1, blank, '[');
+                std::getline(ss1, startHourSup, ':');
+                std::getline(ss1, startMinSup, '-');
+                std::getline(ss1, endHourSup, ':');
+                std::getline(ss1, endMinSup, ']');
+
+                std::stringstream ss_startHourSup(startHourSup);
+                std::stringstream ss_startMinSup(startMinSup);
+                std::stringstream ss_endHourSup(endHourSup);
+                std::stringstream ss_endMinSup(endMinSup);
+                int startHourSup_val, endHourSup_val, startMinSup_val, endMinSup_val;
+                ss_startHourSup >> startHourSup_val;
+                ss_startMinSup >> startMinSup_val;
+                ss_endHourSup >> endHourSup_val;
+                ss_endMinSup >> endMinSup_val;
+
+                if(startHour >= startHourSup_val && endHour < endHourSup_val){
+                    timeRequest = "[" + startHour_str + ":" + startMin_str + "-" + endHour_str + ":" + endMin_str + "]";
+                } else if(startHour >= startHourSup_val && endHour == endHourSup_val && endMin <= endMinSup_val) {
+                    timeRequest = "[" + startHour_str + ":" + startMin_str + "-" + endHour_str + ":" + endMin_str + "]";
+                }
+            }
+        }
+    }
+
+    timeFile.close();  
+    return timeRequest;
+}
+
+int Member::getTotalHours(string requestID){
+    int totalHours = 0;
+    std::fstream myFile("requests.dat", std::ios::in | std::ios::out);
+
+    if (!myFile.is_open())
+    {
+        std::cerr << "There is no existence of host!"
+                  << "\n";
+        return totalHours;
+    }
+
+    std::vector<std::string> lines;
+    std::string line;
+
+    while (std::getline(myFile, line))
+    {
+        std::stringstream ss(line);
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val;
+
+        std::getline(ss, requestId_val, ',');
+        std::getline(ss, hostId_val, ',');
+        std::getline(ss, supporterId_val, ',');
+        std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
+        std::getline(ss, skill_val, ',');
+        std::getline(ss, status_val, ',');
+
+        if (requestID == requestId_val)
+        {
+            std:stringstream ss_hours(totalHours_val);
+            ss_hours >> totalHours;
+        }
+    }
+
+   
+    myFile.close();
+    return totalHours;
+}
 bool Member::SkillsExistOrNot(const std::string &userId)
 {
     fstream filePath;
@@ -1717,12 +1870,14 @@ vector<string> Member::getHistoryBooking(string hostID)
     {
         std::stringstream ss(line);
 
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
         // Process the data
@@ -1774,12 +1929,14 @@ vector<string> Member::getCurrentBooking(string hostID)
     {
         std::stringstream ss(line);
 
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
         // Process the data
@@ -1838,18 +1995,20 @@ void Member::cancelBooking(string requestID)
     while (std::getline(myFile, line))
     {
         std::stringstream ss(line);
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
 
         if (requestID == requestId_val)
         {
-            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + +"," + skill_val + "," + "Cancel");
+            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + "," + timePeriod_val + "," + totalHours_val + "," + skill_val + "," + "Cancel");
             cout << "Cancel request successfully!\n"
                  << "\n";
         }
@@ -1872,10 +2031,6 @@ void Member::cancelBooking(string requestID)
         return;
     }
 
-    // // Check if the last line is empty and remove it if it is
-    // if (!lines.empty() && lines.back().empty()) {
-    //     lines.pop_back();
-    // }
 
     for (const auto &updatedLine : lines)
     {
@@ -1909,12 +2064,14 @@ vector<string> Member::getHistoryRequest(string supporterID)
     {
         std::stringstream ss(line);
 
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val, skillRating;
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val, skillRating;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
 
@@ -1967,12 +2124,14 @@ vector<string> Member::getCurrentRequest(string supporterID)
     {
         std::stringstream ss(line);
 
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
         // Process the data
@@ -2030,18 +2189,20 @@ void Member::acceptRequest(string requestID)
     while (std::getline(myFile, line))
     {
         std::stringstream ss(line);
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
 
         if (requestID == requestId_val)
         {
-            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + +"," + skill_val + "," + "Accepted");
+            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + "," + timePeriod_val + "," + totalHours_val  + "," + skill_val + "," + "Accepted");
             cout << "Accept the request successfully!\n"
                  << "\n";
         }
@@ -2105,18 +2266,20 @@ void Member::rejectRequest(string requestID)
     while (std::getline(myFile, line))
     {
         std::stringstream ss(line);
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHours_val, skill_val, status_val;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHours_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
 
         if (requestID == requestId_val)
         {
-            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + +"," + skill_val + "," + "Rejected");
+            lines.push_back(requestID + "," + hostId_val + "," + supporterId_val + "," + date_val + "," + timePeriod_val + "," + totalHours_val + "," + skill_val + "," + "Rejected");
             cout << "Reject the request successfully!\n"
                  << "\n";
         }
@@ -2157,7 +2320,7 @@ string Member::getRequestIDByOrder(vector<string> listOfRequestsID)
 {
     string requestID = "error";
     string input;
-    cout << "Please choose number of the specific request you want to cancel:\n";
+    cout << "Please choose number of the specific request you want to choose:\n";
     cout << "Enter number (or press x to quit): ";
     cin >> input;
 
@@ -2298,6 +2461,7 @@ void Member::registerMember()
     cout << "Registration successful. Your user ID is: " << User::getUserId() << "\n";
     saveDataToFile(*this);
 
+    // Register member to the block file
     fstream blockFile;
     blockFile.open("block.dat", std::ios::app | std::ios::out);
     if (!blockFile)
@@ -2309,6 +2473,20 @@ void Member::registerMember()
     blockFile << userId + ",[]"
               << "\n";
     blockFile.close();
+
+    // Register member to the time file
+    fstream timeFile;
+    timeFile.open("time.dat", std::ios::app | std::ios::out);
+    if (!timeFile)
+    {
+        std::cerr << "Unable to open file!"
+                  << "\n";
+        return;
+    }
+
+    timeFile << userId + ",[all]"
+              << "\n";
+    timeFile.close();
 
     // delete creditPoint to free up memory
     delete creditPoint;
@@ -2404,6 +2582,225 @@ int Member::loginMember()
     // both password and username is not match
     return 2;
 }
+
+void Member::updateTimePeriod(string userID){
+    string isAll;
+    cout << "Do you want to set time period to all ?\n";
+    cout << "Enter 'yes' or 'no': ";
+    cin >> isAll;
+
+    if(isAll == "yes"){
+        fstream timeFile;
+        timeFile.open("time.dat", std::ios::out | std::ios::in);
+        if (!timeFile.is_open())
+        {
+            std::cerr << "There is no existence of user!"
+                    << "\n";
+            return;
+        }
+
+        std::vector<std::string> lines;
+        std::string line;
+        std::getline(timeFile, line);
+        
+
+        while (std::getline(timeFile, line))
+        {
+            std::stringstream ss(line);
+
+            string userID_val, timePeriod_val;
+
+            std::getline(ss, userID_val, ',');
+            std::getline(ss, timePeriod_val);
+
+            
+            if (userID == userID_val)
+            {
+                lines.push_back(userID + "," + "[all]" );
+                
+                cout << "Update time period work successfully!\n"
+                    << "\n";
+            }
+            else
+            {
+                lines.push_back(line);
+            }
+        }
+
+        timeFile.clear();
+        timeFile.seekg(0, std::ios::beg);
+        timeFile.close();
+
+        std::fstream updateFile("time.dat", std::ios::out | std::ios::trunc);
+
+        if (!updateFile.is_open())
+        {
+            std::cerr << "Error opening file!" << std::endl;
+            return;
+        }
+        
+        updateFile << "userID,timePeriod\n";
+
+        for (const auto &updatedLine : lines)
+        {
+            // cout << updatedLine << "\n";
+            updateFile << updatedLine << "\n";
+        }
+
+        updateFile.close();
+    }else if(isAll == "no"){
+
+        int startHour, startMin, endHour, endMin;
+        bool validateHour = false;
+        bool validateMin = false;
+        while (validateHour == false || validateMin == false)
+        {
+            validateHour = false;
+            validateMin = false;
+            // cout << "Enter the start time you want to set: \n";
+            // cout << "Start Hour: ";
+            // cin >> startHour;
+            // cout << "Start Minute: ";
+            // cin >> startMin;
+            // cout << "Enter the end end you want to set: \n";
+            // cout << "End Hour: ";
+            // cin >> endHour;
+            // cout << "End Minute: ";
+            // cin >> endMin; 
+            std::cout << "Enter the start time you want to set: \n";
+            std::cout << "Start Hour: ";
+
+            if (!(std::cin >> startHour) || startHour < 0 || startHour >= 24) {
+                std::cout << "Invalid input for Start Hour. Please enter a valid hour (0-23).\n";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                
+                continue;
+            }
+
+            std::cout << "Start Minute: ";
+            if (!(std::cin >> startMin) || startMin < 0 || startMin >= 60) {
+                std::cout << "Invalid input for Start Minute. Please enter a valid minute (0-59).\n";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                
+                continue;
+            }
+
+            std::cout << "Enter the end time you want to set: \n";
+            std::cout << "End Hour: ";
+            if (!(std::cin >> endHour) || endHour < 0 || endHour >= 24) {
+                std::cout << "Invalid input for End Hour. Please enter a valid hour (0-23).\n";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                
+                continue;
+            }
+
+            std::cout << "End Minute: ";
+            if (!(std::cin >> endMin) || endMin < 0 || endMin >= 60) {
+                std::cout << "Invalid input for End Minute. Please enter a valid minute (0-59).\n";
+                std::cin.clear();
+                std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+          
+                continue;
+            }
+            validateHour = true;
+            validateMin = true;
+
+            // if(startHour > 0 && endHour > 0 && startHour < 24 && endHour <24 ){
+            //     validateHour = true;
+            // }
+            // if(startMin < 60 && endMin < 60){
+            //     validateMin = true;
+            // }
+            // if(validateHour == false){
+            //     cout << "Hour is invalid. PLease enter hour again from 1 to 23 \n";
+            //     break;
+            // }
+            // if(validateMin == false){
+            //     cout << "Minute is invalid. PLease enter minute again from 1 to 59 \n";
+            //     break;
+            // }
+        };
+        std::string startMin_str = "00";
+        std::string endMin_str = "00";
+
+        if(startMin > 0){
+            startMin_str = std::to_string(startMin);
+        }
+
+        if(endMin > 0){
+            endMin_str = std::to_string(endMin);
+        }
+
+        std::string startHour_str = std::to_string(startHour);
+        std::string endHour_str = std::to_string(endHour);
+
+
+        fstream timeFile;
+        timeFile.open("time.dat", std::ios::out | std::ios::in);
+        if (!timeFile.is_open())
+        {
+            std::cerr << "There is no existence of user!"
+                    << "\n";
+            return;
+        }
+
+        std::vector<std::string> lines;
+        std::string line;
+        std::getline(timeFile, line);
+        
+
+        while (std::getline(timeFile, line))
+        {
+            std::stringstream ss(line);
+
+            string userID_val, timePeriod_val;
+
+            std::getline(ss, userID_val, ',');
+            std::getline(ss, timePeriod_val);
+
+            
+            if (userID == userID_val)
+            {
+                lines.push_back(userID + "," + "[" + startHour_str + ":" + startMin_str + "-" + endHour_str + ":" + endMin_str + "]" );
+                
+                cout << "Update time period work successfully!\n"
+                    << "\n";
+            }
+            else
+            {
+                lines.push_back(line);
+            }
+        }
+
+        timeFile.clear();
+        timeFile.seekg(0, std::ios::beg);
+        timeFile.close();
+
+        std::fstream updateFile("time.dat", std::ios::out | std::ios::trunc);
+
+        if (!updateFile.is_open())
+        {
+            std::cerr << "Error opening file!" << std::endl;
+            return;
+        }
+        
+        updateFile << "userID,timePeriod\n";
+
+        for (const auto &updatedLine : lines)
+        {
+            // cout << updatedLine << "\n";
+            updateFile << updatedLine << "\n";
+        }
+
+        updateFile.close();
+    } else {
+        cout << "Invalid input!";
+    }
+}
+
 
 void Member::updatePasswordInFile()
 {

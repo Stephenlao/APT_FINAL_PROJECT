@@ -18,7 +18,7 @@ private:
 public:
     Request(string requestID = "", string hostID  = "", string supporterID = "", string date = "" , string skill = "");
     void setStatus(status newStatus);
-    void saveRequestDataToFile(string hostID, string supporterID, string skill);
+    void saveRequestDataToFile(string hostID, string supporterID, string skill, string timePeriod);
     bool isFileEmpty(std::ifstream &pfile);
     string getRequestID();
     void setRequestID(string requestID_val);
