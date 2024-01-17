@@ -3829,12 +3829,14 @@ string Member::checkStatus(const string &requestId)
         std::stringstream ss(line);
         std::string part;
 
-        string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val, skillRating;
+        string requestId_val, hostId_val, supporterId_val, date_val,time_period,total_hour, skill_val, status_val, skillRating;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, time_period, ',');
+        std::getline(ss, total_hour, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
 
