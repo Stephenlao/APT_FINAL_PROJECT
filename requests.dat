@@ -1,4 +1,4 @@
-ID,hostID,supporterID,date,skill,status
+ID,hostID,supporterID,date,timePeriod,totalHours,skill,status,rating
 
 
 R1406,M6635,M3617,9-1-2024,testing,Accepted,[skill|3.000000:ok],[supporter|4.300000:ok],[host|3.500000:ok]
@@ -28,3 +28,36 @@ R4397,M4194,M5878,11-1-2024,1,Accepted,[skill|3.400000:ok],[supporter|4.500000:o
 R7027,M4194,M5878,11-1-2024,1,Pending
 R7958,M7001,M3687,11-1-2024,play games,Accepted,[skill|4.500000:goo],[supporter|5.000000:wow],[host|4.000000:good]
 R5791,M7001,M8720,11-1-2024,playing,Accepted,[skill|4.000000:g],[supporter|4.600000:w],[host|3.300000:normal]
+R3875,M1639,M8720,15-1-2024,playing,Pending
+R2399,M1639,M3687,15-1-2024,play games,Pending
+R4187,M1639,M3687,15-1-2024,play games,Pending
+R4116,M1639,M3687,15-1-2024,play games,Pending
+R5975,M1639,M3687,15-1-2024,play games,Pending
+R9518,M1639,M3687,15-1-2024,play games,Pending
+R3029,M1639,M3687,15-1-2024,play games,Pending
+R7934,M1639,M3687,15-1-2024,play games,Pending
+R8266,M1639,M3687,16-1-2024,play games,Pending
+R7523,M1639,M3687,16-1-2024,play games,Pending
+R6011,M1639,M5878,16-1-2024,1,Pending
+R1413,M1639,M8720,16-1-2024,playing,Pending
+R1167,M1639,M8720,16-1-2024,playing,Pending
+R4076,M1639,M8720,16-1-2024,playing,Pending
+R1233,M1639,M8720,16-1-2024,playing,Pending
+R3338,M1639,M8720,16-1-2024,playing,Pending
+R845,M1639,M8720,16-1-2024,playing,Pending
+R774,M1639,M8720,16-1-2024,playing,Pending
+R528,M1639,M8720,16-1-2024,playing,Pending
+R5017,M1639,M8720,16-1-2024,playing,Pending
+R7785,M1639,M8720,16-1-2024,playing,Pending
+R7293,M1639,M8720,16-1-2024,playing,Pending
+R1924,M1639,M8720,16-1-2024,playing,Pending
+R3175,M1639,M8720,16-1-2024,[8:00-10:00],guitar,Pending
+R1831,M1639,M8720,16-1-2024,[8:00-11:00],3,playing,Pending
+R563,M1639,M8720,16-1-2024,[10:24-15:24],5,guitar,Pending
+R1195,M1639,M7198,16-1-2024,[7:00-9:00],Accepted
+R4056,M1639,M7198,16-1-2024,[10:00-12:00],2,cleaning,Cancel
+R8751,M1639,M7198,16-1-2024,[14:00-15:00],1,cleaning,Accepted
+R1876,M1639,M7198,16-1-2024,[1:00-8:00],7,cleaning,Pending
+R8232,M1639,M8720,16-1-2024,[7:00-9:00],2,playing,Pending
+R2394,M1639,M2644,16-1-2024,[7:30-10:30],3,playing,Accepted
+R6055,M6846,M8720,17-1-2024,[10:00-13:00],3,playing,Accepted,[skill|5.000000:excellent],[supporter|3.500000:soso],[host|4.000000:okay fine]

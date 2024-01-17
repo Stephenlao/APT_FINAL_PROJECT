@@ -13,7 +13,7 @@ using std::ifstream;
 Request::Request(string requestID_val ,string hostID_val, string supporterID_val, string date_val, string skill_val)
     : requestID(requestID_val) ,hostID(hostID_val), supporterID(supporterID_val), date(date_val), skill(skill_val){};
 
-void Request::saveRequestDataToFile(string hostID, string supporterID, string skill){
+void Request::saveRequestDataToFile(string hostID, string supporterID, string skill, string timePeriod){
     auto now = std::chrono::system_clock::now();
 
     // Convert the time point to a time_t object
@@ -27,6 +27,24 @@ void Request::saveRequestDataToFile(string hostID, string supporterID, string sk
     int month = localTime->tm_mon + 1;   
     int day = localTime->tm_mday;         
 
+    std::stringstream ss(timePeriod);
+    string startHourSup, endHourSup, startMinSup, endMinSup, blank;
+    std::getline(ss, blank, '[');
+    std::getline(ss, startHourSup, ':');
+    std::getline(ss, startMinSup, '-');
+    std::getline(ss, endHourSup, ':');
+    std::getline(ss, endMinSup, ']');
+
+    std::stringstream ss_startHourSup(startHourSup);
+   
+    std::stringstream ss_endHourSup(endHourSup);
+            
+    int startHourSup_val, endHourSup_val;
+    ss_startHourSup >> startHourSup_val;          
+    ss_endHourSup >> endHourSup_val;
+
+    int totalHours = endHourSup_val - startHourSup_val;
+            
     Request request;
     fstream myFile;
     myFile.open("requests.dat", std::ios::app | std::ios::out);
@@ -35,7 +53,7 @@ void Request::saveRequestDataToFile(string hostID, string supporterID, string sk
         std::ifstream inFile("requests.dat");
         if (isFileEmpty(inFile))
         {
-            myFile << "requestID,hostID,supporterID,date,skill,status" << "\n";
+            myFile << "requestID,hostID,supporterID,date,timePeriod,totalHours,skill,status" << "\n";
         }
         inFile.close();
 
@@ -44,7 +62,7 @@ void Request::saveRequestDataToFile(string hostID, string supporterID, string sk
        requestID = "R" + std::to_string(randomID);
        request.setRequestID(requestID);
 
-       myFile << request.getRequestID() << "," << hostID << "," << supporterID << "," << day << "-" << month << "-" << year << "," << skill << "," << "Pending" << "\n";
+       myFile << request.getRequestID() << "," << hostID << "," << supporterID << "," << day << "-" << month << "-" << year << "," << timePeriod << "," << totalHours << "," << skill << "," << "Pending" << "\n";
        cout << "You have created a request to book successfully!" << "\n";
     } else {
         cout << "Can not open the file";
