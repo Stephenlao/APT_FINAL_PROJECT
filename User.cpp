@@ -2565,6 +2565,14 @@ void Member::registerMember()
                   << "\n";
         return;
     }
+
+    std::ifstream inFileBlock("block.dat");
+    if (isFileEmpty(inFileBlock))
+    {
+        blockFile << "userID,listOfBlockID\n";
+    }
+    inFileBlock.close();
+
     blockFile << userId + ",[]"
               << "\n";
     blockFile.close();
@@ -2578,6 +2586,13 @@ void Member::registerMember()
                   << "\n";
         return;
     }
+
+    std::ifstream inFileTime("time.dat");
+    if (isFileEmpty(inFileTime))
+    {
+        timeFile << "userID,timePeriod\n";
+    }
+    inFileTime.close();
 
     timeFile << userId + ",[all]"
               << "\n";
