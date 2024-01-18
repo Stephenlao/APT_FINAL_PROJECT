@@ -3,13 +3,13 @@ APT FINAL PROJECT TIME BANK
 
 # Project file
 
-GitHub Reppo: https://github.com/vntuananhbui/Team7-Programming1-ContainerPortManagement
+GitHub Repo: [(https://github.com/Stephenlao/APT_FINAL_PROJECT)]
 <br />
-UML DRIAGRAM: [https://drive.google.com/file/d/1XQal3Jv4b2wrsqM0Hp8xhQUr6fKyB86r/view?usp=sharing]
+UML DRIAGRAM: [https://app.diagrams.net/#G1oNETOvZgZbYFJIYJmTW5KFIfqtJ0HT2-)]
 <br />
-REPORT: [https://docs.google.com/document/d/1FaGOPAJO7O8iopQ83AJkvImcN2CtLalF50WXY0H32Qw/edit](https://docs.google.com/document/d/15kY-IDkmPn-3F1-Dq_BWMv9Sr43gnpeNLHbsD0oiAPU/edit?usp=sharing)
+REPORT:[https://docs.google.com/document/d/1jFqJikuvILMYnIDcq-HnPyPJFxPZjwGvcH7hQbJd0Pw/edit?usp=sharing]
 </br>
-Video demonstration link: https://www.youtube.com/watch?v=GjAXfoVEZlY
+Video demonstration link: 
 <br />
 <hr>
 - Project start date: 11/12/2024
@@ -46,4 +46,3 @@ Bank” for people to support each other in daily activities, such as plumbing r
 house cleaning, etc...
 
 
-#### Port Management System
