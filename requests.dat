@@ -65,3 +65,5 @@ R7159,M2710,M2925,17-1-2024,[14:15-15:15],1,python,Accepted,[skill|4.000000:soso
 R8214,M2710,M2925,17-1-2024,[14:00-16:00],2,python,Accepted,[skill|2.900000:not good],[supporter|3.500000:fine],[host|2.800000:bad]
 R9109,M2710,M2925,17-1-2024,[14:30-15:30],1,python,Accepted,[skill|4.000000:good],[supporter|5.000000:excellent],[host|4.000000:wow]
 R4562,M2710,M2925,18-1-2024,[15:30-16:30],1,python,Accepted,[skill|2.990000:okay],[supporter|3.440000:fine],[host|4.000000:fine]
+R1192,M98,M793,18-1-2024,[14:00-16:00],2,java,Pending
+R674,M98,M793,18-1-2024,[16:00-17:00],1,java,Pending

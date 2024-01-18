@@ -572,7 +572,7 @@ float Member::getHostRatingByUserID(const std::string &userID)
         }
     }
 
-    std::cerr << "User ID not found in Rating.dat" << std::endl;
+    // std::cerr << "User ID not found in Rating.dat" << std::endl;
     return 0;
 }
 
@@ -1053,14 +1053,14 @@ void Member::setDetail(const std::vector<std::string> &data, const std::string &
 
 void Member::showAllAvailableSupporters(const std::string &userID,const std::vector<std::string> &allSupporterVctTimePeriod)
 {
-    if (allSupporterVctTimePeriod.empty()) {
-        cout << "Nothing!"<< "\n";
-    } else {
-        for (const std::string &supporter : allSupporterVctTimePeriod) {
-            cout << "Check: ";
-            std::cout << supporter << ",";
-        }
-    }
+    // if (allSupporterVctTimePeriod.empty()) {
+    //     cout << "Nothing!"<< "\n";
+    // } else {
+    //     for (const std::string &supporter : allSupporterVctTimePeriod) {
+    //         cout << "Check: ";
+    //         std::cout << supporter << ",";
+    //     }
+    // }
 
     string timePeriod;
     bool validateTime = false;
@@ -1216,8 +1216,11 @@ void Member::showAllAvailableSupporters(const std::string &userID,const std::vec
         }
 
         if (block == false)
-        {
-            if (data1[9] == "false" && ((allSupporterVctTimePeriod.size() == 1 && allSupporterVctTimePeriod[0] == "all"))) {
+        {   
+            if (data1[9] == "true") {
+                cout << "";
+            }
+            else if (data1[9] == "false" && ((allSupporterVctTimePeriod.size() == 1 && allSupporterVctTimePeriod[0] == "all"))) {
                 cout << "";
             }
 
@@ -1309,11 +1312,16 @@ void Member::showAllAvailableSupporters(const std::string &userID,const std::vec
                      << "\n";
                 break;
             }
-            timePeriod = getRequestTime(getUserIdByName(userNameOfSupporter));
+            timePeriod = getRequestTime(getUserIdByName(userNameOfSupporter), userId);
 
             if(timePeriod == "x"){
                cout << "Your requested time is not in the supporter available time period\n";
                break;
+            }
+
+            if (timePeriod == "y") {
+                cout << "You have already booked supporter in this time frame!. Please select another time range!\n";
+                break;
             }
             
             // Check user credit point
@@ -1338,7 +1346,7 @@ void Member::showAllAvailableSupporters(const std::string &userID,const std::vec
     }
 }
 
-string Member::getRequestTime(string userID){
+string Member::getRequestTime(string userID, string hostId){
     string timeRequest = "x";
     int startHour, startMin, endHour, endMin;
     int hours;
@@ -1385,6 +1393,55 @@ string Member::getRequestTime(string userID){
 
     std::string startHour_str = std::to_string(startHour);
     std::string endHour_str = std::to_string(endHour);
+
+
+    std::string line1;
+    fstream requestsFile;
+    requestsFile.open("requests.dat", std::ios::in);
+    if (!requestsFile.is_open()) {
+        cout << "Unable to open file!\n";
+        return "";
+    }
+
+    while (std::getline(requestsFile, line1)) {
+        std::stringstream ss(line1);
+
+        std::string userIDInFile, hostIDInFile, timePeriod;
+        std::getline(ss, userIDInFile, ',');
+        std::getline(ss, hostIDInFile, ',');
+
+        // Check if the userID matches the parameter
+        if (hostIDInFile == hostId) {
+            // Find the position of '[' and ']'
+            size_t startBracketPos = line1.find("[");
+            size_t endBracketPos = line1.find("]");
+
+            // Check if '[' and ']' are found
+            if (startBracketPos != std::string::npos && endBracketPos != std::string::npos) {
+                // Extract the time period between '[' and ']'
+                timePeriod = line1.substr(startBracketPos + 1, endBracketPos - startBracketPos - 1);
+
+                // Check if the time period contains a dash '-'
+                size_t dashPos = timePeriod.find("-");
+                if (dashPos != std::string::npos) {
+                    // Extract start and end hours and minutes from the time period
+                    int fileStartHour, fileStartMinute, fileEndHour, fileEndMinute;
+                    sscanf(timePeriod.substr(0, dashPos).c_str(), "%d:%d", &fileStartHour, &fileStartMinute);
+                    sscanf(timePeriod.substr(dashPos + 1).c_str(), "%d:%d", &fileEndHour, &fileEndMinute);
+
+                    // Check for overlap
+                    if ((startHour < fileEndHour && endHour > fileStartHour) ||
+                        (startHour == fileStartHour && startMin < fileStartMinute && endHour > fileStartHour) ||
+                        (startHour < fileEndHour && endHour == fileEndHour && endMin > fileEndMinute)) {
+                        timeRequest = "y";
+                        return timeRequest;
+                    }
+                }
+            }
+        }
+    }
+
+    requestsFile.close();
 
     fstream timeFile;
     timeFile.open("time.dat", std::ios::out | std::ios::in);

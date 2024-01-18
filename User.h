@@ -146,7 +146,7 @@ public:
 
     // TIME
     void updateTimePeriod(string userID);
-    string getRequestTime(string userID);
+    string getRequestTime(string userID, string hostID);
     int getTotalHours(string requestID);
 
     // SORT TIME

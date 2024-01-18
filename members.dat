@@ -1,6 +1,5 @@
 userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,MinimumHostRating,SkillRating,AvgHostRating
-M2710,3426373520,host1,host1,host1,099,truong chinh,sai gon,24.000000,false,0,
-M2791,3426373520,host2,host2,host2,077,hoa binh,sai gon,20.000000,false,0,
-M2925,1706879174,supporter1,supporter1,supporter1,055,nvc,sai gon,16.000000,true,3.000000,[[python,2.000000]]
-M3027,1706879174,supporter2,supporter2,supporter2,066,dbp,sai gon,20.000000,true,0.000000,[[java,3.000000]]
-M6330,1706879174,supporter3,supporter3,supporter3,044,nvc,sai gon,20.000000,true,0.000000,[[C++,2.000000]]
+M98,3426373520,host1,host1,host1,099,truong son,sai gon,20.000000,false,0,
+M176,3426373520,host2,host12,host2,088,hoa binh,sai gon,20.000000,false,0,
+M261,1706879174,supporter1,supporter1,supporter1,066,nguyen trai,sai gon,20.000000,true,0.000000,[[python,2.000000]]
+M793,1706879174,supporter2,supporter2,supporter2,055,dien bien phu,sai gon,20.000000,true,0.000000,[[java,3.000000]]
