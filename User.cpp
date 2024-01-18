@@ -10,6 +10,8 @@
 #include "Rating.h"
 #include "Request.h"
 #include <limits>
+#include <algorithm>
+#include <cstdio>
 using std::cin;
 using std::cout;
 using std::ctime;
@@ -488,8 +490,8 @@ float Member::calculateAvgHostRating(string userID)
             std::getline(ss, token, ',');
             std::getline(ss, token, ',');
 
-            cout << "Token: " << token << "\n";
-            cout << "ID: " << userID << "\n";
+            // cout << "Token: " << token << "\n";
+            // cout << "ID: " << userID << "\n";
             // Check if the token matches the userID
             if (token == userID)
             {
@@ -502,7 +504,7 @@ float Member::calculateAvgHostRating(string userID)
                     float hostRating = std::stof(hostRatingStr.substr(0, hostRatingStr.find(":")));
 
                     totalRating += hostRating;
-                    std::cout << "Total rating: " << totalRating << "\n";
+                    // std::cout << "Total rating: " << totalRating << "\n";
                     count++;
                 }
             }
@@ -595,7 +597,7 @@ float calculateSkillRating(const std::string &supporterID, const std::string &sk
             { // supporterID at position [2]
                 foundSupporterID = token;
             }
-            if (tokenCounter == 5)
+            if (tokenCounter == 7)
             { // skill at position [4]
                 // Remove the text after the '|' delimiter to get the skill name
                 size_t pos = token.find("|");
@@ -751,8 +753,8 @@ float Member::calculateAvgSupporterRating(string userID)
             }
             std::getline(ss, token, ',');
 
-            cout << "Token check: " << token << "\n";
-            cout << "user id check: " << userID << "\n";
+            // cout << "Token check: " << token << "\n";
+            // cout << "user id check: " << userID << "\n";
             // Check if the token matches the userID
             if (token == userID)
             {
@@ -763,17 +765,17 @@ float Member::calculateAvgSupporterRating(string userID)
                     // Extract the supporter rating from the line
                     std::string supporterRatingStr = line.substr(supporterIndex + 11);
                     float supporterRating = std::stof(supporterRatingStr.substr(0, supporterRatingStr.find(":")));
-                    cout << "sp rating: " << supporterRating;
+                    // cout << "sp rating: " << supporterRating;
                     totalRating += supporterRating;
-                    std::cout << "Total rating: " << totalRating << "\n";
+                    // std::cout << "Total rating: " << totalRating << "\n";
                     count++;
                 }
             }
-            else
-            {
-                cout << "No userID found"
-                     << "\n";
-            }
+            // else
+            // {
+            //     cout << "No userID found"
+            //          << "\n";
+            // }
         }
     }
     catch (const std::exception &e)
@@ -1049,8 +1051,17 @@ void Member::setDetail(const std::vector<std::string> &data, const std::string &
     }
 }
 
-void Member::showAllAvailableSupporters(const std::string &userID)
+void Member::showAllAvailableSupporters(const std::string &userID,const std::vector<std::string> &allSupporterVctTimePeriod)
 {
+    if (allSupporterVctTimePeriod.empty()) {
+        cout << "Nothing!"<< "\n";
+    } else {
+        for (const std::string &supporter : allSupporterVctTimePeriod) {
+            cout << "Check: ";
+            std::cout << supporter << ",";
+        }
+    }
+
     string timePeriod;
     bool validateTime = false;
     fstream blockFile;
@@ -1141,6 +1152,7 @@ void Member::showAllAvailableSupporters(const std::string &userID)
     {
         bool block = false;
         std::vector<std::string> data;
+        std::vector<std::string> data2;
         Member tempMember; // Create a new temporary member object
         std::stringstream ss(line);
         std::string temp, skillRating;
@@ -1153,6 +1165,14 @@ void Member::showAllAvailableSupporters(const std::string &userID)
 
         data.push_back(temp); // Push the first element (userId) as it's not the same as userID
 
+
+        // Check if userIdInFile is in allSupporterVctTimePeriod
+        if (std::find(allSupporterVctTimePeriod.begin(), allSupporterVctTimePeriod.end(),temp) != allSupporterVctTimePeriod.end()) {
+            // If found, add the whole line to data2
+            data2.push_back(temp);
+        }
+
+
         while (std::getline(ss, temp, ','))
         {
             if (temp.find("[[") != std::string::npos)
@@ -1163,8 +1183,13 @@ void Member::showAllAvailableSupporters(const std::string &userID)
             else
             {
                 data.push_back(temp);
+            // Add to data2 if the userId is in allSupporterVctTimePeriod
+            if (!data2.empty()) {
+                data2.push_back(temp);
+                }            
             }
         }
+
 
         if (!skillRating.empty())
         {
@@ -1184,7 +1209,7 @@ void Member::showAllAvailableSupporters(const std::string &userID)
 
         for (const auto &id : blockList)
         {
-            if (data[0] == id)
+            if (data[0] == id )
             {
                 block = true;
             }
@@ -1192,9 +1217,30 @@ void Member::showAllAvailableSupporters(const std::string &userID)
 
         if (block == false)
         {
-            if (data1[9] == "false")
-            {
-                // If host is a new user
+            if (data1[9] == "false" && ((allSupporterVctTimePeriod.size() == 1 && allSupporterVctTimePeriod[0] == "all"))) {
+                cout << "";
+            }
+
+            else if (data1[9] == "false" && !allSupporterVctTimePeriod.empty() && allSupporterVctTimePeriod[0] != "all") {
+    
+               if (hostRating == 0)
+                {
+                    if (data2.size() > 9 && data2[9] == "true" && data2[7] == data1[7])
+                    {
+
+                        tempMember.setDetail(data2, skillRating); // create object (supporter)
+                        availableList.addUser(tempMember);       // add supporter to vector
+                    }
+                }
+                if (data2.size() > 9 && data2[9] == "true" && data2[7] == data1[7] && (hostRating > stof(data2[10])))
+                {
+                    tempMember.setDetail(data2, skillRating); // create object (supporter)
+                    availableList.addUser(tempMember);       // add supporter to vector
+                }
+            }
+
+            else if (allSupporterVctTimePeriod.empty()) {   
+            // If host is a new user
                 if (hostRating == 0)
                 {
                     if (data.size() > 9 && data[9] == "true" && data[7] == data1[7])
@@ -1208,15 +1254,7 @@ void Member::showAllAvailableSupporters(const std::string &userID)
                 {
                     tempMember.setDetail(data, skillRating); // create object (supporter)
                     availableList.addUser(tempMember);       // add supporter to vector
-                }
-            }
-            else
-            {
-                if (data.size() > 9 && data[9] == "true" && data[7] == data1[7] && std::stoi(data[8]) <= std::stoi(data1[8]) && (hostRating > stof(data[10])))
-                {
-                    tempMember.setDetail(data, skillRating);
-                    availableList.addUser(tempMember);
-                }
+                }            
             }
         }
     }
@@ -2801,6 +2839,224 @@ void Member::updateTimePeriod(string userID){
     }
 }
 
+
+
+
+bool Member::isTimePeriodInRange(const int& startHourInput, const int& startMinuteInput, const int& endHourInput, const int& endMinuteInput, const std::string& fileStart, const std::string& fileEnd) {
+    // Check if both fileStart and fileEnd are "all"
+    if (fileStart == "all" && fileEnd == "all") {
+        return true; // Time period is not specified, so consider it in range
+    }
+    // Parse the time strings to get hours and minutes
+    int fileStartHour, fileStartMinute, fileEndHour, fileEndMinute;
+
+    // Parse fileStart
+    sscanf(fileStart.c_str(), "%d:%d", &fileStartHour, &fileStartMinute);
+
+    // Parse fileEnd
+    sscanf(fileEnd.c_str(), "%d:%d", &fileEndHour, &fileEndMinute);
+
+    // Check if input range start is before file range end
+    bool startsBeforeFileEnds = (startHourInput < fileEndHour) || 
+                                (startHourInput == fileEndHour && startMinuteInput < fileEndMinute);
+
+    // Check if input range end is after file range start
+    bool endsAfterFileStarts = (endHourInput > fileStartHour) || 
+                               (endHourInput == fileStartHour && endMinuteInput > fileStartMinute);
+
+    // Return true if input range overlaps with file range
+    return startsBeforeFileEnds && endsAfterFileStarts;
+}
+
+
+
+// vector<string> Member::sortSupportersByTimePeriod(const string& userId) {
+//         int startHour, startMin, endHour, endMin;
+//         bool validateHour = false;
+//         bool validateMin = false;
+//         while (validateHour == false || validateMin == false)
+//         {
+//             validateHour = false;
+//             validateMin = false;
+
+//             std::cout << "Enter the start time you want to set: \n";
+//             std::cout << "Start Hour: ";
+
+//             if (!(std::cin >> startHour) || startHour < 0 || startHour >= 24) {
+//                 std::cout << "Invalid input for Start Hour. Please enter a valid hour (0-23).\n";
+//                 std::cin.clear();
+//                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                
+//                 continue;
+//             }
+
+//             std::cout << "Start Minute: ";
+//             if (!(std::cin >> startMin) || startMin < 0 || startMin >= 60) {
+//                 std::cout << "Invalid input for Start Minute. Please enter a valid minute (0-59).\n";
+//                 std::cin.clear();
+//                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                
+//                 continue;
+//             }
+
+//             std::cout << "Enter the end time you want to set: \n";
+//             std::cout << "End Hour: ";
+//             if (!(std::cin >> endHour) || endHour < 0 || endHour >= 24) {
+//                 std::cout << "Invalid input for End Hour. Please enter a valid hour (0-23).\n";
+//                 std::cin.clear();
+//                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+                
+//                 continue;
+//             }
+
+//             std::cout << "End Minute: ";
+//             if (!(std::cin >> endMin) || endMin < 0 || endMin >= 60) {
+//                 std::cout << "Invalid input for End Minute. Please enter a valid minute (0-59).\n";
+//                 std::cin.clear();
+//                 std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+          
+//                 continue;
+//             }
+//             validateHour = true;
+//             validateMin = true;
+//         };
+
+//     fstream inputFile("time.dat", std::ios::in);
+//     if (!inputFile) {
+//         std::cerr << "Error opening time.dat file." << "\n";
+//         return;
+//     }
+
+//     string line;
+//     while (getline(inputFile, line)) {
+//         size_t found = line.find(userId);
+//         if (found != string::npos) {
+//             // Found a line with the user ID, skip it
+//             continue;
+//         }
+
+//         size_t startBracket = line.find("[");
+//         size_t endBracket = line.find("]");
+//         if (startBracket != string::npos && endBracket != string::npos) {
+//             string timePeriod = line.substr(startBracket + 1, endBracket - startBracket - 1);
+            
+//             // Split the timePeriod into start and end times
+//             size_t dashPos = timePeriod.find("-");
+//             if (dashPos != string::npos) {
+//                 string fileStartTime = timePeriod.substr(0, dashPos);
+//                 string fileEndTime = timePeriod.substr(dashPos + 1);
+                
+//                 if (isTimePeriodInRange(startHour,startMin,endHour,endMin,fileStartTime,fileEndTime)) {
+//                     cout << line << "\n";
+                
+//                 // Now, you have fileStartTime and fileEndTime separately in the desired format.
+//                 // You can use them as needed.
+//             }
+//         }
+//         }
+//     }
+//     inputFile.close();
+// }
+
+
+std::vector<std::string> Member::sortSupportersByTimePeriod(const std::string& userId) {
+    std::vector<std::string> userIds;
+
+    int startHour, startMin, endHour, endMin;
+    bool validateHour = false;
+    bool validateMin = false;
+    while (validateHour == false || validateMin == false)
+    {
+        validateHour = false;
+        validateMin = false;
+
+        std::cout << "Enter the start time you want to set: \n";
+        std::cout << "Start Hour: ";
+
+        if (!(std::cin >> startHour) || startHour < 0 || startHour >= 24) {
+            std::cout << "Invalid input for Start Hour. Please enter a valid hour (0-23).\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            
+            continue;
+        }
+
+        std::cout << "Start Minute: ";
+        if (!(std::cin >> startMin) || startMin < 0 || startMin >= 60) {
+            std::cout << "Invalid input for Start Minute. Please enter a valid minute (0-59).\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            
+            continue;
+        }
+
+        std::cout << "Enter the end time you want to set: \n";
+        std::cout << "End Hour: ";
+        if (!(std::cin >> endHour) || endHour < 0 || endHour >= 24) {
+            std::cout << "Invalid input for End Hour. Please enter a valid hour (0-23).\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+            
+            continue;
+        }
+
+        std::cout << "End Minute: ";
+        if (!(std::cin >> endMin) || endMin < 0 || endMin >= 60) {
+            std::cout << "Invalid input for End Minute. Please enter a valid minute (0-59).\n";
+            std::cin.clear();
+            std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    
+            continue;
+        }
+        validateHour = true;
+        validateMin = true;
+    };
+
+    std::fstream inputFile("time.dat", std::ios::in);
+    if (!inputFile) {
+        std::cerr << "Error opening time.dat file.\n";
+        return userIds;
+    }
+
+    std::string line;
+    while (getline(inputFile, line)) {
+        size_t found = line.find(userId);
+        if (found != std::string::npos) {
+            continue;
+        }
+
+        size_t startBracket = line.find("[");
+        size_t endBracket = line.find("]");
+    if (startBracket != std::string::npos && endBracket != std::string::npos) {
+        std::string timePeriod = line.substr(startBracket + 1, endBracket - startBracket - 1);
+
+        if (timePeriod == "all") {
+            // Handle the case where timePeriod is "all"
+            std::string fileStartTime = "all";
+            std::string fileEndTime = "all";
+
+            if (isTimePeriodInRange(startHour, startMin, endHour, endMin, fileStartTime, fileEndTime)) {
+                    std::string id = line.substr(0, line.find(","));
+                    userIds.push_back(id);
+            }
+        } else {
+            size_t dashPos = timePeriod.find("-");
+            if (dashPos != std::string::npos) {
+                std::string fileStartTime = timePeriod.substr(0, dashPos);
+                std::string fileEndTime = timePeriod.substr(dashPos + 1);
+
+                if (isTimePeriodInRange(startHour, startMin, endHour, endMin, fileStartTime, fileEndTime)) {
+                    std::string id = line.substr(0, line.find(","));
+                    userIds.push_back(id);
+                }
+            }
+        }   
+    }
+}
+    inputFile.close();
+
+    return userIds;
+}
 
 void Member::updatePasswordInFile()
 {
