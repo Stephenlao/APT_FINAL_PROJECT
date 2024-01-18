@@ -3,9 +3,9 @@ APT FINAL PROJECT TIME BANK
 
 # Project file
 
-GitHub Repo: [(https://github.com/Stephenlao/APT_FINAL_PROJECT)]
+GitHub Repo: [https://github.com/Stephenlao/APT_FINAL_PROJECT]
 <br />
-UML DRIAGRAM: [https://app.diagrams.net/#G1oNETOvZgZbYFJIYJmTW5KFIfqtJ0HT2-)]
+UML DIAGRAM: [https://app.diagrams.net/#G1oNETOvZgZbYFJIYJmTW5KFIfqtJ0HT2-)]
 <br />
 REPORT:[https://docs.google.com/document/d/1jFqJikuvILMYnIDcq-HnPyPJFxPZjwGvcH7hQbJd0Pw/edit?usp=sharing]
 </br>
