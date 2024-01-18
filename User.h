@@ -115,7 +115,7 @@ public:
     void appendIsListedToLine(string& line,bool isListed_val);
     string formatSkills();
     static std::vector<Skill*> extractSkillNameAndPoint(const std::string& skillsStr);
-    void showAllAvailableSupporters(const string& userID);
+    void showAllAvailableSupporters(const string& userID, const std::vector<std::string> &allSupporterVctTimePeriod);
     vector<Skill*> getSkillsLists();
     bool SkillsExistOrNot(const std::string& userId);
     string isListedAsSupporterOrNot(const std::string& userId);
@@ -146,8 +146,14 @@ public:
 
     // TIME
     void updateTimePeriod(string userID);
-    string getRequestTime(string userID);
+    string getRequestTime(string userID, string hostID);
     int getTotalHours(string requestID);
+
+    // SORT TIME
+    bool isTimePeriodInRange(const int& startHourInput, const int& startMinuteInput, const int& endHourInput, const int& endMinuteInput, const string& fileStart, const string& fileEnd);
+    vector<string> sortSupportersByTimePeriod(const string& userId);
+
+
 
     // Rating
     // void addHostRating(int score, const std::string &comment);

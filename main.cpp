@@ -17,6 +17,7 @@ void supporterMenu(Member &member);
 void HostRatingMenu(Member &member, const string &requestId);
 void SupporterRatingMenu(Member &member, const string &requestId);
 void topUpMenu(Member &member);
+void availableSupporterMenu(Member &member);
 
 
 void LogInadminMenu()
@@ -154,6 +155,7 @@ void memberMenu(Member &member)
     cout << "6.Supporter action\n";
     cout << "7.Top-up credit points\n";
     cout << "8.Back to main menu\n";
+    cout << "9.Filter time period\n";
     // cout << "8.Calculate avgHost\n";
     cout << "Enter your choice: ";
     cin >> choice;
@@ -256,13 +258,12 @@ void memberMenu(Member &member)
         break;
     case 4:
     {
-
-        member.showAllAvailableSupporters(member.getUserId());
-        for (const auto &skillPtr : member.getSkillsLists())
-        {
-            // No need to delete, as smart pointers manage memory automatically
-        }
-
+        availableSupporterMenu(member);
+        // member.showAllAvailableSupporters(member.getUserId());
+        // for (const auto &skillPtr : member.getSkillsLists())
+        // {
+        //     // No need to delete, as smart pointers manage memory automatically
+        // }
         memberMenu(member);
         break;
     }
@@ -301,13 +302,45 @@ void memberMenu(Member &member)
     // case 8:
     //     cout << member.calculateAvgHostRating(member.getUserId());
     //     memberMenu(member);
-
+    case 9:
+    //    listOfSupporterTimePeriod = member.sortSupportersByTimePeriod(member.getUserId());
+    //    member.showAllAvailableSupporters(member.getUserId(), listOfSupporterTimePeriod);
+        cout << "NONE" << "\n";
+       memberMenu(member);
+       break; 
     default:
         cout << "Invalid choice!"
              << "\n";
         break;
     }
+  
 }
+
+void availableSupporterMenu(Member &member) {
+    int choice;
+    cout << "\n1. Finding supporters by sorting time period\n";
+    cout << "2. View all available supporter without sorting\n";
+    cout << "3. Back to main menu\n";
+    cout << "Enter your choice: ";
+    cin >> choice;
+    vector<string> listOfSupporterTimePeriod;
+    switch (choice)
+    {
+    case 1:
+       listOfSupporterTimePeriod = member.sortSupportersByTimePeriod(member.getUserId());
+       member.showAllAvailableSupporters(member.getUserId(), listOfSupporterTimePeriod);
+       memberMenu(member);        
+       break;
+    case 2:
+        member.showAllAvailableSupporters(member.getUserId(),{});
+        memberMenu(member);
+        break;
+    default:
+        memberMenu(member);
+        break;
+    }
+}
+
 
 void guestMenu()
 {
