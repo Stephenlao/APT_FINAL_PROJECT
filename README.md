@@ -46,3 +46,37 @@ Bank” for people to support each other in daily activities, such as plumbing r
 house cleaning, etc...
 
 
+## Test accounts
+1. Admin:
+```
+username: admin
+password: rmit1234
+```
+2. Host 1 account:
+```
+username: 
+password: 
+```
+3. Host 2 account:
+```
+username:
+password:
+```
+4. Supporter 1 account:
+```
+username:
+password:
+```
+5. Supporter 2 account:
+```
+username:
+password:
+```
+4. Supporter 3 account:
+```
+username:
+password:
+
+...
+```
+
