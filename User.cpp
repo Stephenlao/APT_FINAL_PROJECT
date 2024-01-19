@@ -1315,7 +1315,7 @@ void Member::showAllAvailableSupporters(const std::string &userID,const std::vec
             }
 
             if (timePeriod == "y") {
-                cout << "You have already booked supporter in this time frame!. Please select another time range!\n";
+                cout << "Time is overlapped. Please select another time!" << "\n";
                 break;
             }
             
@@ -1399,11 +1399,18 @@ string Member::getRequestTime(string userID, string hostId){
         while (std::getline(requestsFile, line1)) {
             std::stringstream ss(line1);
 
-            std::string userIDInFile, hostIDInFile, timePeriod;
+            std::string userIDInFile, hostIDInFile, supporterIDInFile, date_val, timePeriod_val, totalHour_val, skill_val, status_val, timePeriod;
             std::getline(ss, userIDInFile, ',');
             std::getline(ss, hostIDInFile, ',');
+            std::getline(ss, supporterIDInFile, ',');
+            std::getline(ss, date_val, ',');
+            std::getline(ss, timePeriod_val, ',');
+            std::getline(ss, totalHour_val, ',');
+            std::getline(ss, skill_val, ',');
+            std::getline(ss, status_val, ',');
 
-            // Check if the userID matches the parameter
+
+            // Check if the hostId matches the parameter
             if (hostIDInFile == hostId) {
                 // Find the position of '[' and ']'
                 size_t startBracketPos = line1.find("[");
@@ -1425,7 +1432,7 @@ string Member::getRequestTime(string userID, string hostId){
                         // Check for overlap
                         if ((startHour < fileEndHour && endHour > fileStartHour) ||
                             (startHour == fileStartHour && startMin < fileStartMinute && endHour > fileStartHour) ||
-                            (startHour < fileEndHour && endHour == fileEndHour && endMin > fileEndMinute)) {
+                            (startHour < fileEndHour && endHour == fileEndHour && endMin > fileEndMinute) && status_val == "Pending") {
                             timeRequest = "y";
                             return timeRequest;
                         }
