@@ -96,7 +96,7 @@ string User::createPassword()
     while (!isValidPassword)
     {
         cout << "Enter your password: ";
-        std::getline(cin, passwordInput);
+        std::getline(cin >> std::ws, passwordInput);
 
         if (checkValidatePassword(passwordInput))
         {
@@ -544,7 +544,7 @@ float Member::getHostRatingByUserID(const std::string &userID)
     std::ifstream ratingFile("Rating.dat");
     if (!ratingFile)
     {
-        std::cerr << "Unable to open Rating.dat for reading" << std::endl;
+        // std::cerr << "Unable to open Rating.dat for reading" << std::endl;
         return -1.0f; // Return an error value if the file cannot be opened
     }
 
@@ -659,7 +659,7 @@ void Member::saveAvgRatingToFile(const std::string &userID)
     std::ifstream ratingFileIn("Rating.dat"); // Open the file for reading
     if (!ratingFileIn)
     {
-        std::cerr << "Unable to open Rating.dat for reading" << std::endl;
+        // std::cerr << "Unable to open Rating.dat for reading" << std::endl;
         return;
     }
 
@@ -1053,6 +1053,7 @@ void Member::setDetail(const std::vector<std::string> &data, const std::string &
 
 void Member::showAllAvailableSupporters(const std::string &userID,const std::vector<std::string> &allSupporterVctTimePeriod)
 {
+    // cout << userId << "\n";
     // if (allSupporterVctTimePeriod.empty()) {
     //     cout << "Nothing!"<< "\n";
     // } else {
@@ -1202,9 +1203,7 @@ void Member::showAllAvailableSupporters(const std::string &userID,const std::vec
                 }
             }
         }
-        // cout << "Current host rating" << getHostRatingByUserID(temp) << "\n";
-        // cout << "Host Avg" << data1[14] << "\n";
-        // cout << "Require avg" << data[10] << "\n";
+
         float hostRating = getHostRatingByUserID(userID);
 
         for (const auto &id : blockList)
@@ -1220,12 +1219,7 @@ void Member::showAllAvailableSupporters(const std::string &userID,const std::vec
             if (data1[9] == "true") {
                 cout << "";
             }
-            else if (data1[9] == "false" && ((allSupporterVctTimePeriod.size() == 1 && allSupporterVctTimePeriod[0] == "all"))) {
-                cout << "";
-            }
-
-            else if (data1[9] == "false" && !allSupporterVctTimePeriod.empty() && allSupporterVctTimePeriod[0] != "all") {
-    
+            else if (data1[9] == "false" && (!allSupporterVctTimePeriod.empty() && allSupporterVctTimePeriod[0] != "all")) {
                if (hostRating == 0)
                 {
                     if (data2.size() > 9 && data2[9] == "true" && data2[7] == data1[7])
@@ -1242,8 +1236,9 @@ void Member::showAllAvailableSupporters(const std::string &userID,const std::vec
                 }
             }
 
-            else if (allSupporterVctTimePeriod.empty()) {   
+            else if (data1[9] == "false" && allSupporterVctTimePeriod[0] == "all") {   
             // If host is a new user
+
                 if (hostRating == 0)
                 {
                     if (data.size() > 9 && data[9] == "true" && data[7] == data1[7])
@@ -1399,42 +1394,41 @@ string Member::getRequestTime(string userID, string hostId){
     fstream requestsFile;
     requestsFile.open("requests.dat", std::ios::in);
     if (!requestsFile.is_open()) {
-        cout << "Unable to open file!\n";
-        return "";
-    }
+        cout << "";
+    } else {
+        while (std::getline(requestsFile, line1)) {
+            std::stringstream ss(line1);
 
-    while (std::getline(requestsFile, line1)) {
-        std::stringstream ss(line1);
+            std::string userIDInFile, hostIDInFile, timePeriod;
+            std::getline(ss, userIDInFile, ',');
+            std::getline(ss, hostIDInFile, ',');
 
-        std::string userIDInFile, hostIDInFile, timePeriod;
-        std::getline(ss, userIDInFile, ',');
-        std::getline(ss, hostIDInFile, ',');
+            // Check if the userID matches the parameter
+            if (hostIDInFile == hostId) {
+                // Find the position of '[' and ']'
+                size_t startBracketPos = line1.find("[");
+                size_t endBracketPos = line1.find("]");
 
-        // Check if the userID matches the parameter
-        if (hostIDInFile == hostId) {
-            // Find the position of '[' and ']'
-            size_t startBracketPos = line1.find("[");
-            size_t endBracketPos = line1.find("]");
+                // Check if '[' and ']' are found
+                if (startBracketPos != std::string::npos && endBracketPos != std::string::npos) {
+                    // Extract the time period between '[' and ']'
+                    timePeriod = line1.substr(startBracketPos + 1, endBracketPos - startBracketPos - 1);
 
-            // Check if '[' and ']' are found
-            if (startBracketPos != std::string::npos && endBracketPos != std::string::npos) {
-                // Extract the time period between '[' and ']'
-                timePeriod = line1.substr(startBracketPos + 1, endBracketPos - startBracketPos - 1);
+                    // Check if the time period contains a dash '-'
+                    size_t dashPos = timePeriod.find("-");
+                    if (dashPos != std::string::npos) {
+                        // Extract start and end hours and minutes from the time period
+                        int fileStartHour, fileStartMinute, fileEndHour, fileEndMinute;
+                        sscanf(timePeriod.substr(0, dashPos).c_str(), "%d:%d", &fileStartHour, &fileStartMinute);
+                        sscanf(timePeriod.substr(dashPos + 1).c_str(), "%d:%d", &fileEndHour, &fileEndMinute);
 
-                // Check if the time period contains a dash '-'
-                size_t dashPos = timePeriod.find("-");
-                if (dashPos != std::string::npos) {
-                    // Extract start and end hours and minutes from the time period
-                    int fileStartHour, fileStartMinute, fileEndHour, fileEndMinute;
-                    sscanf(timePeriod.substr(0, dashPos).c_str(), "%d:%d", &fileStartHour, &fileStartMinute);
-                    sscanf(timePeriod.substr(dashPos + 1).c_str(), "%d:%d", &fileEndHour, &fileEndMinute);
-
-                    // Check for overlap
-                    if ((startHour < fileEndHour && endHour > fileStartHour) ||
-                        (startHour == fileStartHour && startMin < fileStartMinute && endHour > fileStartHour) ||
-                        (startHour < fileEndHour && endHour == fileEndHour && endMin > fileEndMinute)) {
-                        timeRequest = "y";
-                        return timeRequest;
+                        // Check for overlap
+                        if ((startHour < fileEndHour && endHour > fileStartHour) ||
+                            (startHour == fileStartHour && startMin < fileStartMinute && endHour > fileStartHour) ||
+                            (startHour < fileEndHour && endHour == fileEndHour && endMin > fileEndMinute)) {
+                            timeRequest = "y";
+                            return timeRequest;
+                        }
                     }
                 }
             }
@@ -2326,7 +2320,6 @@ void Member::acceptRequest(string requestID)
 
     for (const auto &updatedLine : lines)
     {
-        // cout << updatedLine << "\n";
         updateFile << updatedLine << "\n";
     }
 
@@ -3427,7 +3420,7 @@ void Admin::resetMemberPassword()
             { // Rest of data
                 newMemberData << temp << ",";
             }
-            newMemberData.seekp(-1, newMemberData.cur); // Remove last comma
+            // newMemberData.seekp(-1, newMemberData.cur); // Remove last comma
             newMemberData << "\n";
         }
         else
@@ -3853,12 +3846,14 @@ std::pair<std::string, std::string> Member::getSupporterIdAndSkillNameInRequestD
     while (std::getline(myFile, line))
     {
         std::stringstream ss(line);
-        std::string requestId_val, hostId_val, supporterId_val, date_val, skill_val, status_val;
+        std::string requestId_val, hostId_val, supporterId_val, date_val, timePeriod_val, totalHour_val, skill_val, status_val;
 
         std::getline(ss, requestId_val, ',');
         std::getline(ss, hostId_val, ',');
         std::getline(ss, supporterId_val, ',');
         std::getline(ss, date_val, ',');
+        std::getline(ss, timePeriod_val, ',');
+        std::getline(ss, totalHour_val, ',');
         std::getline(ss, skill_val, ',');
         std::getline(ss, status_val, ',');
 
@@ -3914,7 +3909,7 @@ string Member::getHostIdInRequestDat(string requestID)
     return "";
 }
 
-float Member::getConsumingPointOfSkillBySupporterId(std::string supporterID, std::string skillName)
+float Member::getConsumingPointOfSkillBySupporterId(std::string supporterID, std::string skillName, int totalHour)
 {
     std::fstream myFile;
     float consumingPoint;
@@ -3970,7 +3965,7 @@ float Member::getConsumingPointOfSkillBySupporterId(std::string supporterID, std
         {
             consumingPoint = getSkillRating(skillRating, skillName);
             currentCreditPoint = std::stof(data[8]);
-            newCreditPoint = currentCreditPoint + consumingPoint;
+            newCreditPoint = currentCreditPoint + (consumingPoint * totalHour);
             data[8] = std::to_string(newCreditPoint); // Update the credit point in the vector
             cout << "Your current credit point: " << currentCreditPoint << " cp\n";
             cout << "Your credit point after accepted booking: " << newCreditPoint << " cp\n";
@@ -4045,7 +4040,7 @@ float Member::getSkillRating(const std::string &skillData, const std::string &sk
     return -1; // Return -1 or any indicator for "not found"
 }
 
-void Member::getHostIdAndDeductCreditPoint(string hostID, float consumingPoint)
+void Member::getHostIdAndDeductCreditPoint(string hostID, float consumingPoint, int totalHour)
 {
     std::fstream myFile;
     myFile.open("members.dat", std::ios::in);
@@ -4099,7 +4094,7 @@ void Member::getHostIdAndDeductCreditPoint(string hostID, float consumingPoint)
         if (data[0] == hostID)
         {
             currentCreditPoint = std::stof(data[8]);
-            newCreditPoint = currentCreditPoint - consumingPoint;
+            newCreditPoint = currentCreditPoint - (consumingPoint * totalHour);
             data[8] = std::to_string(newCreditPoint); // Update the credit point in the vector
         }
 

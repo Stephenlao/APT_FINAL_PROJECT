@@ -138,8 +138,8 @@ public:
     std::pair<std::string, std::string> getSupporterIdAndSkillNameInRequestDat(string requestID);
     string getHostIdInRequestDat(string requestID);
     float getSkillRating(const std::string& skillData, const std::string& skillName);
-    float getConsumingPointOfSkillBySupporterId(string supporterID, string skillName);
-    void getHostIdAndDeductCreditPoint(string hostID,float consumingPoint);
+    float getConsumingPointOfSkillBySupporterId(string supporterID, string skillName,int totalHour);
+    void getHostIdAndDeductCreditPoint(string hostID,float consumingPoint,int totalHour);
 
      // BLOCK
     void blockUser(string userID, string blockID);
