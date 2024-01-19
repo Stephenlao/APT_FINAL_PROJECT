@@ -70,11 +70,11 @@ void adminMenu(Admin &admin)
     {
     case 1:
         admin.showInfo();
-        mainMenu();
+        adminMenu(admin);
         break;
     case 2:
         admin.resetMemberPassword();
-        mainMenu();
+        adminMenu(admin);
         break;
     case 3:
         mainMenu();
@@ -155,8 +155,6 @@ void memberMenu(Member &member)
     cout << "6.Supporter action\n";
     cout << "7.Top-up credit points\n";
     cout << "8.Back to main menu\n";
-    cout << "9.Filter time period\n";
-    // cout << "8.Calculate avgHost\n";
     cout << "Enter your choice: ";
     cin >> choice;
     string choice1;
@@ -259,11 +257,6 @@ void memberMenu(Member &member)
     case 4:
     {
         availableSupporterMenu(member);
-        // member.showAllAvailableSupporters(member.getUserId());
-        // for (const auto &skillPtr : member.getSkillsLists())
-        // {
-        //     // No need to delete, as smart pointers manage memory automatically
-        // }
         memberMenu(member);
         break;
     }
@@ -298,16 +291,7 @@ void memberMenu(Member &member)
 
     case 8:
         mainMenu();
-        break;
-    // case 8:
-    //     cout << member.calculateAvgHostRating(member.getUserId());
-    //     memberMenu(member);
-    case 9:
-    //    listOfSupporterTimePeriod = member.sortSupportersByTimePeriod(member.getUserId());
-    //    member.showAllAvailableSupporters(member.getUserId(), listOfSupporterTimePeriod);
-        cout << "NONE" << "\n";
-       memberMenu(member);
-       break; 
+        break; 
     default:
         cout << "Invalid choice!"
              << "\n";
@@ -332,7 +316,7 @@ void availableSupporterMenu(Member &member) {
        memberMenu(member);        
        break;
     case 2:
-        member.showAllAvailableSupporters(member.getUserId(),{});
+        member.showAllAvailableSupporters(member.getUserId(),{"all"});
         memberMenu(member);
         break;
     default:
@@ -469,6 +453,7 @@ void supporterMenu(Member &member)
     string action;
     string input;
     int number;
+    int totalHour;
     switch (choice)
     {
     case 1:
@@ -493,10 +478,11 @@ void supporterMenu(Member &member)
                 {
                     // Update the status of the request to Accepted
                     member.acceptRequest(requestID);
+                    totalHour = member.getTotalHours(requestID);
                     std::pair<std::string, std::string> supporterIdAndSkill = member.getSupporterIdAndSkillNameInRequestDat(requestID);
-                    float consumingPoint = (member.getConsumingPointOfSkillBySupporterId(supporterIdAndSkill.first, supporterIdAndSkill.second));
+                    float consumingPoint = (member.getConsumingPointOfSkillBySupporterId(supporterIdAndSkill.first, supporterIdAndSkill.second, totalHour));
                     string hostId = member.getHostIdInRequestDat(requestID);
-                    member.getHostIdAndDeductCreditPoint(hostId, consumingPoint);
+                    member.getHostIdAndDeductCreditPoint(hostId, consumingPoint, totalHour);
                     break;
                 }
                 else if (action == "reject")
@@ -617,13 +603,13 @@ void HostRatingMenu(Member &member, const string &requestId)
             // if host rating has already exist
             if (member.isHostRatingExistOrNot(requestId) == 1)
             {
-                cout << "Skill rating V2\n";
+                cout << "Skill rating\n";
                 skillRating = member.addScoreAndComment();
                 skillRatingVct = member.getSkillRatingVct();
                 skillRatingVct.push_back(skillRating);
                 cout << "\n";
 
-                cout << "Supporter rating V2\n";
+                cout << "Supporter rating\n";
                 supporterRating = member.addScoreAndComment();
                 supporterRatingVct = member.getSupporterRatingVct();
                 supporterRatingVct.push_back(supporterRating);
