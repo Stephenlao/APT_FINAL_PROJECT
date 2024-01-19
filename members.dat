@@ -1,6 +1,6 @@
 userID,Password,UserName,FullName,Email,PhoneNumber,HomeAddress,City,CreditPoint,IsListed,MinimumHostRating,SkillRating,AvgHostRating
-M3725,3426373520,host1,host1,host1@gmail.com,099,truong son,sai gon,6.000000,false,0,
+M3725,3426373520,host1,host1,host1@gmail.com,099,truong son,sai gon,12.000000,false,0,
 M3937,3426373520,host2,host2,host2@gmail.com,088,nvc,sai gon,20.000000,false,0,
 M4061,1706879174,supporter1,supporter1,supporter1,077,dien bien phu,sai gon,20.000000,true,0.000000,[[cleaning,2.000000]]
-M4162,1706879174,supporter2,supporter2,supporter2,066,nguyen du,sai gon,40.000000,true,0.000000,[[java,4.000000]]
+M4162,1706879174,supporter2,supporter2,supporter2,066,nguyen du,sai gon,28.000000,true,0.000000,[[java,4.000000]]
 M4855,1706879174,supporter3,supporter3,supporter3,055,nguyen van troi,sai gon,20.000000,true,0.000000,[[playing,3.000000]]
