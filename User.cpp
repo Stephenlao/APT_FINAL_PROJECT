@@ -1430,12 +1430,13 @@ string Member::getRequestTime(string userID, string hostId){
                         sscanf(timePeriod.substr(dashPos + 1).c_str(), "%d:%d", &fileEndHour, &fileEndMinute);
 
                         // Check for overlap
-                        if (((startHour < fileEndHour && endHour > fileStartHour) ||
-                            (startHour == fileStartHour && startMin < fileStartMinute && endHour > fileStartHour) ||
-                            (startHour < fileEndHour && endHour == fileEndHour && endMin > fileEndMinute)) && status_val == "Pending") {
-                            timeRequest = "y";
-                            return timeRequest;
-                        }
+                     if (((startHour < fileEndHour && endHour > fileStartHour) ||
+                        (startHour == fileStartHour && startMin < fileEndMinute && endHour > fileStartHour) ||
+                        (startHour < fileEndHour && endHour == fileStartHour && endMin > fileStartMinute) ||
+                        (startHour == fileStartHour && endHour == fileEndHour && (startMin < fileEndMinute || endMin > fileStartMinute))) && status_val == "Pending") {
+                        timeRequest = "y";
+                        return timeRequest;
+                    }
                     }
                 }
             }
