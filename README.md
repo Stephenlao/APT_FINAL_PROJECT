@@ -73,4 +73,4 @@ username: supporter3
 password: Supporter1234#
 
 ```
-Note: All these accounts are created and saved in file, can only use in WINDOWS due to the variety of hash password function
+Note: All these accounts are created and saved in file, can only use in WINDOWS only
