@@ -60,7 +60,7 @@ password: Host1234#
 3. Supporter 1 account:
 ```
 username: supporter1
-password: Supporter12343
+password: Supporter1234#
 ```
 5. Supporter 2 account:
 ```
