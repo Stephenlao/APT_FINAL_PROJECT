@@ -1,3 +1,4 @@
 requestID,hostID,supporterID,date,timePeriod,totalHours,skill,status
-R3116,M3725,M4162,19-1-2024,[12:00-14:00],2,java,Accepted
-R3387,M3725,M4162,19-1-2024,[13:00-14:00],1,java,Pending
+R3104,M3725,M4061,20-1-2024,[9:00-11:00],2,cleaning,Accepted,[skill|4.200000:good],[supporter|3.900000:great],[host|4.500000:kind]
+R3356,M3725,M4162,20-1-2024,[15:30-16:30],1,java,Rejected
+R3424,M3725,M4855,20-1-2024,[20:15-21:15],1,playing,Accepted,[skill|2.800000:not good],[supporter|3.800000:fine],[host|3.500000:fine]
