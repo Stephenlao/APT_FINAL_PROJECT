@@ -45,6 +45,29 @@ Assume that you are involved in a start-up who came up with an idea to make an a
 Bank” for people to support each other in daily activities, such as plumbing repairs, tutoring, garden care, 
 house cleaning, etc...
 
+## Prerequisites
+
+- [Visual Studio Code](https://code.visualstudio.com/)
+- [C/C++ extension for Visual Studio Code](https://code.visualstudio.com/docs/languages/cpp)
+- [g++](https://gcc.gnu.org/install/index.html) (GNU Compiler Collection)
+
+## How to Build and Run
+
+### MacOS / Linux / Windows
+
+1. Open the project folder in Visual Studio Code.
+
+2. Install the recommended extensions when prompted or manually install the [C/C++ extension](https://marketplace.visualstudio.com/items?itemName=ms-vscode.cpptools).
+
+3. Open the main C++ file (e.g., `main.cpp`).
+
+4. In terminal of Visual Studio Code: g++ *.cpp
+
+5. After a successful build
+   ```bash
+   ./a.out   # MacOS / Linux
+   .\a.exe    # Windows
+
 
 ## Test accounts
 1. Admin:
