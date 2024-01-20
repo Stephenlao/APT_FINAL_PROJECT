@@ -72,5 +72,3 @@ password: Supporter1234#
 username: supporter3
 password: Supporter1234#
 
-...
-```
