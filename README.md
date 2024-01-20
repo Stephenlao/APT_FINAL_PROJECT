@@ -50,33 +50,27 @@ house cleaning, etc...
 1. Admin:
 ```
 username: admin
-password: rmit1234
+password: Rmit1234#
 ```
 2. Host 1 account:
 ```
-username: 
-password: 
+username: host1
+password: Host1234#
 ```
-3. Host 2 account:
+3. Supporter 1 account:
 ```
-username:
-password:
-```
-4. Supporter 1 account:
-```
-username:
-password:
+username: supporter1
+password: Supporter12343
 ```
 5. Supporter 2 account:
 ```
-username:
-password:
+username: supporter2
+password: Supporter1234#
 ```
 4. Supporter 3 account:
 ```
-username:
-password:
+username: supporter3
+password: Supporter1234#
 
 ...
 ```
-
